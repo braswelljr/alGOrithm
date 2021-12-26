@@ -18,3 +18,7 @@
 .idea/
 .vscode/
 .sublime/
+
+# Ctags
+
+main.go

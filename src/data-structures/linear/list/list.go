@@ -9,9 +9,9 @@ type List struct {
 // New creates a new list.
 // Convert params(i.e. lists) to []interface{} with @func TypeToInterface.
 func New(lists ...[]interface{}) *List {
-	// Create a new list.
 	// Check for empty or null list parameter
 	if lists == nil || len(lists) == 0 {
+		// Create a new list.
 		return new(List).Init() // return a new empty list
 	}
 
@@ -60,3 +60,11 @@ func (l *List) Size() int {
 	return l.length
 }
 
+// Join : Joins new slice with old and returns a new list
+func (l *List) Join(slice []interface{}) *List {
+	// append slice to the end of l
+	l.list = append(l.list, slice...)
+	// increment the length of the list
+	l.length += len(slice)
+	return l
+}

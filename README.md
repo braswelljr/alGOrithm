@@ -7,11 +7,11 @@ Data Structures are representations of data sets in a way which makes storage an
 
 ### Classification of Data Structures
 
-| [Linear](#) | [Non - Linear](#) | [Homogeneous](#)   | [Heterogeneous](#)  | [Dynamic](#)      |
-|-------------|-------------------|--------------------|---------------------|-------------------|
-| [List](#)   | [Trees](#)        | [2D Arrays](#)     | [Linked List](#)    | [Dictionaries](#) |
-| [Sets](#)   | [Tables](#)       | [MultiD Arrays](#) | [Ordered List](#)   | [Tree Sets](#)    |
-| [Tuples](#) | [Containers](#)   |                    | [Unordered List](#) | [Sequences](#)    |
-| [Queues](#) |                   |                    |                     |                   |
-| [Stacks](#) |                   |                    |                     |                   |
-| [Heaps](#)  |                   |                    |                     |                   |
+| [Linear](src/data-structures/linear)            | [Non - Linear](#) | [Homogeneous](#)   | [Heterogeneous](#)  | [Dynamic](#)      |
+|-------------------------------------------------|-------------------|--------------------|---------------------|-------------------|
+| [List](src/data-structures/linear/list/list.go) | [Trees](#)        | [2D Arrays](#)     | [Linked List](#)    | [Dictionaries](#) |
+| [Sets](src/data-structures/linear/sets/sets.go) | [Tables](#)       | [MultiD Arrays](#) | [Ordered List](#)   | [Tree Sets](#)    |
+| [Tuples](#)                                     | [Containers](#)   |                    | [Unordered List](#) | [Sequences](#)    |
+| [Queues](#)                                     |                   |                    |                     |                   |
+| [Stacks](#)                                     |                   |                    |                     |                   |
+| [Heaps](#)                                      |                   |                    |                     |                   |

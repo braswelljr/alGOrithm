@@ -2,15 +2,7 @@ package utils
 
 import "reflect"
 
-//// TypeToInterface converts a type to an interface.
-//func TypeToInterface(in []string) []interface{} {
-//	out := make([]interface{}, len(in))
-//	for i, v := range in {
-//		out[i] = v
-//	}
-//	return out
-//}
-
+// TypeToInterface converts a type to an interface.
 func TypeToInterface(args interface{}) (out []interface{}, ok bool) {
 	slice, success := takeArg(args, reflect.Slice)
 	if !success {

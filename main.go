@@ -19,6 +19,7 @@ func main() {
 	arr := list.New(arrAy)
 	arr.Push(1)
 	arr.Pop()
+	arr.Join(arrAY)
 	arr.Push(2)
 	fmt.Printf("%v", arr)
 	fmt.Printf("%v", arrAY)
