@@ -1,9 +1,9 @@
-package linear
+package list
 
 import (
 	"testing"
 )
 
 func TestList(t *testing.T) {
-	List()
+	//List()
 }
