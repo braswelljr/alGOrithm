@@ -3,24 +3,17 @@ package main
 import (
 	"fmt"
 	"github.com/braswelljr/alGOrithm/src/data-structures/linear/list"
-	"github.com/braswelljr/alGOrithm/src/utils"
 )
 
 func main() {
-	array, _, err := utils.GetArray()
-	if err != nil {
-		panic(err)
-	}
-
-	array2 := []string{"Happy", "New", "Year"}
-
-	arrAy, _ := utils.TypeToInterface(array)
-	arrAY, _ := utils.TypeToInterface(array2)
-	arr := list.New(arrAy)
+	//array := []int{2, 3, 5}
+	arr := list.New()
 	arr.Push(1)
-	arr.Pop()
-	arr.Join(arrAY)
-	arr.Push(2)
+	//arr.Pop()
+	//arr.Join(arrAY)
+	//arr.Push(2)
+	arr.Insert(6, 0)
+	arr.Remove(6)
+	//fmt.Printf("%v\n", arr.Next())
 	fmt.Printf("%v", arr)
-	fmt.Printf("%v", arrAY)
 }
