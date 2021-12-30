@@ -19,29 +19,28 @@ func New(lists ...[]int) *List {
     return new(List).Init() // return a new empty list
   }
 
-  // node
-  var node *Node
-  var l []Node
+  // Create a new list
+  l := &List{}
 
-  // not an empty list
-  for i, list := range lists {
-    node = &Node{
-      value:    list[i],
-      previous: nil,
-      next:     nil,
+  // covert slice  to node
+  // Create a new node.
+  var s []Node
+
+  // Iterate over the list and create a node for each value.
+  for _, item := range lists {
+    for _, value := range item {
+      node := &Node{
+        value: value,
+      }
+      //append slice to the end of the list
+      s = append(s, *node)
     }
-
-    //add node to list
-    l = append(l, *node)
   }
-
-  // Create a new list.
-  list := append([]Node{}, l...)
-
-  return &List{
-    length: len(list),
-    list:   list,
-  }
+  // append slice to the end of l
+  l.list = append(l.list, s...)
+  // increment the length of the list
+  l.length = len(l.list)
+  return l
 }
 
 // Init initializes or clears list l.
@@ -86,7 +85,7 @@ func (l *List) Join(slice []int) *List {
       value: item,
     }
     // append slice to the end of the list
-    s = append(l.list, *node)
+    s = append(s, *node)
   }
   // append slice to the end of l
   l.list = append(l.list, s...)
@@ -147,15 +146,19 @@ func (l *List) Remove(element int) {
 // RemoveAt : RemoveAt takes out an item from list at a given position
 func (l *List) RemoveAt(at int) {
   // check for a zero or negative value(treat as zero)
-  if at < 1 {
+  if at < 1 || at > l.length {
     return
   }
-
-  // set item position as slice index
-  at--
-  // append split slice at the given index
-  l.list = append(l.list[:at], l.list[at+1:]...)
-  l.length = len(l.list)
+  // loop through list
+  for i, _ := range l.list {
+    // check for an equal item
+    if i == at {
+      // append split slice at the given index
+      l.list = append(l.list[:i], l.list[i+1:]...)
+      l.length = len(l.list)
+      return
+    }
+  }
 }
 
 // Get : Returns the element at the given position
