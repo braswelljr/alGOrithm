@@ -3,14 +3,10 @@ package list
 // List represents a singly linked list.
 type List struct {
   length int
-  list   []Node
+  list   []Element
 }
 
-type Node struct {
-  value    int
-  previous *Node
-  next     *Node
-}
+type Element int
 
 // New creates a new list.
 func New(lists ...[]int) *List {
@@ -24,16 +20,14 @@ func New(lists ...[]int) *List {
 
   // covert slice  to node
   // Create a new node.
-  var s []Node
+  var s []Element
 
   // Iterate over the list and create a node for each value.
   for _, item := range lists {
     for _, value := range item {
-      node := &Node{
-        value: value,
-      }
+      node := Element(value)
       //append slice to the end of the list
-      s = append(s, *node)
+      s = append(s, node)
     }
   }
   // append slice to the end of l
@@ -52,11 +46,9 @@ func (l *List) Init() *List {
 // Push : Adds a new element to the end of the list.
 func (l *List) Push(element int) {
   // Create a new node.
-  node := &Node{
-    value: element,
-  }
+  node := Element(element)
   // appends element to the end of the list
-  l.list = append(l.list, *node)
+  l.list = append(l.list, node)
   // increment the length of the list
   l.length++
 }
@@ -79,13 +71,11 @@ func (l *List) Size() int {
 func (l *List) Join(slice []int) *List {
   // covert slice  to node
   // Create a new node.
-  var s []Node
+  var s []Element
   for _, item := range slice {
-    node := &Node{
-      value: item,
-    }
+    node := Element(item)
     // append slice to the end of the list
-    s = append(s, *node)
+    s = append(s, node)
   }
   // append slice to the end of l
   l.list = append(l.list, s...)
@@ -97,14 +87,12 @@ func (l *List) Join(slice []int) *List {
 //Insert : Inserts an element at a particular position specified if not append it add the end of the list
 func (l *List) Insert(element int, at int) {
   // set node value
-  node := &Node{
-    value: element,
-  }
+  node := Element(element)
   //check for length of list
   // append item if length is zero or position is greater length
   if l.length < 1 || l.length <= at {
     // append item to the list
-    l.list = append(l.list, *node)
+    l.list = append(l.list, node)
     // increase length of list
     l.length++
     return
@@ -112,7 +100,7 @@ func (l *List) Insert(element int, at int) {
 
   // check for a zero or negative value(treat as zero)
   if at < 1 {
-    l.list = append(append([]Node{}, *node), l.list...)
+    l.list = append(append([]Element{}, node), l.list...)
     l.length = len(l.list)
     return
   }
@@ -125,7 +113,7 @@ func (l *List) Insert(element int, at int) {
 
   // set list
   // append element to first slice and append second slice to the array
-  l.list = append(append(x, *node), y...)
+  l.list = append(append(x, node), y...)
   l.length = len(l.list)
 }
 
@@ -134,7 +122,7 @@ func (l *List) Remove(element int) {
   // loop through list
   for i, item := range l.list {
     // check for an equal item
-    if item.value == element {
+    if item == Element(element) {
       // append split slice at the given index
       l.list = append(l.list[:i], l.list[i+1:]...)
       l.length = len(l.list)
@@ -171,7 +159,7 @@ func (l *List) Get(at int) interface{} {
   // set item position as slice index
   at--
   // return the element at the given position
-  return l.list[at].value
+  return l.list[at]
 }
 
 // Contains : Returns true if the list contains the element
@@ -179,7 +167,7 @@ func (l *List) Contains(element int) bool {
   // loop through list
   for _, item := range l.list {
     // check for an equal item
-    if item.value == element {
+    if item == Element(element) {
       return true
     }
   }
@@ -188,28 +176,6 @@ func (l *List) Contains(element int) bool {
 
 // Clear : Clears the list
 func (l *List) Clear() {
-  l.list = []Node{}
+  l.list = []Element{}
   l.length = len(l.list)
-}
-
-// Next : Returns the next element in the list
-func (l *List) Next() interface{} {
-  // check for length of list
-  if l.length < 1 {
-    return nil
-  }
-
-  // return the next element in the list
-  return l.list[0]
-}
-
-//Prev : Returns the previous element in the list
-func (l *List) Prev() interface{} {
-  // check for length of list
-  if l.length < 1 {
-    return nil
-  }
-
-  // return the previous element in the list
-  return l.list[l.length-1]
 }

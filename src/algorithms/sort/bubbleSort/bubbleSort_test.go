@@ -6,6 +6,7 @@ import (
 
 var (
   slice = []int{5, 4, 3, 2, 1}
+  z     = []int{4, 3, 3, 5, 1044}
 )
 
 func TestBubbleSort(t *testing.T) {
@@ -19,12 +20,19 @@ func TestBubbleSort(t *testing.T) {
 }
 
 func TestBubbleSortLoop(t *testing.T) {
+  slice = BubbleSort(slice)
   for i := 0; i < len(slice); i++ {
-    if i > i+1 {
-      t.Error("BubbleSort() failed. Got", i, " > ", i+1, ". Expected ", i, " < ", i+1)
-      return
+    for j := 0; j < len(slice)-i-1; j++ {
+      if slice[j] > slice[j+1] {
+        t.Error("BubbleSort() failed. Got", slice[j], " < ", slice[j+1], ". Expected ", slice[j], " > ", slice[j+1])
+        return
+      }
+      if slice[j] == slice[j+1] {
+        t.Log("BubbleSort() passed. Got", slice[j], " = ", slice[j+1])
+        return
+      }
+      t.Log("BubbleSort() passed. Got", slice[j], " < ", slice[j+1])
     }
-    t.Log("BubbleSort() passed. . Got", i, " > ", i+1)
   }
 
 }
