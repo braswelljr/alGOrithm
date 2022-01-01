@@ -9,8 +9,8 @@ Data Structures are representations of data sets in a way which makes storage an
 
 - _**[Linear](src/data_structures/linear)**_
   - [List](src/data_structures/linear/list/list.go)
-  - [Sets](src/data_structures/linear/set/sets.go)
-  - [Tuples](#)
+  - [Sets](src/data_structures/linear/set/set.go)
+  - [Tuples](src/data_structures/linear/tuple/tuple.go)
   - [Queues](#)
   - [Stacks](#)
   - [Heaps](#)
