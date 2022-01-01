@@ -1,9 +1,13 @@
 package bubbleSort
 
-// BubbleSort (SORT ALGORITHM) is a simple sorting algorithm that repeatedly steps through the list,
+// BubbleSort (SORT ALGORITHM) is a simple sorting algorithm that repeatedly steps through the list.
 // Time: O(n^2)
 // Space: O(1)
 func BubbleSort(slice []int) []int {
+	// check if slice is empty
+	if len(slice) <= 1 {
+		return slice
+	}
 	// Loop through the slice
 	for i := 0; i < len(slice); i++ {
 		// Loop with the length - i - 1
