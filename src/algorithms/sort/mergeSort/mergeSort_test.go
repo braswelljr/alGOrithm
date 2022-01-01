@@ -26,15 +26,12 @@ func TestMergeSortLoop(t *testing.T) {
   for i := 0; i < len(slice)-1; i++ {
     if slice[i] > slice[i+1] {
       t.Error("The slice is not sorted. Expected ", slice[i], " < ", slice[i+1])
-      return
     }
 
     if slice[i] == slice[i+1] {
       t.Log("MergeSort() passed. Got", slice[i], " = ", slice[i+1])
-      return
     }
 
     t.Log("MergeSort() passed. Got", slice[i], " < ", slice[i+1])
-    return
   }
 }
