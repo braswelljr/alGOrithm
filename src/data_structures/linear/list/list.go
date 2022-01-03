@@ -177,3 +177,11 @@ func (l *List) Clear() {
   l.list = []interface{}{}
   l.length = len(l.list)
 }
+
+// Reverse : Reverses the list
+func (l *List) Reverse() {
+  // reverse the list
+  for i, j := 0, len(l.list)-1; i < j; i, j = i+1, j-1 {
+    l.list[i], l.list[j] = l.list[j], l.list[i]
+  }
+}

@@ -1,6 +1,8 @@
 package tuple
 
-import "strings"
+import (
+  "strconv"
+)
 
 // Tuple is a finite ordered list (sequence) of elements.
 // Tuples are immutable forms of Lists.
@@ -94,23 +96,70 @@ func (tuple *Tuple) ToSlice() []interface{} {
   return tuple.elements
 }
 
-// ToString returns a string representation of the tuple
-func (tuple *Tuple) ToString() string {
-  // create a string builder
-  var builder strings.Builder
-  // append the opening bracket
-  builder.WriteString("[")
-  // iterate over the list and append the elements
+// Equals returns true if the tuple is equal to the given tuple
+func (tuple *Tuple) Equals(other *Tuple) bool {
+  // check if the other tuple is nil
+  if other == nil {
+    return false
+  }
+  // check if the other tuple is equal to the current tuple
+  if tuple.Size() != other.Size() {
+    return false
+  }
+  // iterate over the list and return false if the element is not equal
   for index, item := range tuple.elements {
-    // append the element
-    builder.WriteString(item.(string))
-    // append the comma if the element is not the last element
-    if index < len(tuple.elements)-1 {
-      builder.WriteString(", ")
+    if item != other.Get(index) {
+      return false
     }
   }
-  // append the closing bracket
-  builder.WriteString("]")
-  // return the string representation of the list
-  return builder.String()
+  // return true if all elements are equal
+  return true
+}
+
+// Clone returns a clone of the tuple
+func (tuple *Tuple) Clone() *Tuple {
+  // create a new tuple
+  clone := new(Tuple).Init()
+  // iterate over the list and append the elements
+  for _, item := range tuple.elements {
+    clone.elements = append(clone.elements, item)
+  }
+  // return the clone
+  return clone
+}
+
+// ToMap returns the elements of the tuple as a map
+func (tuple *Tuple) ToMap() map[string]interface{} {
+  // create a new map
+  mapTuple := make(map[string]interface{})
+  // iterate over the list and append the elements
+  for index, item := range tuple.elements {
+    mapTuple[strconv.Itoa(index)] = item
+  }
+  // return the map
+  return mapTuple
+}
+
+// Reverse returns a new tuple with the elements of the tuple in reverse order
+func (tuple *Tuple) Reverse() *Tuple {
+  // create a new tuple
+  reverse := new(Tuple).Init()
+  // iterate over the list and append the elements
+  for index := len(tuple.elements) - 1; index >= 0; index-- {
+    reverse.elements = append(reverse.elements, tuple.elements[index])
+  }
+  // return the reversed tuple
+  return reverse
+}
+
+// ToArray returns the elements of the tuple as an array
+func (tuple *Tuple) ToArray() []interface{} {
+  // create a new array
+  arrayTuple := make([]interface{}, tuple.Size())
+  // iterate over the list and append the elements
+  for index, item := range tuple.elements {
+    arrayTuple[index] = item
+  }
+  // return the array
+  return arrayTuple
 }

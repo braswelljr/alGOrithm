@@ -48,3 +48,24 @@ func (stack *Stack) Pop() {
 func (stack *Stack) Size() int {
   return len(stack.elements)
 }
+
+// Reverse : reverses the Stack
+func (stack *Stack) Reverse() {
+  for i, j := 0, len(stack.elements)-1; i < j; i, j = i+1, j-1 {
+    stack.elements[i], stack.elements[j] = stack.elements[j], stack.elements[i]
+  }
+}
+
+// ToMap : converts the stack to a map
+func (stack *Stack) ToMap() map[int]interface{} {
+  var mapStack = make(map[int]interface{})
+  for i, value := range stack.elements {
+    mapStack[i] = value
+  }
+  return mapStack
+}
+
+// ToArray : converts the stack to an array
+func (stack *Stack) ToArray() []interface{} {
+  return stack.elements
+}
