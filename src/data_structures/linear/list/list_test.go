@@ -6,7 +6,7 @@ import (
 )
 
 var (
-  x    = []int{4, 5, 6, 7, 0, 1, 2, 3}
+  x    = []interface{}{4, 5, 6, 7, 0, 1, 2, 3}
   list = New()
 )
 

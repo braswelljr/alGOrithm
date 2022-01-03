@@ -33,6 +33,19 @@ func New() *Set {
 	return new(Set).Init()
 }
 
+// Value returns the value of the set as a slice
+func (set *Set) Value() []interface{} {
+	// initialize a slice
+	var value []interface{}
+	// iterate the set and extract the values
+	for _, v := range set.values {
+		// append value to the slice
+		value = append(value, v)
+	}
+	// return value
+	return value
+}
+
 // Add adds a value to the set.
 func (set *Set) Add(value interface{}) {
 	// check if value is already present

@@ -7,7 +7,7 @@ import (
 
 func TestSetInit(t *testing.T) {
   s := New()
-  t.Log("Set:", s)
+  t.Log("Set:", s.Value())
 }
 
 func TestSetAdd(t *testing.T) {
@@ -17,7 +17,7 @@ func TestSetAdd(t *testing.T) {
   s.Add([...]int{1, 2, 3})
   s.Add(4)
   s.Add(5)
-  t.Log("Set:", s)
+  t.Log("Set:", s.Value())
 }
 
 func TestSetSize(t *testing.T) {
@@ -134,9 +134,9 @@ func TestSetSymmetricDifference(t *testing.T) {
   y.Add(4)
 
   z := x.SymmetricDifference(y)
-  t.Log("Set x:", x)
-  t.Log("Set y:", y)
-  t.Log("Set z:", z)
+  t.Log("Set x:", x.Value())
+  t.Log("Set y:", y.Value())
+  t.Log("Set z:", z.Value())
 }
 
 // TestSetSubset tests the subset function
@@ -153,6 +153,6 @@ func TestSetSubset(t *testing.T) {
   if x.IsSubset(y) {
     t.Error("Expected x to not be a subset of y")
   } else {
-    t.Log("Passed Subset test with x:", x, " and y:", y)
+    t.Log("Passed Subset test with x:", x.Value(), " and y:", y.Value())
   }
 }

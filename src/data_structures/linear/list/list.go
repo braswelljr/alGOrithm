@@ -3,13 +3,11 @@ package list
 // List represents a singly linked list.
 type List struct {
   length int
-  list   []Element
+  list   []interface{}
 }
 
-type Element int
-
 // New creates a new list.
-func New(lists ...[]int) *List {
+func New(lists ...[]interface{}) *List {
   // Check for empty or null list parameter
   if lists == nil || len(lists) < 1 {
     return new(List).Init() // return a new empty list
@@ -20,12 +18,12 @@ func New(lists ...[]int) *List {
 
   // covert slice  to node
   // Create a new node.
-  var s []Element
+  var s []interface{}
 
   // Iterate over the list and create a node for each value.
   for _, item := range lists {
     for _, value := range item {
-      node := Element(value)
+      node := value
       //append slice to the end of the list
       s = append(s, node)
     }
@@ -44,9 +42,9 @@ func (l *List) Init() *List {
 }
 
 // Push : Adds a new element to the end of the list.
-func (l *List) Push(element int) {
+func (l *List) Push(element interface{}) {
   // Create a new node.
-  node := Element(element)
+  node := element
   // appends element to the end of the list
   l.list = append(l.list, node)
   // increment the length of the list
@@ -68,12 +66,12 @@ func (l *List) Size() int {
 }
 
 // Join : Joins new slice with old and returns a new list
-func (l *List) Join(slice []int) *List {
+func (l *List) Join(slice []interface{}) *List {
   // covert slice  to node
   // Create a new node.
-  var s []Element
+  var s []interface{}
   for _, item := range slice {
-    node := Element(item)
+    node := item
     // append slice to the end of the list
     s = append(s, node)
   }
@@ -85,9 +83,9 @@ func (l *List) Join(slice []int) *List {
 }
 
 //Insert : Inserts an element at a particular position specified if not append it add the end of the list
-func (l *List) Insert(element int, at int) {
+func (l *List) Insert(element interface{}, at int) {
   // set node value
-  node := Element(element)
+  node := element
   //check for length of list
   // append item if length is zero or position is greater length
   if l.length < 1 || l.length <= at {
@@ -100,7 +98,7 @@ func (l *List) Insert(element int, at int) {
 
   // check for a zero or negative value(treat as zero)
   if at < 1 {
-    l.list = append(append([]Element{}, node), l.list...)
+    l.list = append(append([]interface{}{}, node), l.list...)
     l.length = len(l.list)
     return
   }
@@ -118,11 +116,11 @@ func (l *List) Insert(element int, at int) {
 }
 
 // Remove : Remove takes out an item from list
-func (l *List) Remove(element int) {
+func (l *List) Remove(element interface{}) {
   // loop through list
   for i, item := range l.list {
     // check for an equal item
-    if item == Element(element) {
+    if item == element {
       // append split slice at the given index
       l.list = append(l.list[:i], l.list[i+1:]...)
       l.length = len(l.list)
@@ -163,11 +161,11 @@ func (l *List) Get(at int) interface{} {
 }
 
 // Contains : Returns true if the list contains the element
-func (l *List) Contains(element int) bool {
+func (l *List) Contains(element interface{}) bool {
   // loop through list
   for _, item := range l.list {
     // check for an equal item
-    if item == Element(element) {
+    if item == element {
       return true
     }
   }
@@ -176,6 +174,6 @@ func (l *List) Contains(element int) bool {
 
 // Clear : Clears the list
 func (l *List) Clear() {
-  l.list = []Element{}
+  l.list = []interface{}{}
   l.length = len(l.list)
 }

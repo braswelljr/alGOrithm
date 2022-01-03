@@ -8,11 +8,11 @@ Data Structures are representations of data sets in a way which makes storage an
 ### Classification of Data Structures
 
 - _**[Linear](src/data_structures/linear)**_
-  - [List](src/data_structures/linear/list/list.go)
-  - [Sets](src/data_structures/linear/set/set.go)
-  - [Tuples](src/data_structures/linear/tuple/tuple.go)
-  - [Queues](#)
-  - [Stacks](#)
+  - [List](src/data_structures/linear/list/list.go) : is an abstract data type that represents a finite number of ordered values, where the same value may occur more than once.
+  - [Set](src/data_structures/linear/set/set.go) : is an abstract data type can store unique values without any particular order.
+  - [Tuple](src/data_structures/linear/tuple/tuple.go) : is a finite ordered list (sequence) of elements. Tuple is a reference type.
+  - [Queue](src/data_structures/linear/queue/queue.go)
+  - [Stack](src/data_structures/linear/stack/stack.go) : is an abstract data type that operates on the concept of the _last in first out_ (`LIFO`) principle.
   - [Heaps](#)
 - _**[Non - Linear](#)**_
   - [Trees](#)
