@@ -13,7 +13,7 @@ Data Structures are representations of data sets in a way which makes storage an
   - [Tuple](src/data_structures/linear/tuple/tuple.go) : is a finite ordered list (sequence) of elements. Tuple is a reference type.
   - [Queue](src/data_structures/linear/queue/queue.go) : is an abstract data type that implements a First-In-First-Out (`FIFO`) queue of generic items.
   - [Stack](src/data_structures/linear/stack/stack.go) : is an abstract data type that operates on the concept of the Last-In-First-Out (`LIFO`) principle.
-  - [Heap](src/data_structures/linear/heap/heap.go)
+  - [Heap](src/data_structures/linear/heap/heap.go) : is a specialized tree-based data structure that satisfies the heap property: for any node, the value of that node is greater than or equal to the values of its children.
 - #### _[Non - Linear](#)_
   - [Trees](#)
   - [Tables](#)
