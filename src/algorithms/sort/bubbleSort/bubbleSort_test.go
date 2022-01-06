@@ -32,5 +32,4 @@ func TestBubbleSortLoop(t *testing.T) {
     }
     t.Log("BubbleSort() passed. Got", slice[i], " < ", slice[i+1])
   }
-
 }

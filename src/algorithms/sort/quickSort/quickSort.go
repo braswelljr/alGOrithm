@@ -1,30 +1,29 @@
 package quickSort
 
 func QuickSort(array []int) []int {
-  // array is empty or less than 1 element
-  if len(array) <= 1 {
+  if len(array) < 2 {
     return array
   }
 
-  // choose pivot
+  // Pick the pivot
   pivot := array[0]
-  // create left and right arrays
-  left := make([]int, 0)
-  right := make([]int, 0)
 
-  // partition array
-  for _, value := range array {
-    if value < pivot {
-      left = append(left, value)
+  // Partition the array
+  // into values less than the pivot,
+  // and values greater than the pivot
+  less, greater := make([]int, 0), make([]int, 0)
+  for _, value := range array[1:] {
+    if value <= pivot {
+      less = append(less, value)
     } else {
-      right = append(right, value)
+      greater = append(greater, value)
     }
   }
 
-  // recursively sort left and right arrays
-  left = QuickSort(left)
-  right = QuickSort(right)
+  // recursively sort the array
+  less = QuickSort(less)
+  greater = QuickSort(greater)
 
-  // combine and return left and right arrays
-  return append(append(left, pivot), right...)
+  // append and return results
+  return append(append(less, pivot), greater...)
 }

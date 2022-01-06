@@ -45,10 +45,6 @@ func MergeSort(slice []int) []int {
     }
   }
 
-  // Append the remaining elements of the left list.
-  result = append(result, left...)
-
-  // Append the remaining elements of the right list.
-  result = append(result, right...)
-  return result
+  // Append and return the remaining elements of the list.
+  return append(append(result, left...), right...)
 }
