@@ -54,5 +54,16 @@ Algorithm is a set of instructions that describes how to get something done.
   - [Cycle Sort](#)
   - [Gnome Sort](#)
   - [Stooge Sort](#)
-- #### _[Recursion](#)_
-- [Search](#)
+- #### _[Recursion](src/algorithms/recursion)_
+  - [Fibonacci](src/algorithms/recursion/fibonacci/fibonacci.go) : is a recursive algorithm that adds the two preceding numbers to produce the next number in the sequence.
+  - [Factorial](src/algorithms/recursion/factorial/factorial.go) : is a recursive algorithm that multiplies all the preceding numbers to produce the next number in the sequence.
+  - [Euclidean / GCD](src/algorithms/recursion/euclidean/euclidean.go) : is a recursive algorithm that finds the greatest common divisor of two numbers.
+  - [LCM](src/algorithms/recursion/lcm/lcm.go) : is a recursive algorithm that finds the least common multiple of two numbers.
+  - [Tower of Hanoi](src/algorithms/recursion/tower_of_hanoi/tower_of_hanoi.go) : is a recursive algorithm that moves a stack of disks from one tower to another.
+- #### _[Search](src/algorithms/search)_
+  - [Binary Search](src/algorithms/search/binary_search/binary_search.go) : is a search algorithm that finds the position of a target value in a sorted array.
+  - [Interpolation Search](src/algorithms/search/interpolation_search/interpolation_search.go) : is a search algorithm that finds the position of a target value in a sorted array.
+  - [Jump Search](src/algorithms/search/jump_search/jump_search.go) : is a search algorithm that finds the position of a target value in a sorted array.
+  - [Linear Search](src/algorithms/search/linear_search/linear_search.go) : is a search algorithm that finds the position of a target value in a sorted array.
+  - [Ternary Search](src/algorithms/search/ternary_search/ternary_search.go) : is a search algorithm that finds the position of a target value in a sorted array.
+- #### _[Graph](src/algorithms/graph)_
