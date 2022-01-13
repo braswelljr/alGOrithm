@@ -1,7 +1,7 @@
 package lcm
 
 import (
-	"github.com/braswelljr/alGOrithm/src/algorithms/recursion/euclidean"
+	"github.com/braswelljr/alGOrithm/algorithms/recursion/euclidean"
 )
 
 // LCM returns the least common multiple of two integers.
