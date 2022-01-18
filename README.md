@@ -72,4 +72,7 @@ Algorithm is a set of instructions that describes how to get something done.
   - [Linear Search](algorithms/search/linearSearch/linearSearch.go) : is a search algorithm that finds the position of a target value in a sorted array.
   - [Ternary Search](algorithms/search/ternarySearch/ternarySearch.go) : is a search algorithm that finds the position of a target value in a sorted array.
 
+- #### [Cipher](algorithms/cipher)
+  - [Caesar Cypher](algorithms/cipher/caesarCipher/caesarCipher.go)
+
 - #### _[Graph](algorithms/graph)_

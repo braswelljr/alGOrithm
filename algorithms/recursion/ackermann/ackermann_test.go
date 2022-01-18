@@ -25,9 +25,9 @@ func TestAckermann(t *testing.T) {
   for _, testCase := range testCases {
     // Check if Ackermann function returns expected value
     if actual := Ackermann(testCase.m, testCase.n); actual != testCase.expected {
-      t.Errorf("Ackermann(%d, %d) = %d, expected %d", testCase.m, testCase.n, actual, testCase.expected)
+      t.Errorf("Ackermann(%d, %d) = %d, expected %d - Failed", testCase.m, testCase.n, actual, testCase.expected)
     } else {
-      t.Logf("Ackermann(%d, %d) = %d", testCase.m, testCase.n, actual)
+      t.Logf("Ackermann(%d, %d) = %d - Passed", testCase.m, testCase.n, actual)
     }
   }
 }
