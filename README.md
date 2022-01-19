@@ -73,6 +73,6 @@ Algorithm is a set of instructions that describes how to get something done.
   - [Ternary Search](algorithms/search/ternarySearch/ternarySearch.go) : is a search algorithm that finds the position of a target value in a sorted array.
 
 - #### [Cipher](algorithms/cipher)
-  - [Caesar Cypher](algorithms/cipher/caesarCipher/caesarCipher.go)
+  - [Caesar Cipher](algorithms/cipher/caesarCipher/caesarCipher.go) : is a cipher that shifts each letter in a message by a certain number of places. It has a time complexity of <code>O(n)</code>.
 
 - #### _[Graph](algorithms/graph)_
