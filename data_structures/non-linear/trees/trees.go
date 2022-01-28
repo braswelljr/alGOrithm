@@ -41,3 +41,71 @@ func insert(node *Node, value int) *Node {
 
   return node
 }
+
+// Remove removes a node from the tree
+func (tree *Tree) Remove(value int) {
+  tree.Root = remove(tree.Root, value)
+}
+
+func remove(node *Node, value int) *Node {
+  if node == nil {
+    return nil
+  }
+
+  if value < node.Value {
+    node.Left = remove(node.Left, value)
+  } else if value > node.Value {
+    node.Right = remove(node.Right, value)
+  } else {
+    // if the node has no children
+    if node.Left == nil && node.Right == nil {
+      return nil
+    }
+
+    // if the node has only a left child
+    if node.Right == nil {
+      return node.Left
+    }
+
+    // if the node has only a right child
+    if node.Left == nil {
+      return node.Right
+    }
+
+    // if the node has both children
+    // find the inorder successor
+    successor := node.Right
+    for successor.Left != nil {
+      successor = successor.Left
+    }
+
+    // copy the value from the inorder successor
+    node.Value = successor.Value
+
+    // recursively remove the inorder successor
+    node.Right = remove(node.Right, successor.Value)
+  }
+
+  return node
+}
+
+// Search searches for a node in the tree
+func (tree *Tree) Search(value int) bool {
+  return search(tree.Root, value)
+}
+
+func search(node *Node, value int) bool {
+  if node == nil {
+    return false
+  }
+
+  // if the value is less than the current node, search the left subtree
+  if value < node.Value {
+    return search(node.Left, value)
+    // if the value is greater than the current node, search the right subtree
+  } else if value > node.Value {
+    return search(node.Right, value)
+  }
+
+  return true
+}

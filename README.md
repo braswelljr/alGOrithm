@@ -15,7 +15,7 @@ Data Structures are representations of data sets in a way which makes storage an
   - [Stack](data_structures/linear/stack/stack.go) : is an abstract data type that operates on the concept of the Last-In-First-Out (`LIFO`) principle.
   - [Heap](data_structures/linear/heap/heap.go) : is a specialized tree-based data structure that satisfies the heap property: for any node, the value of that node is greater than or equal to the values of its children.
 - #### _[Non - Linear](#)_
-  - [Trees](#)
+  - [Trees](data_structures/non-linear/trees/trees.go) : is a data structure that consists of a set of nested nodes, each node having a value and a set of child nodes.
   - [Tables](#)
   - [Containers](#)
 - #### _[Homogeneous](#)_
@@ -74,5 +74,7 @@ Algorithm is a set of instructions that describes how to get something done.
 
 - #### [Cipher](algorithms/cipher)
   - [Caesar Cipher](algorithms/cipher/caesarCipher/caesarCipher.go) : is a cipher that shifts each letter in a message by a certain number of places. It has a time complexity of <code>O(n)</code>.
-
+  - [Vigenere Cipher](algorithms/cipher/vigenereCipher/vigenereCipher.go) : is a cipher that shifts each letter in a message by a certain number of places. It has a time complexity of <code>O(n)</code>.
+  - [Hill Cipher](#) : is a cipher that shifts each letter in a message by a certain number of places. It has a time complexity of <code>O(n)</code>.
+  - [Rot13 Cipher](#) : is a cipher that shifts each letter in a message by 13 number of places. It has a time complexity of <code>O(n)</code>.
 - #### _[Graph](algorithms/graph)_
