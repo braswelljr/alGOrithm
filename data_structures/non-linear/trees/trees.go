@@ -109,3 +109,24 @@ func search(node *Node, value int) bool {
 
   return true
 }
+
+// Size - returns the number of nodes in the tree
+func (tree *Tree) Size() int {
+  return size(tree.Root)
+}
+
+func size(node *Node) int {
+  // if node has a null value return 0 as the size
+  if node == nil {
+    return 0
+  }
+
+  // recursively check for the size of the left and right subtrees
+  return size(node.Left) + size(node.Right) + 1
+}
+
+// Clear - removes all nodes from the tree or returns a new tree
+func (tree *Tree) Clear() *Tree {
+  // clean all the nodes in the tree
+  return new(Tree).Init()
+}
