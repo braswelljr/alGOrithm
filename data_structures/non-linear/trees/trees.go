@@ -130,3 +130,97 @@ func (tree *Tree) Clear() *Tree {
   // clean all the nodes in the tree
   return new(Tree).Init()
 }
+
+// Traverse - traverses the tree in order
+func (tree *Tree) Traverse() []int {
+  return traverse(tree.Root)
+}
+
+// traverse -
+func traverse(node *Node) []int {
+  // if the node is null, return an empty array
+  if node == nil {
+    return []int{}
+  }
+
+  // recursively traverse the left subtree
+  left := traverse(node.Left)
+
+  // recursively traverse the right subtree
+  right := traverse(node.Right)
+
+  // return the left subtree, the current node, and the right subtree
+  return append(append(left, node.Value), right...)
+}
+
+// Min - returns the minimum value in the tree
+func (tree *Tree) Min() int {
+  return min(tree.Root)
+}
+
+// min - recursively steps through left subtree and returns the min value
+func min(node *Node) int {
+  // if the node is null, return 0
+  if node == nil {
+    return 0
+  }
+
+  // if the node has no left child, return the value of the node
+  if node.Left == nil {
+    return node.Value
+  }
+
+  // recursively check the left subtree
+  return min(node.Left)
+}
+
+// Max - returns the maximum value in the tree
+func (tree *Tree) Max() int {
+  return max(tree.Root)
+}
+
+// max - recursively steps through right subtree and returns the max value
+func max(node *Node) int {
+  // if the node is null, return 0
+  if node == nil {
+    return 0
+  }
+
+  // if the node has no right child, return the value of the node
+  if node.Right == nil {
+    return node.Value
+  }
+
+  // recursively check the right subtree
+  return max(node.Right)
+}
+
+// Height - returns the height of the tree
+func (tree *Tree) Height() int {
+  return height(tree.Root)
+}
+
+// height - recursively checks the height of the left and right subtrees
+func height(node *Node) int {
+  // if the node is null, return 0
+  if node == nil {
+    return 0
+  }
+
+  // recursively check the height of the left subtree
+  left := height(node.Left)
+
+  // recursively check the height of the right subtree
+  right := height(node.Right)
+
+  // return the greatest of the left and right subtree heights
+  if left > right {
+    return left + 1
+  }
+  return right + 1
+}
+
+// Graft - Adding a tree or section to a tree
+//func (tree *Tree) Graft(node *Node) Tree{
+//  return
+//}
