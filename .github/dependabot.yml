@@ -4,7 +4,27 @@ updates:
     directory: /
     schedule:
       interval: weekly
+       time: '00:00'
+      open-pull-requests-limit: 10
+      reviewers:
+        - braswelljr
+      assignees:
+        - braswelljr
+      commit-message:
+        prefix: fix
+        prefix-development: chore
+        include: scope
   - package-ecosystem: gomod
     directory: /
     schedule:
       interval: weekly
+       time: '00:00'
+      open-pull-requests-limit: 10
+      reviewers:
+        - braswelljr
+      assignees:
+        - braswelljr
+      commit-message:
+        prefix: fix
+        prefix-development: chore
+        include: scope
