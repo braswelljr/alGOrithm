@@ -7,17 +7,17 @@ Data Structures are representations of data sets in a way which makes storage an
 
 ### Classification of Data Structures
 
-- #### _[Linear](data_structures/linear)_
-  - [List](data_structures/linear/list/list.go) : is an abstract data type that represents a finite number of ordered values, where the same value may occur more than once.
-  - [Set](data_structures/linear/set/set.go) : is an abstract data type can store unique values without any particular order.
-  - [Tuple](data_structures/linear/tuple/tuple.go) : is a finite ordered list (sequence) of elements. Tuple is a reference type.
-  - [Queue](data_structures/linear/queue/queue.go) : is an abstract data type that implements a First-In-First-Out (`FIFO`) queue of generic items.
-  - [Stack](data_structures/linear/stack/stack.go) : is an abstract data type that operates on the concept of the Last-In-First-Out (`LIFO`) principle.
-  - [Heap](data_structures/linear/heap/heap.go) : is a specialized tree-based data structure that satisfies the heap property: for any node, the value of that node is greater than or equal to the values of its children.
+- #### _[Linear](data-structures/linear)_
+  - [List](data-structures/linear/list/list.go) : is an abstract data type that represents a finite number of ordered values, where the same value may occur more than once.
+  - [Set](data-structures/linear/set/set.go) : is an abstract data type can store unique values without any particular order.
+  - [Tuple](data-structures/linear/tuple/tuple.go) : is a finite ordered list (sequence) of elements. Tuple is a reference type.
+  - [Queue](data-structures/linear/queue/queue.go) : is an abstract data type that implements a First-In-First-Out (`FIFO`) queue of generic items.
+  - [Stack](data-structures/linear/stack/stack.go) : is an abstract data type that operates on the concept of the Last-In-First-Out (`LIFO`) principle.
+  - [Heap](data-structures/linear/heap/heap.go) : is a specialized tree-based data structure that satisfies the heap property: for any node, the value of that node is greater than or equal to the values of its children.
 - #### _[Non - Linear](#)_
-  - [Trees](data_structures/non-linear/trees/trees.go) : is a data structure that consists of a set of nested nodes, each node having a value and a set of child nodes.
-  - [Tables](#)
-  - [Containers](#)
+  - [Trees](data-structures/non-linear/trees/trees.go) : is a data structure that consists of a set of nested nodes, each node having a value and a set of child nodes.
+  - [Tables](data-structures/non-linear/table/table.go) : is a data structure that consists of a set of rows and columns, each row having a set of columns. The table is a two-dimensional array. The table is a reference type.
+  - [Containers](data-structures/non-linear/container/container.go) : is a data structure that consists of a set of elements, each element having a key and a value. The container is a reference type. The container is a reference type.
 - #### _[Homogeneous](#)_
   - [Two Dimensional Arrays](#)
   - [Multi Dimensional Arrays](#)
