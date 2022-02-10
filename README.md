@@ -60,7 +60,7 @@ Algorithm is a set of instructions that describes how to get something done.
   - [Factorial](algorithms/recursion/factorial/factorial.go) : is a recursive algorithm that multiplies all the preceding numbers to produce the next number in the sequence.
   - [Euclidean / GCD](algorithms/recursion/euclidean/euclidean.go) : is a recursive algorithm that finds the greatest common divisor of two numbers.
   - [LCM](algorithms/recursion/lcm/lcm.go) : is a recursive algorithm that finds the least common multiple of two numbers.
-  - [Tower of Hanoi](algorithms/recursion/tower_of_hanoi/tower_of_hanoi.go) : is a recursive algorithm that moves a stack of disks from one tower to another.
+  - [Tower of Hanoi](algorithms/recursion/towerOfHanoi/tower_of_hanoi.go) : is a recursive algorithm that moves a stack of disks from one tower to another.
   - [Ackermann Function](algorithms/recursion/ackermann/ackermann.go) : is a recursive algorithm that finds the value of the Ackermann function. It is a total recursive function that can be defined in terms of itself.
   - [McCarthy Function](algorithms/recursion/mccarthy91/mccarthy91.go) : is a recursive algorithm that finds the value of the McCarthy function. It is a total recursive function that can be defined in terms of itself.
   - [Palindrome](algorithms/recursion/palindrome/palindrome.go) : is an algorithm that checks if a word is equal to its reversed.

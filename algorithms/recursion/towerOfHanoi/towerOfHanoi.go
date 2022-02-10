@@ -1,4 +1,4 @@
-package tower_of_hanoi
+package towerOfHanoi
 
 // TowerOfHanoi returns the sequence of moves required to move n disks from the
 // first peg to the last peg using the second and third pegs as temporary

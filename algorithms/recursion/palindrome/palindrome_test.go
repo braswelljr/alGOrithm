@@ -1,4 +1,3 @@
 package palindrome
 
 // Test Palindrome
-
