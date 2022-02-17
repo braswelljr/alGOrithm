@@ -46,6 +46,10 @@ func (list *List) Insert(value interface{}) {
 
 // Remove removes the node from the list.
 func (list *List) Remove(element interface{}) {
+	// check length of list
+	if len(list.elements) < 1 {
+		return
+	}
 	// find the node
 	for i, node := range list.elements {
 		if node.value == element {

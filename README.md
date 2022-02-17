@@ -48,8 +48,8 @@ Algorithm is a set of instructions that describes how to get something done.
   - [Heap Sort](algorithms/sort/heapSort/heapSort.go) : is a comparison based sort that uses a heap data structure to sort the list. Heap Sort has a **time complexity** of <code>O(n log n)</code>.
   - [Quick Sort](algorithms/sort/quickSort/quickSort.go) : is a comparison based sort that uses a divide and conquer strategy to sort the list. Quick Sort has a **time complexity** of <code>O(n log n)</code>.
   - [Selection Sort](algorithms/sort/selectionSort/selectionSort.go) : is a comparison based sort that finds the smallest element in the list and places it at the beginning. Selection Sort has a **time complexity** of <code>O(n<sup>2</sup>)</code>.
-  - [Insertion Sort](#) : is a comparison based sort that builds the final sorted array one item at a time. Insertion Sort has a **time complexity** of <code>O(n<sup>2</sup>)</code>.
-  - [Radix Sort](#)
+  - [Insertion Sort](algorithms/sort/insertionSort/insertionSort.go) : is a comparison based sort that builds the final sorted array one item at a time. Insertion Sort has a **time complexity** of <code>O(n<sup>2</sup>)</code>.
+  - [Radix Sort](algorithms/sort/radixSort/radixSort.go) : is a comparison based sort that sorts the list by grouping the list into buckets. Radix Sort has a **time complexity** of <code>O(n<sup>2</sup>)</code>. `uncomplete`
   - [Shell Sort](#)
   - [Tree Sort](#)
   - [Bucket Sort](#)
@@ -80,6 +80,6 @@ Algorithm is a set of instructions that describes how to get something done.
 - #### [Cipher](algorithms/cipher)
   - [Caesar Cipher](algorithms/cipher/caesarCipher/caesarCipher.go) : is a cipher that shifts each letter in a message by a certain number of places. It has a time complexity of <code>O(n)</code>.
   - [Vigenere Cipher](algorithms/cipher/vigenereCipher/vigenereCipher.go) : is a cipher that shifts each letter in a message by a certain number of places. It has a time complexity of <code>O(n)</code>.
-  - [Hill Cipher](#) : is a cipher that shifts each letter in a message by a certain number of places. It has a time complexity of <code>O(n)</code>.
+  - [Hill Cipher](#) : is a cipher that shifts each letter in a message by a certain number of places. It has a time complexity of <code>O(n)</code>.`uncomplete`
   - [Rot13 Cipher](#) : is a cipher that shifts each letter in a message by 13 number of places. It has a time complexity of <code>O(n)</code>.
 - #### _[Graph](algorithms/graph)_

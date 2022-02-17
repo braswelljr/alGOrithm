@@ -44,7 +44,7 @@ func (list *List) Insert(value interface{}) {
 // Remove deletes the given node from the list.
 func (list *List) Remove(element int) {
   // If the list is empty, return.
-  if len(list.elements) > 1 {
+  if len(list.elements) < 1 {
     return
   }
 
