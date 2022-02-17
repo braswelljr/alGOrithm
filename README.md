@@ -22,7 +22,10 @@ Data Structures are representations of data sets in a way which makes storage an
   - [Two Dimensional Arrays](#)
   - [Multi Dimensional Arrays](#)
 - #### _[Heterogeneous](#)_
-  - [Linked List](#)
+  - [Linked List](data-structures/heterogeneous/linkedList): is a data structure that consists of a set of nodes, each node having a value and a reference to the next node.
+    - [Single Linked List](data-structures/heterogeneous/linkedList/singleLinkedList/singleLinkedList.go) : is a data structure that consists of a set of nodes, each node having a value and a reference to the next node. The list is a reference type.
+    - [Double Linked List](data-structures/heterogeneous/linkedList/doubleLinkedList/doubleLinkedList.go) : is a data structure that consists of a set of nodes, each node having a value and a reference to the previous and next node. The list is a reference type.
+    - [Circular Linked List](data-structures/heterogeneous/linkedList/circularLinkedList/circularLinkedList.go) : is a data structure which has the last item contains link of the first element as next and the first element has a link to the last element as previous. The list is a reference type.
   - [Ordered List](#)
   - [Unordered List](#)
 - #### _[Dynamic](#)_
