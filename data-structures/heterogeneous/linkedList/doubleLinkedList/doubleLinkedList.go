@@ -44,14 +44,42 @@ func (list *List) Insert(value interface{}) {
 	list.elements = append(list.elements, node)
 }
 
-// Remove removes the node at the given index from the list.
-func (list *List) Remove(index int) {
-	// if the index is out of bounds, return
-	if index < 0 || index >= len(list.elements) {
+// Remove removes the node from the list.
+func (list *List) Remove(element interface{}) {
+	// find the node
+	for i, node := range list.elements {
+		if node.value == element {
+			// if the node is the head, set the head to the next node
+			if node == list.head {
+				list.head = node.next
+			}
+			// if the node is the tail, set the tail to the prev node
+			if node == list.tail {
+				list.tail = node.prev
+			}
+			// if the node has a prev, set the prev's next to the node's next
+			if node.prev != nil {
+				node.prev.next = node.next
+			}
+			// if the node has a next, set the next's prev to the node's prev
+			if node.next != nil {
+				node.next.prev = node.prev
+			}
+			// remove the node from the list
+			list.elements = append(list.elements[:i], list.elements[i+1:]...)
+			break
+		}
+	}
+}
+
+// RemoveAt removes the node at the given index from the list.
+func (list *List) RemoveAt(at int) {
+	// if the at is out of bounds, return
+	if at < 0 || at >= len(list.elements) {
 		return
 	}
-	// get the node at the given index
-	node := list.elements[index]
+	// get the node at the given at
+	node := list.elements[at]
 	// if the node is the head, set the head to the next node
 	if node == list.head {
 		list.head = node.next
@@ -69,14 +97,14 @@ func (list *List) Remove(index int) {
 		node.next.prev = node.prev
 	}
 	// remove the node from the list
-	list.elements = append(list.elements[:index], list.elements[index+1:]...)
+	list.elements = append(list.elements[:at], list.elements[at+1:]...)
 }
 
-// Search searches the list for the given value and returns the index of the first occurrence.
+// Search searches the list for the given value and returns the at of the first occurrence.
 func (list *List) Search(value interface{}) int {
 	// iterate over the list
 	for i, node := range list.elements {
-		// if the node's value is the given value, return the index
+		// if the node's value is the given value, return the at
 		if node.value == value {
 			return i
 		}

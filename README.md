@@ -26,8 +26,10 @@ Data Structures are representations of data sets in a way which makes storage an
     - [Single Linked List](data-structures/heterogeneous/linkedList/singleLinkedList/singleLinkedList.go) : is a data structure that consists of a set of nodes, each node having a value and a reference to the next node. The list is a reference type.
     - [Double Linked List](data-structures/heterogeneous/linkedList/doubleLinkedList/doubleLinkedList.go) : is a data structure that consists of a set of nodes, each node having a value and a reference to the previous and next node. The list is a reference type.
     - [Circular Linked List](data-structures/heterogeneous/linkedList/circularLinkedList/circularLinkedList.go) : is a data structure which has the last item contains link of the first element as next and the first element has a link to the last element as previous. The list is a reference type.
-  - [Ordered List](#)
-  - [Unordered List](#)
+      - [Circular Single Linked List](data-structures/heterogeneous/linkedList/circularLinkedList/circularSingleLinkedList/circularSingleLinkedList.go) : is a data structure which has the last item contains link of the first element as next and the first element has a link to the last element as previous. The list is a reference type.
+      - [Circular Double Linked List](data-structures/heterogeneous/linkedList/circularLinkedList/circularDoubleLinkedList/circularDoubleLinkedList.go) : is a data structure which has the last item contains link of the first element as next and the first element has a link to the last element as previous. The list is a reference type.
+  - [Ordered List](data-structures/heterogeneous/orderedList/orderedList.go) : is a data structure that consists of a set of nodes, each node having a value and a reference to the next node. The list is a reference type.
+  - [Unordered List](data-structures/heterogeneous/unorderedList/unorderedList.go) : is a data structure that consists of a set of nodes, each node having a value and a reference to the next node. The list is a reference type.
 - #### _[Dynamic](#)_
   - [Dictionaries](#)
   - [Tree Sets](#)

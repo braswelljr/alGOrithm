@@ -41,24 +41,51 @@ func (list *List) Insert(value interface{}) {
   list.elements = append(list.elements, node)
 }
 
-// Remove deletes the node at the given index.
-func (list *List) Remove(index int) {
-  // check for out of bounds or valid index
-  if index < 0 || index >= len(list.elements) {
+// Remove deletes the given node from the list.
+func (list *List) Remove(element int) {
+  // If the list is empty, return.
+  if len(list.elements) > 1 {
     return
   }
 
-  node := list.elements[index]
+  // loop through elements and find the element to remove
+  for i, node := range list.elements {
+    // check if the element is the one to remove
+    if node.Value == element {
+      // if the element is the head
+      if i == 0 {
+        // set the head to the next element
+        list.Head = list.elements[1]
+      } else if i == len(list.elements)-1 {
+        // set the tail to the previous element
+        list.Tail = list.elements[len(list.elements)-2]
+      } else {
+        // set the next element of the previous element to the next element
+        list.elements[i-1].Next = list.elements[i+1]
+      }
+    }
+    break
+  }
+}
+
+// RemoveAt deletes the node at the given index.
+func (list *List) RemoveAt(at int) {
+  // check for out of bounds or valid at
+  if at < 0 || at >= len(list.elements) {
+    return
+  }
+
+  node := list.elements[at]
   if node == list.Head {
     // delete head
     list.Head = node.Next
   } else {
     // find previous node
-    prev := list.elements[index-1]
+    prev := list.elements[at-1]
     prev.Next = node.Next
   }
   // remove node from list
-  list.elements = append(list.elements[:index], list.elements[index+1:]...)
+  list.elements = append(list.elements[:at], list.elements[at+1:]...)
 }
 
 // Get returns the value of the node at the given index.
