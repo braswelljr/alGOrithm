@@ -2,13 +2,13 @@ package singleLinkedList
 
 // Node is a node of a single linked list.
 type Node struct {
-  Value interface{}
-  Next  *Node
+  value interface{}
+  next  *Node
 }
 
 type List struct {
-  Head     *Node
-  Tail     *Node
+  head     *Node
+  tail     *Node
   elements []*Node
 }
 
@@ -19,23 +19,23 @@ func New() *List {
 
 // Init initializes a single linked list.
 func (list *List) Init() {
-  list.Head = nil
-  list.Tail = nil
+  list.head = nil
+  list.tail = nil
   list.elements = []*Node{}
 }
 
 // Insert inserts a new node at the end of the list.
 func (list *List) Insert(value interface{}) {
   // Create a new node.
-  node := &Node{Value: value}
-  if list.Head == nil {
+  node := &Node{value: value}
+  if list.head == nil {
     // If the list is empty, set the head and tail to the new node.
-    list.Head = node
-    list.Tail = node
+    list.head = node
+    list.tail = node
   } else {
     // If the list is not empty, set the next pointer of the tail to the new node.
-    list.Tail.Next = node
-    list.Tail = node
+    list.tail.next = node
+    list.tail = node
   }
   // append node to elements
   list.elements = append(list.elements, node)
@@ -51,17 +51,17 @@ func (list *List) Remove(element int) {
   // loop through elements and find the element to remove
   for i, node := range list.elements {
     // check if the element is the one to remove
-    if node.Value == element {
+    if node.value == element {
       // if the element is the head
       if i == 0 {
         // set the head to the next element
-        list.Head = list.elements[1]
+        list.head = list.elements[1]
       } else if i == len(list.elements)-1 {
         // set the tail to the previous element
-        list.Tail = list.elements[len(list.elements)-2]
+        list.tail = list.elements[len(list.elements)-2]
       } else {
         // set the next element of the previous element to the next element
-        list.elements[i-1].Next = list.elements[i+1]
+        list.elements[i-1].next = list.elements[i+1]
       }
     }
     break
@@ -76,13 +76,13 @@ func (list *List) RemoveAt(at int) {
   }
 
   node := list.elements[at]
-  if node == list.Head {
+  if node == list.head {
     // delete head
-    list.Head = node.Next
+    list.head = node.next
   } else {
     // find previous node
     prev := list.elements[at-1]
-    prev.Next = node.Next
+    prev.next = node.next
   }
   // remove node from list
   list.elements = append(list.elements[:at], list.elements[at+1:]...)
@@ -95,7 +95,7 @@ func (list *List) Get(index int) interface{} {
     return nil
   }
   // return value of node
-  return list.elements[index].Value
+  return list.elements[index].value
 }
 
 // Set sets the value of the node at the given index.
@@ -105,7 +105,7 @@ func (list *List) Set(index int, value interface{}) {
     return
   }
   // set value of node
-  list.elements[index].Value = value
+  list.elements[index].value = value
 }
 
 // Length returns the length of the list.
@@ -118,7 +118,7 @@ func (list *List) Search(value interface{}) int {
   // iterate over list
   for i, node := range list.elements {
     // check if value matches
-    if node.Value == value {
+    if node.value == value {
       return i
     }
   }
@@ -133,4 +133,70 @@ func (list *List) Reverse() {
     // swap nodes
     list.elements[i], list.elements[len(list.elements)-i-1] = list.elements[len(list.elements)-i-1], list.elements[i]
   }
+}
+
+// IndexOf returns the index of the given value.
+func (list *List) IndexOf(value interface{}) int {
+  // iterate over list
+  for i, node := range list.elements {
+    // check if value matches
+    if node.value == value {
+      return i
+    }
+  }
+  // return -1 if not found
+  return -1
+}
+
+// Head returns the head of the list.
+func (list *List) Head() interface{} {
+  // return nil if list is empty
+  if list.head == nil {
+    return nil
+  }
+  // return head value
+  return list.head.value
+}
+
+// Tail returns the tail of the list.
+func (list *List) Tail() interface{} {
+  // return nil if list is empty
+  if list.tail == nil {
+    return nil
+  }
+  // return tail value
+  return list.tail.value
+}
+
+// IsEmpty checks if list is empty
+func (list *List) IsEmpty() bool {
+  // checks length of list
+  if len(list.elements) < 1 {
+    return false
+  }
+
+  // returns true if is not empty
+  return true
+}
+
+// Empty sets the list to empty
+func (list *List) Empty() {
+  // set head and tail to nil
+  list.head = nil
+  list.tail = nil
+  // set elements to empty slice
+  list.elements = []*Node{}
+}
+
+// Values returns a slice of the values in the list.
+func (list *List) Values() []interface{} {
+  // create slice to hold values
+  values := make([]interface{}, len(list.elements))
+  // iterate over list
+  for i, node := range list.elements {
+    // add value to slice
+    values[i] = node.value
+  }
+  // return slice
+  return values
 }
