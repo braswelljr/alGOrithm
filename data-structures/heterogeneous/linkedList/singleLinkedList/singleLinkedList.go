@@ -28,14 +28,15 @@ func (list *List) Init() {
 func (list *List) Insert(value interface{}) {
   // Create a new node.
   node := &Node{value: value}
-  if list.head == nil {
+  if len(list.elements) < 1 {
     // If the list is empty, set the head and tail to the new node.
     list.head = node
     list.tail = node
   } else {
     // If the list is not empty, set the next pointer of the tail to the new node.
-    list.tail.next = node
     list.tail = node
+    list.tail.next = node
+    list.elements[len(list.elements)-1].next = node
   }
   // append node to elements
   list.elements = append(list.elements, node)
@@ -151,7 +152,7 @@ func (list *List) IndexOf(value interface{}) int {
 // Head returns the head of the list.
 func (list *List) Head() interface{} {
   // return nil if list is empty
-  if list.head == nil {
+  if len(list.elements) < 1 || list.head == nil {
     return nil
   }
   // return head value
@@ -161,7 +162,7 @@ func (list *List) Head() interface{} {
 // Tail returns the tail of the list.
 func (list *List) Tail() interface{} {
   // return nil if list is empty
-  if list.tail == nil {
+  if len(list.elements) < 1 || list.tail == nil {
     return nil
   }
   // return tail value
