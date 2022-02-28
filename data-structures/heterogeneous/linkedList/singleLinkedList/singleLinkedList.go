@@ -6,6 +6,7 @@ type Node struct {
   next  *Node
 }
 
+// List has a head(first element of the list), tail(last element of the list) and the elements(list).
 type List struct {
   head     *Node
   tail     *Node
@@ -28,18 +29,17 @@ func (list *List) Init() {
 func (list *List) Insert(value interface{}) {
   // Create a new node.
   node := &Node{value: value}
-  if len(list.elements) < 1 {
+  if len(list.elements) < 1 || list.head == nil {
     // If the list is empty, set the head and tail to the new node.
-    list.head = node
-    list.tail = node
+    list.head, list.tail = node, node
   } else {
     // If the list is not empty, set the next pointer of the tail to the new node.
-    list.tail = node
-    list.tail.next = node
-    list.elements[len(list.elements)-1].next = node
+    list.tail, list.tail.next, list.elements[len(list.elements)-1].next = node, node, node
   }
   // append node to elements
   list.elements = append(list.elements, node)
+  // set reference of the tail's(next ref) to nil
+  list.elements[len(list.elements)-1].next = nil
 }
 
 // Remove deletes the given node from the list.

@@ -30,18 +30,20 @@ func (list *List) Init(values []interface{}) {
 func (list *List) Insert(value interface{}) {
   // create a new node
   node := &Node{value: value}
-  if list.head == nil {
+  if len(list.elements) < 1 || list.head == nil {
     // if the list is empty, set the head and tail to the new node
-    list.head = node
-    list.tail = node
+    list.head, list.tail = node, node
   } else {
     // otherwise, set the new node's next to the current tail and the current tail's prev to the new node
-    list.tail.next = node
-    node.prev = list.tail
-    list.tail = node
+    // If the list is not empty, set the next pointer of the tail to the new node.
+    node.prev, list.tail, list.tail.next, list.elements[len(list.elements)-1].next = list.tail, node, node, node
   }
   // add the new node to the list
   list.elements = append(list.elements, node)
+  // set reference of the head's(prev ref) to nil
+  list.elements[0].prev = nil
+  // set reference of the tail's(next ref) to nil
+  list.elements[len(list.elements)-1].next = nil
 }
 
 // Remove removes the node from the list.

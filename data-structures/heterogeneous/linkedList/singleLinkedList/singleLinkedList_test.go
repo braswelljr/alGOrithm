@@ -10,7 +10,7 @@ var (
 func TestSingleLinkedList(t *testing.T) {
   t.Run("New", TestListNew)
   t.Run("Insert", TestListInsert)
-  t.Run("Next", TestNextValue)
+  t.Run("Next, Head and Tail Values", TestNextValue)
 }
 
 func TestListNew(t *testing.T) {
@@ -46,8 +46,26 @@ func TestNextValue(t *testing.T) {
   }
   nextList := make([]interface{}, len(list.elements))
   for i, element := range list.elements {
-    nextList[i] = element.next.value
+    if element.next != nil {
+      nextList[i] = element.next.value
+    }
   }
+  lv := list.Values()
+  t.Log("List -> ", lv)
+  t.Log("Head (", list.head.value, ") and Tail (", list.tail, ")")
   t.Log("Next list -> ", nextList)
-  t.Log("List -> ", list.Values())
+  nlv, nnextList := lv[1:], nextList[:len(nextList)-1]
+
+  for i, _ := range nlv {
+    for j, _ := range nnextList {
+      if i == j {
+        if nlv[i] == nnextList[j] {
+          t.Log("The next value of the node ", nlv[i], " is ", nnextList[j])
+        } else {
+          t.Error("Expected The next value of the node ", nlv[i], " to be ", nnextList[j], " but got ", nnextList[j])
+          break
+        }
+      }
+    }
+  }
 }
