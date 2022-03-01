@@ -11,6 +11,7 @@ func TestCircularSingleLinkedList(t *testing.T) {
   t.Run("New", TestListNew)
   t.Run("Insert", TestListInsert)
   t.Run("Next", TestNextValue)
+  t.Run("Remove", TestListRemove)
 }
 
 func TestListNew(t *testing.T) {
@@ -48,6 +49,30 @@ func TestNextValue(t *testing.T) {
   for i, element := range list.elements {
     nextList[i] = element.next.value
   }
-  t.Log("Next list -> ", nextList)
   t.Log("List -> ", list.Values())
+  t.Log("Next list -> ", nextList)
+  t.Log("Head (", list.head, ") - Tail (", list.tail, ")")
+}
+
+func TestListRemove(t *testing.T) {
+  for _, element := range x {
+    // Insert
+    list.Insert(element)
+  }
+  element := 0
+  // length before remove
+  lb := len(list.elements)
+  list.Remove(element)
+  list.RemoveAt(4)
+  list.Remove(7)
+  list.RemoveAt(0)
+  // length after remove
+  la := len(list.elements)
+  // check length after remove
+  if lb < la {
+    t.Error("Remove() should remove element from the list")
+  } else {
+    t.Log("Removed ", element, " from the list")
+  }
+  t.Log("List ", list.Values())
 }

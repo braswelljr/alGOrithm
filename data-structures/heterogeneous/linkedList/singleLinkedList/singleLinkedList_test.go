@@ -52,7 +52,7 @@ func TestNextValue(t *testing.T) {
   }
   lv := list.Values()
   t.Log("List -> ", lv)
-  t.Log("Head (", list.head.value, ") and Tail (", list.tail, ")")
+  t.Log("Head (", list.head, ") and Tail (", list.tail, ")")
   t.Log("Next list -> ", nextList)
   nlv, nnextList := lv[1:], nextList[:len(nextList)-1]
 
@@ -60,9 +60,9 @@ func TestNextValue(t *testing.T) {
     for j, _ := range nnextList {
       if i == j {
         if nlv[i] == nnextList[j] {
-          t.Log("The next value of the node ", nlv[i], " is ", nnextList[j])
+          t.Log("The next value of the node ", lv[i], " is ", nnextList[j])
         } else {
-          t.Error("Expected The next value of the node ", nlv[i], " to be ", nnextList[j], " but got ", nnextList[j])
+          t.Error("Expected The next value of the node ", lv[i], " to be ", nextList[j], " but got ", nnextList[j])
           break
         }
       }
