@@ -17,9 +17,8 @@ func TestRadixSort(t *testing.T) {
 }
 
 func TestRadixSortLoop(t *testing.T) {
-  slice := []int{2, 4, 3, 5, 4, 1, 6}
+  slice := []int{2, 390, 5, 4, 20, 1, 6}
   slice = RadixSort(slice)
-  //RadixSort(slice)
   for i := 0; i < len(slice)-1; i++ {
     if slice[i] > slice[i+1] {
       t.Error("RadixSort() failed. Got", slice[i], " < ", slice[i+1], ". Expected ", slice[i], " > ", slice[i+1])

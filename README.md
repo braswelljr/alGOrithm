@@ -41,7 +41,7 @@ Algorithm is a set of instructions that describes how to get something done.
 
 ### Classification of Algorithms
 
-- #### _[Sort](algorithms/sort)_
+- #### _[SORT](algorithms/sort)_
   - [Bubble Sort](algorithms/sort/bubbleSort/bubbleSort.go) : is a simple sorting algorithm that repeatedly steps through the list, compares elements and swaps them if they are in the wrong order. Bubble Sort has a **time complexity** of <code>O(n<sup>2</sup>)</code>.
   - [Merge Sort](algorithms/sort/mergeSort/mergeSort.go) : is a comparison based sort that recursively splits the list into smaller sub-lists until the sub-lists are small enough to be sorted individually. Merge Sort was invented by [`John Von Neumman`](https://en.wikipedia.org/wiki/John_von_Neumann) in _1945_. It has a **time complexity** of <code>O(n log n)</code>.
   - [Comb Sort](#) : is a sorting algorithm that uses a gap sequence to sort the array. It is a variant of the Bubble Sort algorithm. Comb Sort has a **time complexity** of <code>O(n<sup>2</sup>)</code>. The algorithm is a variation of the [bubble sort](algorithms/sort/bubbleSort/bubbleSort.go) algorithm. It was originally designed by [`Włodzimierz Dobosiewicz`](#) and [`Artur Borowy`](#) in 1980
@@ -49,10 +49,10 @@ Algorithm is a set of instructions that describes how to get something done.
   - [Quick Sort](algorithms/sort/quickSort/quickSort.go) : is a comparison based sort that uses a divide and conquer strategy to sort the list. Quick Sort has a **time complexity** of <code>O(n log n)</code>.
   - [Selection Sort](algorithms/sort/selectionSort/selectionSort.go) : is a comparison based sort that finds the smallest element in the list and places it at the beginning. Selection Sort has a **time complexity** of <code>O(n<sup>2</sup>)</code>.
   - [Insertion Sort](algorithms/sort/insertionSort/insertionSort.go) : is a comparison based sort that builds the final sorted array one item at a time. Insertion Sort has a **time complexity** of <code>O(n<sup>2</sup>)</code>.
-  - [Radix Sort](algorithms/sort/radixSort/radixSort.go) : is a comparison based sort that sorts the list by grouping the list into buckets. Radix Sort has a **time complexity** of <code>O(n<sup>2</sup>)</code>. `uncomplete`
+  - [Radix Sort](algorithms/sort/radixSort/radixSort.go) : is a comparison based sort that sorts the list by grouping the list into buckets.  It avoids comparison by creating and distributing elements into buckets according to their radix. Radix Sort has a **time complexity** of <code>O(n<sup>2</sup>)</code>. `uncomplete`
+  - [Bucket Sort](#)
   - [Shell Sort](#)
   - [Tree Sort](#)
-  - [Bucket Sort](#)
   - [Counting Sort](#)
   - [Smooth Sort](#)
   - [Bogo Sort](#)

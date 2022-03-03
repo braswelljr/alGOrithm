@@ -1,5 +1,9 @@
 package radixSort
 
+import (
+  "strconv"
+)
+
 // RadixSort is a non-comparative integer sorting algorithm.
 func RadixSort(list []int) []int {
   if len(list) < 2 {
@@ -18,29 +22,38 @@ func RadixSort(list []int) []int {
     }
   }
 
-  // create a bucket for each digit
-  buckets := make([][]int, 10)
+  // add the zero padding
+  x := "1"
+  // loop through the max and add the zero padding
+  for i := 0; i < len(strconv.Itoa(max)); i++ {
+    x += "0"
+  }
+  // convert the max to a string
+  padding, _ := strconv.Atoi(x)
+
+  // create a list of buckets
+  buckets := make([][]int, padding)
+
   // loop through the list and sort it
   for _, element := range list {
-    // get the digit of the element
-    digit := element / max
-    // append the element to the bucket
-    buckets[digit] = append(buckets[digit], element)
-  }
+    // get the bucket index
+    bucketIndex := element % padding
 
-  //  loop through the buckets and sort them
+    // append the element to the bucket
+    buckets[bucketIndex] = append(buckets[bucketIndex], element)
+  }
+  // create a new list
+  list = []int{}
+
+  // loop through the buckets and sort them
   for _, bucket := range buckets {
     // sort the bucket
-    bucket = RadixSort(bucket)
-  }
+    sortedBucket := RadixSort(bucket)
 
-  // create a new list to hold the sorted list
-  sortedList := make([]int, 0)
-  // loop through the buckets and append the elements to the sorted list
-  for _, bucket := range buckets {
-    sortedList = append(sortedList, bucket...)
+    // append the sorted bucket to the list
+    list = append(list, sortedBucket...)
   }
 
   // return the sorted list
-  return sortedList
+  return list
 }
