@@ -76,10 +76,12 @@ Algorithm is a set of instructions that describes how to get something done.
   - [Jump to Search](algorithms/search/jumpSearch/jumpSearch.go) : is a search algorithm that finds the position of a target value in a sorted array. It is a variation of the [Binary Search](algorithms/search/binarySearch/binarySearch.go) algorithm. It has a **time complexity** of <code>O(log n)</code> and a **space complexity** of <code>O(1)</code>.
   - [Linear Search](algorithms/search/linearSearch/linearSearch.go) : is a search algorithm that finds the position of a target value in a sorted array. It has a **time complexity** of <code>O(n)</code> and a **space complexity** of <code>O(1)</code>.
   - [Ternary Search](algorithms/search/ternarySearch/ternarySearch.go) : is a search algorithm that finds the position of a target value in a sorted array.
-
+  - [Breadth-First Search](algorithms/search/breadthFirstSearch/breadthFirstSearch.go) : is a search algorithm that finds the position of a target value in a graph. It has a **time complexity** of <code>O(n)</code> and a **space complexity** of <code>O(n)</code>.
 - #### [Cipher](algorithms/cipher)
   - [Caesar Cipher](algorithms/cipher/caesarCipher/caesarCipher.go) : is a cipher that shifts each letter in a message by a certain number of places. It has a time complexity of <code>O(n)</code>.
   - [Vigenere Cipher](algorithms/cipher/vigenereCipher/vigenereCipher.go) : is a cipher that shifts each letter in a message by a certain number of places. It has a time complexity of <code>O(n)</code>.
   - [Hill Cipher](#) : is a cipher that shifts each letter in a message by a certain number of places. It has a time complexity of <code>O(n)</code>.`uncomplete`
   - [Rot13 Cipher](#) : is a cipher that shifts each letter in a message by 13 number of places. It has a time complexity of <code>O(n)</code>.
 - #### _[Graph](algorithms/graph)_
+  - [A* Search](algorithms/graph/aStarSearch/aStarSearch.go) : is a search algorithm that finds the shortest path between two nodes in a graph. It has a **time complexity** of <code>O(n)</code> and a **space complexity** of <code>O(b^d)</code>.
+  - [Dijkstra's Algorithm](algorithms/graph/dijkstra/dijkstra.go) : is a search algorithm that finds the shortest path between two nodes in a graph. It has a **time complexity** of <code>O(n)</code> and a **space complexity** of <code>O(n)</code>.
