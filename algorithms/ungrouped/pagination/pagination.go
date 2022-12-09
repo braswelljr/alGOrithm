@@ -101,81 +101,103 @@ func New(page, perPage, total, offset int) *Pagination {
 }
 
 // Page returns the page.
+// @return int
 func (p *Pagination) Page() int {
 	return p.page
 }
 
 // PerPage returns the perPage.
+// @return int
 func (p *Pagination) PerPage() int {
 	return p.perPage
 }
 
 // Total returns the total.
+// @return int
 func (p *Pagination) Total() int {
 	return p.total
 }
 
 // Pages returns the total number of pages.
+// @return int
 func (p *Pagination) Pages() int {
 	return p.pages
 }
 
 // Previous returns the previous.
+// @return int
 func (p *Pagination) Previous() int {
 	return p.previous
 }
 
 // Next returns the next.
+// @return int
 func (p *Pagination) Next() int {
 	return p.next
 }
 
 // Offset returns the offset.
+// @return int
 func (p *Pagination) Offset() int {
 	return p.offset
 }
 
 // HasPrevious returns true if the pagination has a previous page, false otherwise.
+// @return bool
 func (p *Pagination) HasPrevious() bool {
 	return p.page > 1
 }
 
 // HasNext returns true if the pagination has a next page, false otherwise.
+// @return bool
 func (p *Pagination) HasNext() bool {
 	return p.page < p.pages
 }
 
 // set the page
+// @param page - the current page.
+// @return void
 func (p *Pagination) SetPage(page int) {
 	p.page = page
 }
 
 // set the perPage
+// @param perPage - the number of items per page.
+// @return void
 func (p *Pagination) SetPerPage(perPage int) {
 	p.perPage = perPage
 }
 
 // set the total
+// @param total - the total number of items.
+// @return void
 func (p *Pagination) SetTotal(total int) {
 	p.total = total
 }
 
 // set the pages
+// @param pages - the total number of pages.
 func (p *Pagination) SetPages(pages int) {
 	p.pages = pages
 }
 
 // set the previous
+// @param previous - the previous page.
+// @return void
 func (p *Pagination) SetPrevious(previous int) {
 	p.previous = previous
 }
 
 // set the next
+// @param next - the next page.
+// @return void
 func (p *Pagination) SetNext(next int) {
 	p.next = next
 }
 
 // set the offset
+// @param offset - the offset.
+// @return void
 func (p *Pagination) SetOffset(offset int) {
 	p.offset = offset
 }
