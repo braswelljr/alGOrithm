@@ -19,4 +19,4 @@ clean:
 
 .PHONY: test
 test:
-	go test $(go list ./... | grep -v /utils)
+	go test -race -v ./...
