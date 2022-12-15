@@ -75,7 +75,6 @@ func (list *List) Remove(element interface{}) {
 			// remove node from list
 			list.list = append(list.list[:i], list.list[i+1:]...)
 		}
-		break
 	}
 }
 

@@ -40,7 +40,7 @@ func TestListRemove(t *testing.T) {
 
 	v := 7
 	ol := len(list.list) // old length (length before insert)
-	var tobeRemoved interface{} = nil
+	var tobeRemoved *Node
 
 	for _, node := range list.list {
 		if v == node.value {
@@ -49,13 +49,12 @@ func TestListRemove(t *testing.T) {
 	}
 	list.Remove(v)
 	nl := len(list.list) // new length (length after insert)
-	//t.Log(tobeRemoved, "- New length:", nl, " - Old length:", ol)
 
 	if nl >= ol && tobeRemoved == nil {
 		t.Log("No matching nodes to be removed!")
 		return
 	} else if nl >= ol {
-		t.Error("Something happened, Could not remove node!")
+		t.Error("Could not remove item from List")
 		return
 	}
 
