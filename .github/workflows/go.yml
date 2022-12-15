@@ -31,11 +31,11 @@ jobs:
       - name: Download dependencies
         run: go mod download
 
-      - name: Run tests
-        run: make test
-
       - name: Build
         run: go build -v ./...
 
+      - name: Lint
+        run: go fmt ./...
+
       - name: Test
-        run: go test $(go list ./... | grep -v /utils)
+        run: go test -race ./...
