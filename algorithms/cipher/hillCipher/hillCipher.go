@@ -1,6 +1,7 @@
 package hillCipher
 
 import (
+	"github.com/braswelljr/alGOrithm/data-structures/non-linear/matrix"
 	"github.com/braswelljr/alGOrithm/utils"
 )
 
@@ -29,4 +30,29 @@ func GenerateKey(n int) [][]int {
 
 	// return the key matrix
 	return keyMatrix
+}
+
+// Encrypt - encrypts a message using the hill cipher
+//
+//	@param message - the message to be encrypted
+//	@param keyMatrix - the key matrix
+//	@return encryptedMessage - the encrypted message
+func Encrypt(message string, keyMatrix [][]int) string {
+	// convert the message to an integer matrix
+	// multiply the key matrix and the message matrix
+	// import from the matrix package
+	// messageMatrix := utils.ConvertStringToMatrix(message, len(keyMatrix))
+	messageMatrix := matrix.ConvertStringToMatrix(message, len(keyMatrix))
+
+	// set keyMatrix as the base matrix
+	k := matrix.NewFromData(keyMatrix)
+
+	// multiply the key matrix and the message matrix
+	product := k.Multiply(messageMatrix)
+
+	// convert the product matrix to a string
+	encryptedMessage := product.ConvertToString()
+
+	// return the encrypted message
+	return encryptedMessage
 }
