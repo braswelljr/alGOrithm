@@ -35,13 +35,18 @@ func New(lists ...[]interface{}) *List {
 	return l
 }
 
-// Init initializes or clears list l.
+// Init - initializes or clears list l.
+//
+//	@return - *List
 func (l *List) Init() *List {
 	l.length = 0
 	return l
 }
 
-// Push : Adds a new element to the end of the list.
+// Push - Adds a new element to the end of the list.
+//
+//	@param element - element to be added
+//	@return - void
 func (l *List) Push(element interface{}) {
 	// Create a new node.
 	node := element
@@ -51,7 +56,9 @@ func (l *List) Push(element interface{}) {
 	l.length++
 }
 
-// Pop : Removes the last element from list
+// Pop - Removes the last element from list
+//
+//	@return - void
 func (l *List) Pop() {
 	// slice the list from the last element
 	l.list = l.list[:l.length-1]
@@ -59,13 +66,18 @@ func (l *List) Pop() {
 	l.length--
 }
 
-// Size : Returns the length of the list
+// Size - Returns the length of the list
+//
+//	@return - int
 func (l *List) Size() int {
 	// return the length of the list
 	return l.length
 }
 
-// Join : Joins new slice with old and returns a new list
+// Join - adds new slice with old and returns a new list
+//
+//	@param slice - slice to be added
+//	@return - *List
 func (l *List) Join(slice []interface{}) *List {
 	// covert slice  to node
 	// Create a new node.
@@ -82,7 +94,11 @@ func (l *List) Join(slice []interface{}) *List {
 	return l
 }
 
-//Insert : Inserts an element at a particular position specified if not append it add the end of the list
+// Insert - adds an element at a particular position specified if not append it add the end of the list
+//
+//	@param element - element to be added
+//	@param at - position of element to be added
+//	@return - void
 func (l *List) Insert(element interface{}, at int) {
 	// set node value
 	node := element
@@ -115,7 +131,10 @@ func (l *List) Insert(element interface{}, at int) {
 	l.length = len(l.list)
 }
 
-// Remove : Remove takes out an item from list
+// Remove - Remove takes out an item from list
+//
+//	@param element - element to be removed
+//	@return - void
 func (l *List) Remove(element interface{}) {
 	// loop through list
 	for i, item := range l.list {
@@ -129,7 +148,10 @@ func (l *List) Remove(element interface{}) {
 	}
 }
 
-// RemoveAt : RemoveAt takes out an item from list at a given position
+// RemoveAt - takes out an item from list at a given position
+//
+//	@param at - position of item to be removed
+//	@return - void
 func (l *List) RemoveAt(at int) {
 	// check for a zero or negative value(treat as zero)
 	if at < 0 || at >= l.length {
@@ -147,7 +169,10 @@ func (l *List) RemoveAt(at int) {
 	}
 }
 
-// Get : Returns the element at the given position
+// Get - Returns the element at the given position
+//
+//	@param at - position of item to be removed
+//	@return - void
 func (l *List) Get(at int) interface{} {
 	// check for a zero or negative value(treat as zero)
 	if at < 1 {
@@ -160,7 +185,10 @@ func (l *List) Get(at int) interface{} {
 	return l.list[at]
 }
 
-// Contains : Returns true if the list contains the element
+// Contains - Returns true if the list contains the element
+//
+//	@param element - element to be checked
+//	@return - bool
 func (l *List) Contains(element interface{}) bool {
 	// loop through list
 	for _, item := range l.list {
@@ -172,13 +200,17 @@ func (l *List) Contains(element interface{}) bool {
 	return false
 }
 
-// Clear : Clears the list
+// Clear - empties the list
+//
+//	@return - void
 func (l *List) Clear() {
 	l.list = []interface{}{}
 	l.length = len(l.list)
 }
 
-// Reverse : Reverses the list
+// Reverse - Reverses the list
+//
+//	@return - void
 func (l *List) Reverse() {
 	// reverse the list
 	for i, j := 0, len(l.list)-1; i < j; i, j = i+1, j-1 {
