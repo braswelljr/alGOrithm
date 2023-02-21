@@ -1,8 +1,14 @@
+// CaesarCipher is a function that takes a string and a number and returns the string encrypted with the caesar cipher.
+//
+//	@function Encrypt - takes up a word with a shift value and returns the word encrypted with the caesar cipher.
+//	@function Decrypt - takes up an encrypted word with the corresponding shift value and returns the decrypted word.
 package caesarCipher
 
-// CaesarCipher is a function that takes a string and a number and returns the string encrypted with the caesar cipher.
-
-// Encrypt returns the word with shifted values
+// Encrypt - takes up a word with a shift value and returns an encryption.
+//
+//	@param word - word to be encrypted
+//	@param shift - shift value
+//	@return - string
 func Encrypt(word string, shift int) string {
 	var cipher string
 
@@ -26,7 +32,11 @@ func Encrypt(word string, shift int) string {
 	return cipher
 }
 
-// Decrypt returns the word with shifted values
+// Decrypt - takes up an encrypted word with the corresponding shift value and returns the decrypted word.
+//
+//	@param cipher - encrypted word
+//	@param shift - shift value
+//	@return - string
 func Decrypt(cipher string, shift int) string {
 	var word string
 

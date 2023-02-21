@@ -1,3 +1,29 @@
+// list - A list is a linear data structure, in which the elements are not stored at contiguous memory locations.
+//
+//	@function New - creates a new list
+//	@function Init - initializes or clears list l.
+//	@function Push - Adds a new element to the end of the list.
+//	@function Pop - Removes the last element from list
+//	@function Size - Returns the length of the list
+//	@function Join - adds new slice with old and returns a new list
+//	@function Insert - adds an element at a particular position specified if not append it add the end of the list
+//	@function Remove - removes an element at a particular position specified
+//	@function Get - returns an element at a particular position specified
+//	@function Set - sets an element at a particular position specified
+//	@function IndexOf - returns the index of an element specified
+//	@function Contains - checks if an element is in the list
+//	@function Clear - clears the list
+//	@function Empty - checks if the list is empty
+//	@function Reverse - reverses the list
+//	@function Sort - sorts the list
+//	@function Swap - swaps two elements in the list
+//	@function String - returns a string representation of the list
+//	@function Values - returns a slice of the list
+//	@function Iterator - returns an iterator for the list
+//	@function Equal - checks if two lists are equal
+//	@function Copy - copies the list
+//	@function Clone - clones the list
+//	@function Merge - merges two lists
 package list
 
 // List represents a singly linked list.
@@ -158,7 +184,7 @@ func (l *List) RemoveAt(at int) {
 		return
 	}
 	// loop through list
-	for i, _ := range l.list {
+	for i := range l.list {
 		// check for an equal item
 		if i == at {
 			// append split slice at the given index
@@ -200,10 +226,10 @@ func (l *List) Contains(element interface{}) bool {
 	return false
 }
 
-// Clear - empties the list
+// Empty - empties the list
 //
 //	@return - void
-func (l *List) Clear() {
+func (l *List) Empty() {
 	l.list = []interface{}{}
 	l.length = len(l.list)
 }

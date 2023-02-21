@@ -26,7 +26,7 @@ func TestList(t *testing.T) {
 	t.Logf("if %v then it contains %v\n", l.Contains(number), number)
 	l.RemoveAt(2)
 	t.Logf("With RemoveAt: %v", l)
-	l.Clear()
+	l.Empty()
 	t.Logf("With Clear: %v", l)
 	l.Join(x)
 	t.Logf("With Join: %v", l)
@@ -46,7 +46,7 @@ func TestListSize(t *testing.T) {
 
 // test empty list clear
 func TestListClear(t *testing.T) {
-	list.Clear()
+	list.Empty()
 	if list.Size() != 0 {
 		t.Errorf("Clear() should return an empty list")
 		return
