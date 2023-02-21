@@ -1,3 +1,17 @@
+// Tuple - A finite ordered list (sequence) of elements.
+// Tuples are immutable forms of Lists.
+// Tuple is a reference type.
+//
+//		@function Init - initializes a new tuple
+//		@function New - calls the Init function to initialize a new Tuple
+//		@function Size - returns the number of elements in the tuple
+//		@function Get - returns the element at the specified position in the tuple
+//	  @function Set - replaces the element at the specified position in the tuple with the specified element
+//		@function Contains - returns true if the tuple contains the specified element
+//		@function IndexOf - returns the index of the first occurrence of the specified element in the tuple
+//		@function String - returns a string representation of the tuple
+//		@function Values - returns a slice of the tuple
+//		@function Iterator - returns an iterator for the tuple
 package tuple
 
 import (
@@ -120,10 +134,8 @@ func (tuple *Tuple) Equals(other *Tuple) bool {
 func (tuple *Tuple) Clone() *Tuple {
 	// create a new tuple
 	clone := new(Tuple).Init()
-	// iterate over the list and append the elements
-	for _, item := range tuple.elements {
-		clone.elements = append(clone.elements, item)
-	}
+	// copy the elements of the current tuple to the new tuple
+	clone.elements = append(clone.elements, tuple.elements...)
 	// return the clone
 	return clone
 }
@@ -156,10 +168,8 @@ func (tuple *Tuple) Reverse() *Tuple {
 func (tuple *Tuple) ToArray() []interface{} {
 	// create a new array
 	arrayTuple := make([]interface{}, tuple.Size())
-	// iterate over the list and append the elements
-	for index, item := range tuple.elements {
-		arrayTuple[index] = item
-	}
+	// copy the elements of the current tuple to the new array
+	copy(arrayTuple, tuple.elements)
 	// return the array
 	return arrayTuple
 }

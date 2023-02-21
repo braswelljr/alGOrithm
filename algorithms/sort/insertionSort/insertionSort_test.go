@@ -33,12 +33,10 @@ func TestInsertionSortLoop(t *testing.T) {
 	t.Log("Slice : ", slice)
 }
 
-// returns a slice of random numbers with range n
+// Perm - return a slice of random numbers with range n
 func perm(n int) (out []int) {
-	for _, v := range rand.Perm(n) {
-		out = append(out, v)
-	}
-	return
+	// return a slice of random numbers with range n
+	return append(out, rand.Perm(n)...)
 }
 
 func BenchmarkInsertionSort(b *testing.B) {
@@ -47,10 +45,15 @@ func BenchmarkInsertionSort(b *testing.B) {
 }
 
 func benchmarkInsertionSort(x int, b *testing.B) {
+	// run the InsertionSort function b.N times
 	for i := 0; i < b.N; i++ {
+		// stop timer
 		b.StopTimer()
+		// get a slice of random numbers with range x
 		values := perm(x)
+		// start timer
 		b.StartTimer()
-		values = InsertionSort(values)
+		// run the InsertionSort function
+		_ = InsertionSort(values)
 	}
 }

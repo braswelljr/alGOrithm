@@ -20,3 +20,16 @@ clean:
 .PHONY: test
 test:
 	go test -race -v ./...
+
+.PHONY: fix
+fix: ## Fix lint violations
+	gofmt -s -w .
+	goimports -w $$(find . -type f -name '*.go' -not -path "*/vendor/*")
+
+.PHONY: check-makefile
+check-makefile:
+	cat -e -t -v Makefile
+
+.PHONY: lint
+lint: ## Run linters
+	$(GOLINT) run

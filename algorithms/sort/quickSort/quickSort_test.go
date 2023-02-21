@@ -32,24 +32,39 @@ func TestQuickSortLoop(t *testing.T) {
 	t.Log("Slice : ", slice)
 }
 
-// returns a slice of random numbers with range n
+// perm - return a slice of random numbers with range n
+//
+//	@param {int} n - range of the slice
+//	@return {[]int} - slice of random numbers
 func perm(n int) (out []int) {
-	for _, v := range rand.Perm(n) {
-		out = append(out, v)
-	}
-	return
+	// rand.Perm returns a slice of n random numbers
+	return append(out, rand.Perm(n)...)
 }
 
+// BenchmarkQuickSort - run the QuickSort function b.N times
+//
+//	@param {testing.B} b - testing.B
+//	@return - void
 func BenchmarkQuickSort(b *testing.B) {
 	// Benchmark a 100
 	benchmarkQuickSort(100, b)
 }
 
+// benchmarkQuickSort - run the QuickSort function b.N times
+//
+//	@param {int} x - size of the slice
+//	@param {testing.B} b - testing.B
+//	@return - void
 func benchmarkQuickSort(x int, b *testing.B) {
+	// run the QuickSort function b.N times
 	for i := 0; i < b.N; i++ {
+		// stop timer
 		b.StopTimer()
+		// get a slice of random numbers with range x
 		values := perm(x)
+		// start timer
 		b.StartTimer()
-		values = QuickSort(values)
+		// run the QuickSort function
+		_ = QuickSort(values)
 	}
 }

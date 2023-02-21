@@ -31,24 +31,39 @@ func TestSelectionSortLoop(t *testing.T) {
 	t.Log("Slice : ", slice)
 }
 
-// returns a slice of random numbers with range n
+// perm - return a slice of random numbers with range n
+//
+//	@param {int} n - range of the slice
+//	@return {[]int} - slice of random numbers
 func perm(n int) (out []int) {
-	for _, v := range rand.Perm(n) {
-		out = append(out, v)
-	}
-	return
+	// rand.Perm returns a slice of n random numbers
+	return append(out, rand.Perm(n)...)
 }
 
+// BenchmarkRadixSort - run the RadixSort function b.N times
+//
+//	@param {testing.B} b - testing.B
+//	@return - void
 func BenchmarkSelectionSort(b *testing.B) {
 	// Benchmark a 100
 	benchmarkSelectionSort(100, b)
 }
 
+// benchmarkSelectionSort - run the SelectionSort function b.N times
+//
+//	@param {int} x - size of the slice
+//	@param {testing.B} b - testing.B
+//	@return - void
 func benchmarkSelectionSort(x int, b *testing.B) {
+	// run the SelectionSort function b.N times
 	for i := 0; i < b.N; i++ {
+		// stop timer
 		b.StopTimer()
+		// get a slice of random numbers
 		values := perm(x)
+		// start timer
 		b.StartTimer()
-		values = SelectionSort(values)
+		// run the SelectionSort function
+		_ = SelectionSort(values)
 	}
 }

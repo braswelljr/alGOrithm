@@ -21,10 +21,8 @@ func New(elements ...[]interface{}) *Stack {
 
 	// Iterate over the list and create a node for each value.
 	for _, item := range elements {
-		for _, value := range item {
-			//append slice to the end of the list
-			element = append(element, value)
-		}
+		// append slice to the end of the list
+		element = append(element, item...)
 	}
 
 	// Create a new node.

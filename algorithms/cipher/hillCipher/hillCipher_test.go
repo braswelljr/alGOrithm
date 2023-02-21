@@ -5,7 +5,7 @@ import "testing"
 var (
 	size      = 15                // the size of the key matrix
 	keyMatrix = GenerateKey(size) // the key matrix
-	messages  = []string{
+	_         = []string{
 		"Hello World!",
 		"Go is awesome!\nBut we gotta do it right!",
 		"Go is awesome!\nBut we gotta do it right!\nAnd we gotta do it fast!",
