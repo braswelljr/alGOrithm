@@ -12,9 +12,10 @@ type Matrix struct {
 }
 
 // New - creates a new matrix
-// @param rows - the number of rows
-// @param cols - the number of columns
-// @return m - the matrix
+//
+//	@param rows - the number of rows
+//	@param cols - the number of columns
+//	@return m - the matrix
 func New(rows, cols int) *Matrix {
 	// create a new matrix
 	m := &Matrix{}
