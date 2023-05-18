@@ -1,7 +1,7 @@
 package breadthFirstSearch
 
 import (
-  "testing"
+	"testing"
 )
 
 // Test BreadthFirstSearch with a graph with a single vertex.

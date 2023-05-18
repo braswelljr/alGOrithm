@@ -2,9 +2,9 @@ package utils
 
 // ConvertStringToMatrix - converts a string to a matrix
 //
-//  @param message - the message to be converted
-//  @param n - the size of the matrix
-//  @return matrix - the matrix
+//	@param message - the message to be converted
+//	@param n - the size of the matrix
+//	@return matrix - the matrix
 func ConvertStringToMatrix(message string, n int) [][]int {
 	// create a slice of slices
 	var matrix [][]int

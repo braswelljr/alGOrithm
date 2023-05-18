@@ -13,23 +13,23 @@ func New(key string) *VigenereCipher {
 // Encrypt encrypts the given plaintext using the Vigenere cipher.
 func (c *VigenereCipher) Encrypt(word string) string {
 	var cipher string
-  // loop through word
+	// loop through word
 	for _, c := range word {
-    // append character to the cipher
+		// append character to the cipher
 		cipher += string(c + 26 - 'a')
 	}
-  // return the cipher
+	// return the cipher
 	return cipher
 }
 
 // Decrypt decrypts the given cipher using the Vigenere cipher.
 func (c *VigenereCipher) Decrypt(cipher string) string {
 	var word string
-  // loop cipher
+	// loop cipher
 	for _, c := range cipher {
-    // append character to word
+		// append character to word
 		word += string(c - 26 + 'a')
 	}
-  // return word
+	// return word
 	return word
 }
