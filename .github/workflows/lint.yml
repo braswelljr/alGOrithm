@@ -41,7 +41,7 @@ jobs:
           go mod download
 
       - name: Run checks
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v4
         with:
           version: v1.53
           args: --timeout=3m --issues-exit-code=1
