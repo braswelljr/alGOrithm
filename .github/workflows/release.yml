@@ -1,5 +1,6 @@
 # Release: on a vX.Y.Z tag, re-run the checks and publish the algorithm
-# command for every platform with GoReleaser (.goreleaser.yaml).
+# command for every platform with GoReleaser (.goreleaser.yaml), then the
+# site's WebAssembly on the release and on GitHub Pages (the wasm job).
 name: Release
 
 on:
@@ -36,3 +37,56 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+
+  # The site's WebAssembly: Vercel builds only the Next.js site, so each
+  # release builds algorithm.wasm and terminal.wasm here, attaches them to the
+  # GitHub release, and publishes them on GitHub Pages (the gh-pages branch),
+  # which serves them to other origins from a CDN: wasm/vX.Y.Z/ for good, and
+  # wasm/latest/ for the site (NEXT_PUBLIC_WASM_BASE on Vercel). Every
+  # release's folder is kept, so an older deployment still finds its build.
+  wasm:
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      # The terminal's module needs a newer Go than the library's go.mod.
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: web/runtime/go.mod
+
+      - name: Build the wasm
+        run: make web/wasm
+
+      - name: Attach to the release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "$GITHUB_REF_NAME" web/public/algorithm.wasm web/public/terminal.wasm web/public/wasm_exec.js --clobber
+
+      - name: Publish on GitHub Pages
+        run: |
+          set -euo pipefail
+          out="$(mktemp -d)"
+          cp web/public/algorithm.wasm web/public/terminal.wasm web/public/wasm_exec.js "$out/"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin gh-pages >/dev/null; then
+            git fetch origin gh-pages
+            git switch gh-pages
+          else
+            git switch --orphan gh-pages
+            git rm -rf --quiet . || true
+          fi
+          mkdir -p "wasm/$GITHUB_REF_NAME" wasm/latest
+          cp "$out"/* "wasm/$GITHUB_REF_NAME/"
+          cp "$out"/* wasm/latest/
+          touch .nojekyll
+          git add .nojekyll wasm
+          git commit -m "wasm: $GITHUB_REF_NAME" || echo "nothing to publish"
+          git push origin gh-pages

@@ -70,8 +70,8 @@ func (a *Matrix) Multiply(b *Matrix) *Matrix {
 	for i := 0; i < a.Rows; i++ {
 		// loop through the columns
 		for j := 0; j < b.Cols; j++ {
-			// loop through the rows
-			for k := 0; k < a.Rows; k++ {
+			// loop through a's columns (b's rows)
+			for k := 0; k < a.Cols; k++ {
 				// multiply the values and add it to the matrix
 				c.Data[i][j] += a.Data[i][k] * b.Data[k][j]
 			}
@@ -168,46 +168,62 @@ func (a *Matrix) Determinant() int {
 	return determinant(b)
 }
 
-// determinant - calculates the determinant of a matrix
+// determinant - calculates the determinant of a square matrix by cofactor
+// expansion along the first row
 //
 //	@param a - the matrix
 //	@return det - the determinant of the matrix
 func determinant(a *Matrix) int {
-	// check if the matrix is 2x2
-	if a.Rows == 2 && a.Cols == 2 {
-		// return the determinant
+	switch a.Rows {
+	case 0:
+		return 1
+	case 1:
+		return a.Data[0][0]
+	case 2:
 		return a.Data[0][0]*a.Data[1][1] - a.Data[0][1]*a.Data[1][0]
 	}
 
-	// create a new matrix
-	b := NewMatrix(a.Rows-1, a.Cols-1)
-
 	// create a variable to hold the determinant
-	det := 0
+	det, sign := 0, 1
 
-	// loop through the columns
+	// expand along the first row, alternating the cofactor's sign
 	for i := 0; i < a.Cols; i++ {
-		// loop through the rows
-		for j := 1; j < a.Rows; j++ {
-			// loop through the columns
-			for k := 0; k < a.Cols; k++ {
-				// check if the column is not the current column
-				if k != i {
-					// set the value
-					b.Data[j-1][k] = a.Data[j][k]
-				}
-			}
-		}
-
-		// calculate the determinant
-		det += a.Data[0][i] * determinant(b)
+		det += sign * a.Data[0][i] * determinant(minor(a, 0, i))
+		sign = -sign
 	}
 
 	// return the determinant
 	return det
 }
 
-// Inverse - calculates the inverse of a matrix
+// minor - the matrix a without one row and one column
+//
+//	@param a - the matrix
+//	@param row - the row to leave out
+//	@param col - the column to leave out
+//	@return m - the minor
+func minor(a *Matrix, row, col int) *Matrix {
+	m := NewMatrix(a.Rows-1, a.Cols-1)
+	for i, r := 0, 0; i < a.Rows; i++ {
+		if i == row {
+			continue
+		}
+		for j, c := 0, 0; j < a.Cols; j++ {
+			if j != col {
+				m.Data[r][c] = a.Data[i][j]
+				c++
+			}
+		}
+		r++
+	}
+	return m
+}
+
+// Inverse - calculates the inverse of a square matrix as its adjugate
+// divided by its determinant. The entries are integers, so the result is
+// exact only when the inverse has integer entries (a determinant of 1 or -1,
+// for one); otherwise each entry is truncated toward zero. A singular matrix
+// (determinant 0) gives the zero matrix.
 //
 //	@param a - the matrix
 //	@return b - the inverse of the matrix
@@ -216,7 +232,7 @@ func (a *Matrix) Inverse() *Matrix {
 	b := NewMatrix(a.Rows, a.Cols)
 
 	// calculate the determinant
-	det := b.Determinant()
+	det := a.Determinant()
 
 	// check if the determinant is 0
 	if det == 0 {
@@ -224,42 +240,14 @@ func (a *Matrix) Inverse() *Matrix {
 		return b
 	}
 
-	// create a new matrix
-	c := NewMatrix(a.Rows-1, a.Cols-1)
-
-	// loop through the rows
+	// the adjugate is the transpose of the cofactor matrix
 	for i := 0; i < a.Rows; i++ {
-		// loop through the columns
 		for j := 0; j < a.Cols; j++ {
-			// loop through the rows
-			for k := 0; k < a.Rows; k++ {
-				// check if the row is not the current row
-				if k != i {
-					// loop through the columns
-					for l := 0; l < a.Cols; l++ {
-						// check if the column is not the current column
-						if l != j {
-							// set the value
-							c.Data[k][l] = a.Data[k][l]
-						}
-					}
-				}
-			}
-
-			// set the value
-			b.Data[i][j] = determinant(c)
-		}
-	}
-
-	// loop through the rows
-	for i := 0; i < a.Rows; i++ {
-		// loop through the columns
-		for j := 0; j < a.Cols; j++ {
-			// check if the row and column are even
+			cofactor := determinant(minor(a, i, j))
 			if (i+j)%2 != 0 {
-				// set the value
-				b.Data[i][j] = -b.Data[i][j]
+				cofactor = -cofactor
 			}
+			b.Data[j][i] = cofactor / det
 		}
 	}
 

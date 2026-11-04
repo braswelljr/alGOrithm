@@ -15,7 +15,7 @@ make ci       # what CI runs for Go
 make dev      # build, serve the site, and rebuild and test on every change (make web/install first)
 ```
 
-Go 1.21 or later, and no Go dependencies ([rule](docs/rules/the-standard-library-only.md)). Node.js 24+ and pnpm for `web/` only.
+Go 1.27 or later, and no Go dependencies ([rule](docs/rules/the-standard-library-only.md)). Node.js 24+ and pnpm for `web/` only.
 
 ## Adding an algorithm, data structure or simulation
 

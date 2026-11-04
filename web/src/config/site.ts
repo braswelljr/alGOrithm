@@ -6,7 +6,10 @@ export const wasmVersion = process.env.NEXT_PUBLIC_WASM_VERSION ?? 'dev';
 
 export const wasmOptions = {
   wasmUrl: `${basePath}/algorithm.wasm?v=${wasmVersion}`,
-  execUrl: `${basePath}/wasm_exec.js?v=${wasmVersion}`
+  execUrl: `${basePath}/wasm_exec.js?v=${wasmVersion}`,
+  // The release's builds (GitHub Pages) when published, else the site's own:
+  // lib/wasm-source.ts.
+  resolve: () => import('@/lib/wasm-source').then((m) => m.wasmUrl('algorithm'))
 };
 
 export const repoUrl = 'https://github.com/braswelljr/alGOrithm';

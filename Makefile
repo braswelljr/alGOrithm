@@ -31,6 +31,13 @@ cover: ## Coverage profile into coverage.out, then a per-function summary
 	go test -race -coverprofile=coverage.out ./...
 	go tool cover -func=coverage.out
 
+.PHONY: cover/check
+cover/check: ## Fail when a pkg/ package is under 90% or an exported function is untested
+	# -coverpkg counts every test that runs pkg/ code: the registry's runs of
+	# every entry through its TraceX function count for the topic package.
+	go test -coverpkg=./pkg/... -coverprofile=coverage.out ./pkg/... ./internal/...
+	go run ./tools/coverage -profile coverage.out -min 90
+
 .PHONY: bench
 bench: ## Benchmarks (BENCH=regexp, COUNT=n)
 	go test -run '^$$' -bench '$(BENCH)' -benchmem -count $(COUNT) ./...
@@ -52,7 +59,7 @@ lint: ## golangci-lint v2
 	golangci-lint run
 
 .PHONY: ci
-ci: vet format/check lint test wasm ## Everything CI checks
+ci: vet format/check lint test cover/check wasm ## Everything CI checks
 
 .PHONY: hooks
 hooks: ## Install the Git hooks in lefthook.yml
@@ -70,6 +77,9 @@ web/wasm: ## Build the WebAssembly into the site's public/
 	GOOS=js GOARCH=wasm go build -trimpath $(LDFLAGS) -o $(WASM_OUT)/algorithm.wasm ./cmd/algorithm-wasm
 	@# Optional: binaryen's wasm-opt shrinks the build further; skipped when it is not installed.
 	@if command -v wasm-opt >/dev/null 2>&1; then wasm-opt -Oz --enable-bulk-memory --enable-sign-ext --enable-nontrapping-float-to-int $(WASM_OUT)/algorithm.wasm -o $(WASM_OUT)/algorithm.wasm && echo "wasm-opt: done"; else echo "wasm-opt: not installed, skipped"; fi
+	@# The editor's terminal: gnux's shell and the editor's commands, from its
+	@# own module (web/runtime), so the library's go.mod keeps no requirements.
+	cd web/runtime && GOOS=js GOARCH=wasm go build -trimpath -ldflags="-s -w" -o ../../$(WASM_OUT)/terminal.wasm ./cmd/terminal
 	cp "$$(go env GOROOT)/lib/wasm/wasm_exec.js" $(WASM_OUT)/wasm_exec.js
 	@# Precompressed copies for hosts that serve them as they are (nginx gzip_static,
 	@# Caddy precompressed); Vercel compresses on its own.

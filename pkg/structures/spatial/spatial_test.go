@@ -2,10 +2,12 @@ package spatial_test
 
 import (
 	"math/rand"
+	"reflect"
 	"sort"
 	"testing"
 
 	"github.com/braswelljr/alGOrithm/pkg/structures/spatial"
+	"github.com/braswelljr/alGOrithm/pkg/trace"
 )
 
 func sorted(ps []spatial.Point) []spatial.Point {
@@ -106,5 +108,84 @@ func TestQuadTree(t *testing.T) {
 		if got, _ := q.Query(rect); !same(got, want) {
 			t.Fatalf("Query(%v) = %v, want %v", rect, got, want)
 		}
+	}
+}
+
+func TestKDTreeSnapshot(t *testing.T) {
+	// the classic example: the median split puts (7,2) at the root
+	kd := spatial.NewKDTree(spatial.Point{X: 2, Y: 3}, spatial.Point{X: 5, Y: 4}, spatial.Point{X: 9, Y: 6},
+		spatial.Point{X: 4, Y: 7}, spatial.Point{X: 8, Y: 1}, spatial.Point{X: 7, Y: 2}, spatial.Point{X: 2, Y: 3})
+	if kd.Len() != 6 {
+		t.Errorf("len %d, the duplicate is kept once", kd.Len())
+	}
+	want := trace.Snapshot{
+		Layout: "tree",
+		Nodes: []trace.Node{
+			{ID: 0, Label: "(7,2) x", Role: "root", Parent: -1},
+			{ID: 1, Label: "(5,4) y", Parent: 0},
+			{ID: 2, Label: "(2,3) x", Parent: 1},
+			{ID: 3, Label: "(4,7) x", Parent: 1},
+			{ID: 4, Label: "(9,6) y", Parent: 0},
+			{ID: 5, Label: "(8,1) x", Parent: 4},
+		},
+		Edges: []trace.Edge{
+			{From: 0, To: 1, Label: "left"}, {From: 1, To: 2, Label: "left"}, {From: 1, To: 3, Label: "right"},
+			{From: 0, To: 4, Label: "right"}, {From: 4, To: 5, Label: "left"},
+		},
+	}
+	if got := kd.Snapshot(); !reflect.DeepEqual(got, want) {
+		t.Errorf("snapshot %+v\nwant %+v", got, want)
+	}
+	if e := spatial.NewKDTree().Snapshot(); e.Nodes == nil || len(e.Nodes) != 0 || len(e.Edges) != 0 {
+		t.Errorf("an empty tree's snapshot %+v", e)
+	}
+}
+
+func TestQuadTreeSnapshot(t *testing.T) {
+	q := spatial.NewQuadTree(spatial.Rect{Min: spatial.Point{}, Max: spatial.Point{X: 7, Y: 7}}, 0) // capacity becomes 1
+	if !q.Insert(spatial.Point{X: 1, Y: 1}) || !q.Insert(spatial.Point{X: 6, Y: 6}) {
+		t.Fatal("inserts inside the bounds failed")
+	}
+	if q.Insert(spatial.Point{X: 6, Y: 6}) || q.Insert(spatial.Point{X: 8, Y: 0}) {
+		t.Error("a duplicate or an outside point was inserted")
+	}
+	if q.Contains(spatial.Point{X: 9, Y: 9}) || q.Contains(spatial.Point{X: 2, Y: 2}) || !q.Contains(spatial.Point{X: 6, Y: 6}) {
+		t.Error("Contains")
+	}
+	want := trace.Snapshot{
+		Layout: "tree",
+		Nodes: []trace.Node{
+			{ID: 0, Label: "(0,0)-(7,7)", Role: "root", Parent: -1},
+			{ID: 1, Label: "(0,0)-(3,3) [(1,1)]", Parent: 0},
+			{ID: 2, Label: "(4,0)-(7,3) []", Parent: 0},
+			{ID: 3, Label: "(0,4)-(3,7) []", Parent: 0},
+			{ID: 4, Label: "(4,4)-(7,7) [(6,6)]", Parent: 0},
+		},
+		Edges: []trace.Edge{{From: 0, To: 1, Label: "SW"}, {From: 0, To: 2, Label: "SE"}, {From: 0, To: 3, Label: "NW"}, {From: 0, To: 4, Label: "NE"}},
+	}
+	if got := q.Snapshot(); !reflect.DeepEqual(got, want) {
+		t.Errorf("snapshot %+v\nwant %+v", got, want)
+	}
+	if q.Len() != 2 {
+		t.Errorf("len %d", q.Len())
+	}
+	one := spatial.NewQuadTree(spatial.Rect{}, 1)
+	one.Insert(spatial.Point{})
+	if s := one.Snapshot(); len(s.Nodes) != 1 || s.Nodes[0].Label != "(0,0)-(0,0) [(0,0)]" {
+		t.Errorf("a one-cell tree %+v", s)
+	}
+}
+
+func TestPointAndRectStrings(t *testing.T) {
+	p := spatial.Point{X: -1, Y: 2}
+	if p.String() != "(-1,2)" {
+		t.Errorf("point %q", p.String())
+	}
+	r := spatial.Rect{Min: p, Max: spatial.Point{X: 3, Y: 4}}
+	if r.String() != "(-1,2)-(3,4)" {
+		t.Errorf("rect %q", r.String())
+	}
+	if !r.Contains(p) || r.Contains(spatial.Point{X: 4, Y: 4}) || spatial.Dist2(p, spatial.Point{X: 2, Y: 6}) != 25 {
+		t.Error("Contains or Dist2")
 	}
 }

@@ -13,7 +13,7 @@ The point is to show the algorithm. A sort that calls a sorting package teaches 
 ```text
 module github.com/braswelljr/alGOrithm
 
-go 1.21
+go 1.27
 ```
 
 What the standard library has is used: `cmp.Ordered` for generics, `container/heap` under `pathfinding`'s frontier, `encoding/csv` and `encoding/json` in `dataset`, `hash/fnv` in `structures.HashTable`, `net/http` for `algorithm serve`, `embed` for the source in `algorithm.go`.

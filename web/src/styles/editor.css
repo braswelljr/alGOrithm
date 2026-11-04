@@ -1,0 +1,88 @@
+/* The editor's syntax colors (@lezer/highlight's classHighlighter classes),
+   close to the GitHub themes the code block's highlighter uses, so an open file
+   reads like the same code on a docs page. Light first, dark under .dark. */
+.editor-surface {
+  --tok-keyword: #cf222e;
+  --tok-string: #0a3069;
+  --tok-number: #0550ae;
+  --tok-comment: #6e7781;
+  --tok-type: #953800;
+  --tok-function: #8250df;
+  --tok-property: #0550ae;
+  --tok-operator: #cf222e;
+  --tok-meta: #57606a;
+}
+.dark .editor-surface {
+  --tok-keyword: #ff7b72;
+  --tok-string: #a5d6ff;
+  --tok-number: #79c0ff;
+  --tok-comment: #8b949e;
+  --tok-type: #ffa657;
+  --tok-function: #d2a8ff;
+  --tok-property: #79c0ff;
+  --tok-operator: #ff7b72;
+  --tok-meta: #8b949e;
+}
+.editor-surface .tok-keyword,
+.editor-surface .tok-modifier,
+.editor-surface .tok-controlKeyword {
+  color: var(--tok-keyword);
+}
+.editor-surface .tok-string,
+.editor-surface .tok-string2,
+.editor-surface .tok-character {
+  color: var(--tok-string);
+}
+.editor-surface .tok-number,
+.editor-surface .tok-bool,
+.editor-surface .tok-atom,
+.editor-surface .tok-literal {
+  color: var(--tok-number);
+}
+.editor-surface .tok-comment {
+  color: var(--tok-comment);
+  font-style: italic;
+}
+.editor-surface .tok-typeName,
+.editor-surface .tok-className,
+.editor-surface .tok-namespace {
+  color: var(--tok-type);
+}
+.editor-surface .tok-variableName.tok-definition,
+.editor-surface .tok-function,
+.editor-surface .tok-macroName {
+  color: var(--tok-function);
+}
+.editor-surface .tok-propertyName {
+  color: var(--tok-property);
+}
+.editor-surface .tok-operator {
+  color: var(--tok-operator);
+}
+.editor-surface .tok-meta,
+.editor-surface .tok-punctuation {
+  color: var(--tok-meta);
+}
+.editor-surface .tok-heading {
+  color: var(--tok-function);
+  font-weight: 700;
+}
+.editor-surface .tok-link,
+.editor-surface .tok-url {
+  color: var(--tok-number);
+  text-decoration: underline;
+}
+.editor-surface .tok-emphasis {
+  font-style: italic;
+}
+.editor-surface .tok-strong {
+  font-weight: 700;
+}
+.editor-surface .tok-invalid {
+  color: var(--danger);
+}
+
+/* Trailing spaces, when style hints are on: a quiet wash, not arrows or dots. */
+.editor-surface .cm-trailingSpace {
+  background-color: color-mix(in oklab, var(--danger) 18%, transparent);
+}

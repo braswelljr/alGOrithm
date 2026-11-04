@@ -134,15 +134,21 @@ export function shift(s: BricksState, dr: number, dc: number): BricksState {
   return s.over || !fits(s, p) ? s : { ...s, piece: p };
 }
 
-/** Turns the piece a quarter clockwise, nudging it off a wall when it would not fit. */
-export function rotate(s: BricksState): BricksState {
+/**
+ * Turns the piece a quarter, clockwise (1) or back (-1), nudging it off a wall
+ * when it would not fit there.
+ */
+export function rotate(s: BricksState, way: 1 | -1 = 1): BricksState {
   if (s.over) return s;
   for (const kick of [0, -1, 1, -2, 2]) {
-    const p = { ...s.piece, turn: s.piece.turn + 1, col: s.piece.col + kick };
+    const p = { ...s.piece, turn: s.piece.turn + way, col: s.piece.col + kick };
     if (fits(s, p)) return { ...s, piece: p };
   }
   return s;
 }
+
+/** Turns the piece a quarter counter-clockwise. */
+export const rotateBack = (s: BricksState): BricksState => rotate(s, -1);
 
 /** Settles the piece, clears full rows, scores them, and brings on the next piece. */
 export function lock(s: BricksState, rand: () => number): BricksState {

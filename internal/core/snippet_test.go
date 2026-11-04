@@ -24,7 +24,7 @@ func TestGoSnippetsCompile(t *testing.T) {
 		t.Fatal(err)
 	}
 	dir := t.TempDir()
-	mod := "module snippets\n\ngo 1.21\n\nrequire " + Module + " v0.0.0\n\nreplace " + Module + " => " + root + "\n"
+	mod := "module snippets\n\ngo 1.27\n\nrequire " + Module + " v0.0.0\n\nreplace " + Module + " => " + root + "\n"
 	if err := os.WriteFile(filepath.Join(dir, "go.mod"), []byte(mod), 0o600); err != nil {
 		t.Fatal(err)
 	}

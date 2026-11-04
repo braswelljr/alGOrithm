@@ -1,6 +1,7 @@
 import type { Tour } from '@/lib/tour/define';
 import { arenaTour } from './arena';
 import { docsEntryTour } from './docs-entry';
+import { editorTour } from './editor';
 import { quizTour } from './quiz';
 import { shellTour } from './shell';
 import { structuresTour } from './structures';
@@ -20,6 +21,7 @@ export const TOURS: Tour[] = [
   systemDesignTour,
   quizTour,
   arenaTour,
+  editorTour,
   docsEntryTour,
   tagsTour
 ];

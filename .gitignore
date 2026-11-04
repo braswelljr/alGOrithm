@@ -38,4 +38,6 @@ web/public/algorithm.wasm
 web/public/wasm_exec.js
 web/public/algorithm.wasm.gz
 web/public/algorithm.wasm.br
+web/public/terminal.wasm
+web/public/terminal.wasm.gz
 web/public/dev-build.json

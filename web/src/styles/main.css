@@ -6,6 +6,7 @@
 @import '../visualizer/styles.css';
 @import '../visualizer/theme.css';
 @import './preferences.css';
+@import './editor.css';
 
 /* The visualizer's surfaces follow the theme's. */
 .av-root {

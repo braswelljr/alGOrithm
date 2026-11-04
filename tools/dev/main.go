@@ -17,7 +17,6 @@ import (
 	"os/exec"
 	"os/signal"
 	"path/filepath"
-	"runtime"
 	"sort"
 	"strings"
 	"syscall"
@@ -170,10 +169,12 @@ func buildAll() error {
 	if out, err := cmd.CombinedOutput(); err != nil {
 		return fmt.Errorf("wasm: %w\n%s", err, out)
 	}
-	execJS := filepath.Join(runtime.GOROOT(), "lib", "wasm", "wasm_exec.js")
-	if _, err := os.Stat(execJS); err != nil {
-		execJS = filepath.Join(runtime.GOROOT(), "misc", "wasm", "wasm_exec.js") // Go before 1.24
+	// The wasm_exec.js of the go that built the wasm: the two must match.
+	root, err := exec.Command("go", "env", "GOROOT").Output()
+	if err != nil {
+		return fmt.Errorf("go env GOROOT: %w", err)
 	}
+	execJS := filepath.Join(strings.TrimSpace(string(root)), "lib", "wasm", "wasm_exec.js")
 	return copyFile(execJS, filepath.Join(wasmSite, "wasm_exec.js"))
 }
 

@@ -50,8 +50,8 @@ func FreeSpace(blocks int, script string) (FreeSpaceResult, error) {
 		switch {
 		case f[0] == "alloc" && len(f) == 3:
 			n, ok := atoi(f[2], 1, blocks)
-			if !ok {
-				return res, inputErr("line %d: alloc NAME 1-%d", nums[k], blocks)
+			if _, taken := files[f[1]]; !ok || taken {
+				return res, inputErr("line %d: alloc NAME 1-%d, a name not already allocated", nums[k], blocks)
 			}
 			start, run := -1, 0
 			for i := 0; i < blocks && start < 0; i++ {

@@ -6,26 +6,24 @@ Ordered walks through the catalog, generated from `core.Paths()` (`go run ./tool
 |------|-------|-----|-------|-------|
 | [Big O by example](#big-o-by-example) | beginner | anyone new to algorithms | 8 | none |
 | [Sorting from zero](#sorting-from-zero) | beginner | first algorithms course | 10 | [Big O by example](#big-o-by-example) |
-| [Searching, and why sorted data matters](#searching-and-sorted-data) | beginner | first algorithms course | 8 | [Sorting from zero](#sorting-from-zero) |
-| [Data structures: from arrays to trees](#arrays-to-trees) | beginner | first data structures course | 11 | [Big O by example](#big-o-by-example) |
-| [JavaScript arrays and lodash, inside](#javascript-and-lodash) | beginner | web developers | 12 | none |
-| [Thinking recursively, then dynamic programming](#recursion-and-dynamic-programming) | intermediate | second algorithms course | 10 | [Big O by example](#big-o-by-example) |
-| [Greedy choices, and when they fail](#greedy-versus-optimal) | intermediate | second algorithms course | 8 | [Thinking recursively, then dynamic programming](#recursion-and-dynamic-programming) |
-| [Pathfinding on grids](#pathfinding-on-grids) | beginner | game and robotics beginners | 5 | [Data structures: from arrays to trees](#arrays-to-trees) |
+| [Searching, and why sorted data matters](#searching-and-why-sorted-data-matters) | beginner | first algorithms course | 8 | [Sorting from zero](#sorting-from-zero) |
+| [Data structures: from arrays to trees](#data-structures-from-arrays-to-trees) | beginner | first data structures course | 11 | [Big O by example](#big-o-by-example) |
+| [JavaScript arrays and lodash, inside](#javascript-arrays-and-lodash-inside) | beginner | web developers | 12 | none |
+| [Thinking recursively, then dynamic programming](#thinking-recursively-then-dynamic-programming) | intermediate | second algorithms course | 10 | [Big O by example](#big-o-by-example) |
+| [Greedy choices, and when they fail](#greedy-choices-and-when-they-fail) | intermediate | second algorithms course | 8 | [Thinking recursively, then dynamic programming](#thinking-recursively-then-dynamic-programming) |
+| [Pathfinding on grids](#pathfinding-on-grids) | beginner | game and robotics beginners | 5 | [Data structures: from arrays to trees](#data-structures-from-arrays-to-trees) |
 | [Graphs step by step](#graphs-step-by-step) | intermediate | second algorithms course | 11 | [Pathfinding on grids](#pathfinding-on-grids) |
-| [Searching text](#text-and-patterns) | intermediate | anyone who has used grep | 10 | [Searching, and why sorted data matters](#searching-and-sorted-data) |
-| [Words and documents](#words-and-documents) | intermediate | anyone building search or text tools | 8 | [Searching text](#text-and-patterns) |
-| [Making data smaller](#making-data-smaller) | intermediate | anyone curious about zip files | 6 | [Greedy choices, and when they fail](#greedy-versus-optimal) |
-| [Numbers and the math under algorithms](#numbers-and-math) | intermediate | learners who like math | 10 | [Big O by example](#big-o-by-example) |
-| [Classical ciphers and how they break](#classical-ciphers) | beginner | puzzle lovers and security beginners | 9 | none |
-| [Crypto internals](#crypto-internals) | advanced | developers who use cryptography libraries | 13 | [Classical ciphers and how they break](#classical-ciphers), [Numbers and the math under algorithms](#numbers-and-math) |
-| [Hashing inside out](#hashing-inside-out) | intermediate | developers who use maps every day | 10 | [Data structures: from arrays to trees](#arrays-to-trees) |
-| [Machine learning from scratch](#machine-learning-from-scratch) | intermediate | developers curious about ML | 18 | [Numbers and the math under algorithms](#numbers-and-math) |
-| [How an operating system works](#how-an-os-works) | intermediate | operating systems course | 17 | [Data structures: from arrays to trees](#arrays-to-trees) |
-| [How systems talk and agree](#how-systems-talk-and-agree) | intermediate | backend developers | 11 | [How an operating system works](#how-an-os-works) |
-| [System design from estimates to architectures](#system-design) | intermediate | engineers preparing a design or an interview | 14 | [How systems talk and agree](#how-systems-talk-and-agree) |
-
-<a id="big-o-by-example"></a>
+| [Searching text](#searching-text) | intermediate | anyone who has used grep | 10 | [Searching, and why sorted data matters](#searching-and-why-sorted-data-matters) |
+| [Words and documents](#words-and-documents) | intermediate | anyone building search or text tools | 8 | [Searching text](#searching-text) |
+| [Making data smaller](#making-data-smaller) | intermediate | anyone curious about zip files | 6 | [Greedy choices, and when they fail](#greedy-choices-and-when-they-fail) |
+| [Numbers and the math under algorithms](#numbers-and-the-math-under-algorithms) | intermediate | learners who like math | 10 | [Big O by example](#big-o-by-example) |
+| [Classical ciphers and how they break](#classical-ciphers-and-how-they-break) | beginner | puzzle lovers and security beginners | 9 | none |
+| [Crypto internals](#crypto-internals) | advanced | developers who use cryptography libraries | 13 | [Classical ciphers and how they break](#classical-ciphers-and-how-they-break), [Numbers and the math under algorithms](#numbers-and-the-math-under-algorithms) |
+| [Hashing inside out](#hashing-inside-out) | intermediate | developers who use maps every day | 10 | [Data structures: from arrays to trees](#data-structures-from-arrays-to-trees) |
+| [Machine learning from scratch](#machine-learning-from-scratch) | intermediate | developers curious about ML | 18 | [Numbers and the math under algorithms](#numbers-and-the-math-under-algorithms) |
+| [How an operating system works](#how-an-operating-system-works) | intermediate | operating systems course | 17 | [Data structures: from arrays to trees](#data-structures-from-arrays-to-trees) |
+| [How systems talk and agree](#how-systems-talk-and-agree) | intermediate | backend developers | 11 | [How an operating system works](#how-an-operating-system-works) |
+| [System design from estimates to architectures](#system-design-from-estimates-to-architectures) | intermediate | engineers preparing a design or an interview | 14 | [How systems talk and agree](#how-systems-talk-and-agree) |
 
 ## Big O by example
 
@@ -83,8 +81,6 @@ What O(1), O(log n), O(n), O(n log n), O(n^2) and O(2^n) feel like, seen in the 
    algorithm run tower-of-hanoi --example
    ```
 
-
-<a id="sorting-from-zero"></a>
 
 ## Sorting from zero
 
@@ -155,8 +151,6 @@ From the simplest sorts to the ones in standard libraries, and why input order c
    ```
 
 
-<a id="searching-and-sorted-data"></a>
-
 ## Searching, and why sorted data matters
 
 What sorting buys you: from scanning every value to finding one in a handful of steps.
@@ -213,8 +207,6 @@ What sorting buys you: from scanning every value to finding one in a handful of 
    algorithm run median-of-medians --example
    ```
 
-
-<a id="arrays-to-trees"></a>
 
 ## Data structures: from arrays to trees
 
@@ -290,8 +282,6 @@ How the way data is held decides which operations are fast.
    algorithm run union-find --example
    ```
 
-
-<a id="javascript-and-lodash"></a>
 
 ## JavaScript arrays and lodash, inside
 
@@ -373,8 +363,6 @@ The array methods and utility functions you use every day, implemented and trace
    ```
 
 
-<a id="recursion-and-dynamic-programming"></a>
-
 ## Thinking recursively, then dynamic programming
 
 Solve a problem in terms of smaller ones, then stop solving the same smaller ones twice.
@@ -444,14 +432,12 @@ Solve a problem in terms of smaller ones, then stop solving the same smaller one
    ```
 
 
-<a id="greedy-versus-optimal"></a>
-
 ## Greedy choices, and when they fail
 
 Taking the best-looking choice is fast, and sometimes exactly right; these pairs show when.
 
 - Level: intermediate, for second algorithms course.
-- Walk first: [Thinking recursively, then dynamic programming](#recursion-and-dynamic-programming).
+- Walk first: [Thinking recursively, then dynamic programming](#thinking-recursively-then-dynamic-programming).
 - In the terminal: `algorithm learn greedy-versus-optimal`.
 
 1. **Greedy Coin Change** (`greedy-coin-change`): Coins 1, 3 and 4 for 6: greedy takes 4 + 1 + 1, three coins.
@@ -503,14 +489,12 @@ Taking the best-looking choice is fast, and sometimes exactly right; these pairs
    ```
 
 
-<a id="pathfinding-on-grids"></a>
-
 ## Pathfinding on grids
 
 How a search decides which cell to explore next, and why that changes everything.
 
 - Level: beginner, for game and robotics beginners.
-- Walk first: [Data structures: from arrays to trees](#arrays-to-trees).
+- Walk first: [Data structures: from arrays to trees](#data-structures-from-arrays-to-trees).
 - In the terminal: `algorithm learn pathfinding-on-grids`.
 
 1. **Breadth-First Search** (`breadth-first-search`): A queue explores in rings: the first path to the end is a shortest one.
@@ -543,8 +527,6 @@ How a search decides which cell to explore next, and why that changes everything
    algorithm run a-star --example
    ```
 
-
-<a id="graphs-step-by-step"></a>
 
 ## Graphs step by step
 
@@ -621,14 +603,12 @@ Traversals, orders, shortest paths, spanning trees, components and flows on weig
    ```
 
 
-<a id="text-and-patterns"></a>
-
 ## Searching text
 
 Finding patterns in text without reading it twice, and the structures that make it fast.
 
 - Level: intermediate, for anyone who has used grep.
-- Walk first: [Searching, and why sorted data matters](#searching-and-sorted-data).
+- Walk first: [Searching, and why sorted data matters](#searching-and-why-sorted-data-matters).
 - In the terminal: `algorithm learn text-and-patterns`.
 
 1. **Naive String Search** (`naive-search`): Try every position: O(n m) when the text is full of near matches.
@@ -692,14 +672,12 @@ Finding patterns in text without reading it twice, and the structures that make 
    ```
 
 
-<a id="words-and-documents"></a>
-
 ## Words and documents
 
 From counting words to ranking documents, suggesting spellings and showing what changed.
 
 - Level: intermediate, for anyone building search or text tools.
-- Walk first: [Searching text](#text-and-patterns).
+- Walk first: [Searching text](#searching-text).
 - In the terminal: `algorithm learn words-and-documents`.
 
 1. **Word Frequency** (`word-frequency`): The first thing any text tool does: count the words.
@@ -751,14 +729,12 @@ From counting words to ranking documents, suggesting spellings and showing what 
    ```
 
 
-<a id="making-data-smaller"></a>
-
 ## Making data smaller
 
 Lossless compression: repeated runs, frequent symbols, repeated phrases, and transforms that help.
 
 - Level: intermediate, for anyone curious about zip files.
-- Walk first: [Greedy choices, and when they fail](#greedy-versus-optimal).
+- Walk first: [Greedy choices, and when they fail](#greedy-choices-and-when-they-fail).
 - In the terminal: `algorithm learn making-data-smaller`.
 
 1. **Run-Length Encoding** (`run-length-encoding`): Runs of the same symbol become a count: great for some data, worse for most.
@@ -797,8 +773,6 @@ Lossless compression: repeated runs, frequent symbols, repeated phrases, and tra
    algorithm run move-to-front --example
    ```
 
-
-<a id="numbers-and-math"></a>
 
 ## Numbers and the math under algorithms
 
@@ -869,8 +843,6 @@ Divisibility, primes, modular arithmetic and fast arithmetic: the toolkit behind
    ```
 
 
-<a id="classical-ciphers"></a>
-
 ## Classical ciphers and how they break
 
 Two thousand years of secret writing, and the attacks that make each one obsolete.
@@ -933,14 +905,12 @@ Two thousand years of secret writing, and the attacks that make each one obsolet
    ```
 
 
-<a id="crypto-internals"></a>
-
 ## Crypto internals
 
 What happens inside hashes, ciphers and key exchange. For learning only: never protect data with these.
 
 - Level: advanced, for developers who use cryptography libraries.
-- Walk first: [Classical ciphers and how they break](#classical-ciphers), [Numbers and the math under algorithms](#numbers-and-math).
+- Walk first: [Classical ciphers and how they break](#classical-ciphers-and-how-they-break), [Numbers and the math under algorithms](#numbers-and-the-math-under-algorithms).
 - In the terminal: `algorithm learn crypto-internals`.
 
 1. **Base64** (`base64`): Encoding is not encryption: anyone can reverse it.
@@ -1022,14 +992,12 @@ What happens inside hashes, ciphers and key exchange. For learning only: never p
    ```
 
 
-<a id="hashing-inside-out"></a>
-
 ## Hashing inside out
 
 Hash functions, and what a hash table does when two keys land in the same place.
 
 - Level: intermediate, for developers who use maps every day.
-- Walk first: [Data structures: from arrays to trees](#arrays-to-trees).
+- Walk first: [Data structures: from arrays to trees](#data-structures-from-arrays-to-trees).
 - In the terminal: `algorithm learn hashing-inside-out`.
 
 1. **DJB2** (`djb2`): A classic string hash: multiply by 33 and add each character.
@@ -1093,14 +1061,12 @@ Hash functions, and what a hash table does when two keys land in the same place.
    ```
 
 
-<a id="machine-learning-from-scratch"></a>
-
 ## Machine learning from scratch
 
 Fit a line, then classify, cluster and train a tiny neural network, with every number visible.
 
 - Level: intermediate, for developers curious about ML.
-- Walk first: [Numbers and the math under algorithms](#numbers-and-math).
+- Walk first: [Numbers and the math under algorithms](#numbers-and-the-math-under-algorithms).
 - In the terminal: `algorithm learn machine-learning-from-scratch`.
 
 1. **Linear Regression** (`linear-regression`): The line that makes the squared errors smallest, solved in one formula.
@@ -1212,14 +1178,12 @@ Fit a line, then classify, cluster and train a tiny neural network, with every n
    ```
 
 
-<a id="how-an-os-works"></a>
-
 ## How an operating system works
 
 Processes and the CPU, then memory, disks, deadlock and threads: the decisions an OS makes every millisecond.
 
 - Level: intermediate, for operating systems course.
-- Walk first: [Data structures: from arrays to trees](#arrays-to-trees).
+- Walk first: [Data structures: from arrays to trees](#data-structures-from-arrays-to-trees).
 - In the terminal: `algorithm learn how-an-os-works`.
 
 1. **First Come, First Served** (`fcfs-scheduling`): Processes run in arrival order: one long job makes everyone behind it wait.
@@ -1329,14 +1293,12 @@ Processes and the CPU, then memory, disks, deadlock and threads: the decisions a
    ```
 
 
-<a id="how-systems-talk-and-agree"></a>
-
 ## How systems talk and agree
 
 From one lossy link to a cluster that agrees: retransmission, congestion, clocks, quorums, consensus, and the infrastructure that keeps it up.
 
 - Level: intermediate, for backend developers.
-- Walk first: [How an operating system works](#how-an-os-works).
+- Walk first: [How an operating system works](#how-an-operating-system-works).
 - In the terminal: `algorithm learn how-systems-talk-and-agree`.
 
 1. **Stop-and-Wait ARQ** (`stop-and-wait`): Send one frame, wait for its ack, resend on a timeout: reliable, but one frame per round trip.
@@ -1405,8 +1367,6 @@ From one lossy link to a cluster that agrees: retransmission, congestion, clocks
    algorithm run circuit-breaker --example
    ```
 
-
-<a id="system-design"></a>
 
 ## System design from estimates to architectures
 

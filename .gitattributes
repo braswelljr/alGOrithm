@@ -1,0 +1,9 @@
+# Text files are checked out with LF on every system, Windows too: gofmt and
+# the generated-docs check compare bytes, and a CRLF checkout fails both.
+* text=auto eol=lf
+
+# Binary outputs, never diffed or converted.
+*.wasm binary
+*.png binary
+*.gz binary
+*.zst binary

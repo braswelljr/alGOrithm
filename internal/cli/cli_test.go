@@ -60,6 +60,8 @@ func TestCLI(t *testing.T) {
 		{"run bad option", "", []string{"run", "round-robin", "--example", "--option", "quantum"}, 2, nil, "NAME=NUMBER"},
 		{"run trace", "", []string{"run", "bubble-sort", "2", "1", "--trace"}, 0, []string{"compare", "swap"}, ""},
 		{"compare", "", []string{"compare", "bubble-sort", "merge-sort", "--generate", "random", "--size", "50"}, 0, []string{"50 values"}, ""},
+		{"compare every sort skips the capped", "", []string{"compare", "--generate", "random", "--size", "500"}, 0, []string{"500 values", "merge-sort"}, "skipping bogo-sort: at most 8 values"},
+		{"compare a named capped sort", "", []string{"compare", "bogo-sort", "--generate", "random", "--size", "50"}, 1, nil, "at most 8 values"},
 		{"source", "", []string{"source", "dijkstra"}, 0, []string{"// algorithms/pathfinding/dijkstra.go", "func Dijkstra("}, ""},
 		{"snippet", "", []string{"snippet", "quick-sort"}, 0, []string{"sorting.Quick(", "algorithm run quick-sort"}, ""},
 		{"data", "", []string{"data", "--generate", "sorted", "--size", "3"}, 0, nil, ""},

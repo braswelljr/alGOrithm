@@ -76,6 +76,9 @@ alGOrithm/
     dev/              # `make dev`: build, start the site, watch, rebuild, test, reload
     gendocs/          # generated docs; its test fails when they are stale
   web/                # one Next.js app; web/AGENTS.md has its layout and conventions
+    runtime/          # the editor's terminal.wasm: its own Go module (gnux, klauspost/compress), so the
+                      # library keeps no requirements; goexec (go run on the Go Playground), makefile
+                      # (a small make), tooling (format and lint), ztools, terminal, cmd/terminal
   docs/               # guides/ and catalog.md (generated) for users; rules, workflows, requirements, design (map: docs/README.md)
   .agents/skills/, .claude/skills/, skills-lock.json
   .goreleaser.yaml, .github/workflows/ (go.yml, lint.yml, web.yml, release.yml)
@@ -87,6 +90,7 @@ alGOrithm/
 make dev           # build CLI + wasm, start the site, then rebuild and retest on every Go change
 make build         # bin/algorithm
 make test          # go test -race ./...
+make cover/check   # coverage floor: every pkg/ package at 90%+, no exported function untested
 make lint          # golangci-lint run (v2)
 make format        # golangci-lint fmt
 make ci            # vet + format check + lint + test + wasm compile
@@ -119,7 +123,7 @@ command-line mistake.
 
 ## Requirements
 
-- **Go 1.21+** (`go.mod`; `cmp`, `slices`, built-in `min`/`max`). No third-party Go modules, no cgo.
+- **Go 1.27+** (`go.mod`; `cmp`, `slices`, built-in `min`/`max`, range-over-int and per-iteration loop variables). No third-party Go modules, no cgo. (`web/runtime` is a separate module and may require gnux and klauspost/compress; nothing in `pkg/` imports it.)
 - **golangci-lint v2**, **lefthook** (hooks), **goreleaser v2** (only for `make release/check`).
 - **Node.js 24+ and pnpm 12** for `web/`.
 
@@ -229,7 +233,8 @@ lints clean.
 paging, disk and the Banker's algorithm; random operations against models for the structures;
 `check.Sort`/`check.Search` for sorts and searches), the registry's consistency, example and
 snippet-compile tests, the command end to end (including the HTTP API and MCP), the embedded
-source, and `tools/gendocs`' freshness check. `web/`: 36 package tests (player machine, replay,
+source, and `tools/gendocs`' freshness check. `make cover/check` (`tools/coverage`) keeps the floor:
+every `pkg/` package at 90% statement coverage or more, and no exported function that no test runs. `web/`: 36 package tests (player machine, replay,
 every entry through the real wasm) and the site's tests. Method:
 [`docs/workflows/testing-and-benchmarking.md`](docs/workflows/testing-and-benchmarking.md).
 
@@ -237,7 +242,7 @@ every entry through the real wasm) and the site's tests. Method:
 
 | File | What it does |
 |------|--------------|
-| `go.yml` | build, `gofmt` check, `go vet`, `go test -race` on Linux, macOS and Windows; wasm build and a command smoke test on Linux |
+| `go.yml` | build, `gofmt` check, `go vet`, `go test -race` on Linux, macOS and Windows; the coverage floor (`make cover/check`), wasm build and a command smoke test on Linux |
 | `lint.yml` | `go mod verify`, golangci-lint v2 on the whole tree |
 | `web.yml` | wasm, then the site's lint, type-check, tests, build and size budgets; keeps the static site |
 | `release.yml` | on a `vX.Y.Z` tag: tests, then GoReleaser (archives for linux/darwin/windows/freebsd, checksums, Homebrew formula when `HOMEBREW_TAP_TOKEN` is set) |

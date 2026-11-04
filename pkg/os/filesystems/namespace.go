@@ -47,11 +47,11 @@ func (ns *namespace) resolve(path string, parent, verbose bool, depth int) (*INo
 	}
 	for i, name := range parts {
 		last := i == len(parts)-1
-		if last && parent {
-			return cur, name, nil
-		}
 		if cur.Kind != "dir" {
 			return nil, "", inputErr("%s: not a directory (ENOTDIR)", path)
+		}
+		if last && parent {
+			return cur, name, nil
 		}
 		num, ok := cur.Entries[name]
 		if !ok {
@@ -137,6 +137,9 @@ func (ns *namespace) run(f []string) error {
 		dir, name, err := ns.resolve(arg(2), true, false, 0)
 		if err != nil {
 			return err
+		}
+		if _, exists := dir.Entries[name]; exists {
+			return inputErr("%s: file exists (EEXIST)", arg(2))
 		}
 		dir.Entries[name] = target.Number
 		target.Links++

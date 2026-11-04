@@ -91,9 +91,9 @@ export const GAME_INFO: GameInfo[] = [
     howTo: (
       <>
         <p>
-          Left and right move the piece, up or X turns it, down drops it a row and Space drops it to
-          the bottom. With a mouse, move over the well to slide the piece, click to turn it and
-          right click to drop it.
+          Left and right move the piece; up, X or R turns it clockwise as it falls and Z turns it
+          back; down drops it a row and Space drops it to the bottom. With a mouse, move over the
+          well to slide the piece, click to turn it and right click to drop it.
         </p>
         <p>
           A full row clears: 100 points for one, 300 for two, 500 for three and 800 for four at

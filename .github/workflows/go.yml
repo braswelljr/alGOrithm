@@ -1,6 +1,7 @@
 # Tests: every package builds, is gofmt -s clean, passes go vet and its tests
-# under the race detector on Linux, macOS and Windows; the wasm build compiles
-# and the command runs (NFR-1, NFR-9, NFR-11, NFR-21).
+# under the race detector on Linux, macOS and Windows; keeps its coverage floor
+# (every pkg/ package at 90%, every exported function tested); the wasm build
+# compiles and the command runs (NFR-1, NFR-9, NFR-11, NFR-21).
 name: Tests
 on: [push, pull_request]
 
@@ -39,6 +40,18 @@ jobs:
 
       - name: Test
         run: go test -race ./...
+
+      # The editor's terminal (its own module, so the library's go.mod keeps
+      # no requirements): the go command, the compression tools, the shell.
+      - name: Test the terminal module
+        if: runner.os == 'Linux'
+        working-directory: web/runtime
+        run: go vet ./... && go test -race ./...
+
+      # Every pkg/ package at 90% or more, and no exported function untested.
+      - name: Coverage floor
+        if: runner.os == 'Linux'
+        run: make cover/check
 
       - name: Build for the browser
         if: runner.os == 'Linux'

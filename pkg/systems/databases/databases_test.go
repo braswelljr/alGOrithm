@@ -1,7 +1,9 @@
 package databases
 
 import (
+	"errors"
 	"math/rand"
+	"reflect"
 	"slices"
 	"sort"
 	"strings"
@@ -425,5 +427,354 @@ func TestParseSchedule(t *testing.T) {
 	}
 	if _, err := ParseTable("a,b\n1"); err == nil {
 		t.Error("short row accepted")
+	}
+}
+
+func TestRelationalOperators(t *testing.T) {
+	tb, err := ParseTable("name,city,age\nAma,Accra,30\nKofi,Kumasi,41\nEsi,Accra,25\nYaw,Tamale,52\nAbena,Accra,35\nAma,Accra,99")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Run("every comparison", func(t *testing.T) {
+		want := map[string][]string{
+			"age = 30":       {"Ama"},
+			"age != 30":      {"Kofi", "Esi", "Yaw", "Abena", "Ama"},
+			"age < 30":       {"Esi"},
+			"age <= 30":      {"Ama", "Esi"},
+			"age > 41":       {"Yaw", "Ama"},
+			"age>=41":        {"Kofi", "Yaw", "Ama"},
+			"city = Accra":   {"Ama", "Esi", "Abena", "Ama"},
+			"name < B":       {"Ama", "Abena", "Ama"},
+			" city != Accra": {"Kofi", "Yaw"},
+		}
+		for cond, names := range want {
+			p, err := ParsePredicate(cond)
+			if err != nil {
+				t.Fatalf("%q: %v", cond, err)
+			}
+			got, err := Select(tb, p)
+			if err != nil {
+				t.Fatal(err)
+			}
+			var gotNames []string
+			for _, r := range got.Rows {
+				gotNames = append(gotNames, r[0])
+			}
+			if !slices.Equal(gotNames, names) {
+				t.Errorf("%q: %v, want %v", cond, gotNames, names)
+			}
+		}
+		for _, bad := range []string{"age", "= 3", "age >", ""} {
+			if _, err := ParsePredicate(bad); !errors.Is(err, ErrInput) {
+				t.Errorf("ParsePredicate(%q): %v", bad, err)
+			}
+		}
+		if _, err := Select(tb, Predicate{"height", ">", "1"}); !errors.Is(err, ErrInput) {
+			t.Errorf("an unknown column: %v", err)
+		}
+	})
+	t.Run("project drops duplicate rows", func(t *testing.T) {
+		got, err := Project(tb, []string{"city", "NAME"})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !slices.Equal(got.Columns, []string{"city", "name"}) || len(got.Rows) != 5 || got.Rows[0][1] != "Ama" {
+			t.Errorf("project %v %v", got.Columns, got.Rows)
+		}
+		if _, err := Project(tb, []string{"zip"}); !errors.Is(err, ErrInput) {
+			t.Errorf("an unknown column: %v", err)
+		}
+	})
+	t.Run("every aggregate", func(t *testing.T) {
+		want := map[string][][]string{
+			"count": {{"Accra", "4"}, {"Kumasi", "1"}, {"Tamale", "1"}},
+			"sum":   {{"Accra", "189"}, {"Kumasi", "41"}, {"Tamale", "52"}},
+			"avg":   {{"Accra", "47"}, {"Kumasi", "41"}, {"Tamale", "52"}}, // 189 / 4 rounds down
+			"min":   {{"Accra", "25"}, {"Kumasi", "41"}, {"Tamale", "52"}},
+			"max":   {{"Accra", "99"}, {"Kumasi", "41"}, {"Tamale", "52"}},
+		}
+		for agg, rows := range want {
+			got, err := GroupBy(tb, "city", agg, "age")
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got.Rows, rows) {
+				t.Errorf("%s: %v, want %v", agg, got.Rows, rows)
+			}
+			name := agg + "(age)"
+			if agg == "count" {
+				name = "count"
+			}
+			if got.Columns[1] != name {
+				t.Errorf("%s column %q", agg, got.Columns[1])
+			}
+		}
+		for name, f := range map[string]func() error{
+			"unknown aggregate": func() error { _, err := GroupBy(tb, "city", "median", "age"); return err },
+			"unknown group":     func() error { _, err := GroupBy(tb, "zip", "count", ""); return err },
+			"unknown of":        func() error { _, err := GroupBy(tb, "city", "sum", "zip"); return err },
+			"sum of text":       func() error { _, err := GroupBy(tb, "city", "sum", "name"); return err },
+		} {
+			if err := f(); !errors.Is(err, ErrInput) {
+				t.Errorf("%s: %v", name, err)
+			}
+		}
+	})
+	t.Run("a whole query", func(t *testing.T) {
+		stages, err := Query(tb, "where city = Accra | project name, age | order age desc | limit 2 |")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(stages) != 4 {
+			t.Fatalf("%d stages", len(stages))
+		}
+		last := stages[3].Table
+		if !reflect.DeepEqual(last.Rows, [][]string{{"Ama", "99"}, {"Abena", "35"}}) {
+			t.Errorf("rows %v", last.Rows)
+		}
+		if stages[0].Op != "where city = Accra" || len(stages[0].Table.Rows) != 4 {
+			t.Errorf("first stage %q with %d rows", stages[0].Op, len(stages[0].Table.Rows))
+		}
+		asc, _ := Query(tb, "sort age | limit 100")
+		if asc[1].Table.Rows[0][2] != "25" || len(asc[1].Table.Rows) != 6 {
+			t.Errorf("ascending sort, limit past the end: %v", asc[1].Table.Rows)
+		}
+		sum, _ := Query(tb, "group city sum age")
+		if sum[0].Table.Rows[0][1] != "189" {
+			t.Errorf("group sum: %v", sum[0].Table.Rows)
+		}
+		for _, bad := range []string{"", " | ", "select age", "group city", "group a b c d", "sort", "sort zip", "limit -1", "limit x", "project zip", "drop name"} {
+			if _, err := Query(tb, bad); !errors.Is(err, ErrInput) {
+				t.Errorf("Query(%q): %v", bad, err)
+			}
+		}
+	})
+	if _, err := ParseTable("\n\n"); !errors.Is(err, ErrInput) {
+		t.Errorf("a table with no header: %v", err)
+	}
+}
+
+func TestJoinColumns(t *testing.T) {
+	l, _ := ParseTable(employees)
+	r, _ := ParseTable(depts)
+	cases := []struct {
+		on, lc, rc string
+		ok         bool
+	}{
+		{"id = dept_id", "id", "dept_id", true},
+		{" dept ", "dept", "dept", true},
+		{"", "dept", "dept", true},
+	}
+	for _, c := range cases {
+		lc, rc, ok := JoinColumns(l, r, c.on)
+		if lc != c.lc || rc != c.rc || ok != c.ok {
+			t.Errorf("JoinColumns(%q) = %q %q %v", c.on, lc, rc, ok)
+		}
+	}
+	other, _ := ParseTable("x,y\n1,2")
+	if _, _, ok := JoinColumns(l, other, ""); ok {
+		t.Error("tables with no column in common found one")
+	}
+}
+
+func TestStructureSnapshots(t *testing.T) {
+	t.Run("B+ tree", func(t *testing.T) {
+		tr := NewBPlusTree(2) // held to 3
+		if tr.Order() != 3 || tr.Height() != 1 || len(tr.Snapshot().Nodes) != 0 {
+			t.Errorf("empty: order %d height %d", tr.Order(), tr.Height())
+		}
+		for k := 1; k <= 20; k++ {
+			tr.Insert(k, k*k)
+		}
+		checkBPlus(t, tr)
+		s := tr.Snapshot()
+		var leaves, nexts int
+		var walked []string
+		for _, n := range s.Nodes {
+			if n.Role == "leaf" {
+				leaves++
+				walked = append(walked, n.Label)
+			}
+		}
+		for _, e := range s.Edges {
+			if e.Label == "next" {
+				nexts++
+			}
+		}
+		if s.Nodes[0].Role != "root" || leaves < 2 || nexts != leaves-1 || tr.Height() < 3 {
+			t.Errorf("root %q, %d leaves, %d next edges, height %d", s.Nodes[0].Role, leaves, nexts, tr.Height())
+		}
+		var keys []string
+		for _, l := range walked {
+			keys = append(keys, strings.Fields(l)...)
+		}
+		if len(keys) != 20 || keys[0] != "1" || keys[19] != "20" {
+			t.Errorf("the leaves hold %v", keys)
+		}
+		if len(s.Edges)-nexts != len(s.Nodes)-1 {
+			t.Errorf("%d parent edges for %d nodes", len(s.Edges)-nexts, len(s.Nodes))
+		}
+	})
+	t.Run("buffer pool", func(t *testing.T) {
+		b, _ := NewBufferPool(3, Clock, 1)
+		if b.Unpin(1) {
+			t.Error("unpinned a page not in memory")
+		}
+		_, _ = b.Fetch(1, true, true, trace.Nop{})
+		_, _ = b.Fetch(2, false, false, trace.Nop{})
+		labels := []string{}
+		for _, n := range b.Snapshot().Nodes {
+			labels = append(labels, n.Label)
+		}
+		if want := []string{"page 1 (pinned 1, ref, dirty)", "page 2 (ref)", "empty"}; !slices.Equal(labels, want) {
+			t.Errorf("labels %q, want %q", labels, want)
+		}
+		if b.Snapshot().Nodes[0].Role != "hand" {
+			t.Error("the clock hand is not shown")
+		}
+		if !b.Unpin(1) || b.Unpin(1) {
+			t.Error("one pin, one unpin")
+		}
+		l, _ := NewBufferPool(1, LRUK, 2)
+		_, _ = l.Fetch(5, false, false, trace.Nop{})
+		if n := l.Snapshot().Nodes[0]; n.Label != "page 5" || n.Role != "" {
+			t.Errorf("LRU-K frame %+v", n)
+		}
+	})
+	t.Run("extendible hash", func(t *testing.T) {
+		h := NewExtendibleHash(1)
+		if s := h.Snapshot(); len(s.Nodes) != 2 || s.Nodes[0].Label != "dir" || s.Nodes[1].Label != "d=0: (empty)" {
+			t.Errorf("empty %+v", s)
+		}
+		for _, k := range []int{0, 1, 2, 3} {
+			if _, err := h.Insert(k); err != nil {
+				t.Fatal(err)
+			}
+		}
+		s := h.Snapshot()
+		dirs := 1 << h.GlobalDepth()
+		if len(s.Edges) != dirs || s.Nodes[0].Role != "global depth 2" || s.Nodes[1].Label != "dir 01" {
+			t.Errorf("%d edges for %d entries, %+v", len(s.Edges), dirs, s.Nodes[:2])
+		}
+		keys := 0
+		for _, n := range s.Nodes[dirs:] {
+			keys += len(strings.Fields(n.Label[strings.Index(n.Label, ":")+1:]))
+		}
+		if keys != 4 {
+			t.Errorf("buckets hold %d keys, want 4", keys)
+		}
+	})
+	t.Run("linear hash", func(t *testing.T) {
+		h := NewLinearHash(1, 1)
+		for _, k := range []int{1, 2, 3, 4, 5} {
+			h.Insert(k)
+		}
+		s := h.Snapshot()
+		next := 0
+		for _, n := range s.Nodes {
+			if n.Role == "next" {
+				next++
+			}
+		}
+		if next != 1 && h.next < len(s.Nodes) {
+			t.Errorf("%d nodes marked next", next)
+		}
+		if !h.Delete(3) || h.Delete(3) || h.Search(3, trace.Nop{}) {
+			t.Error("delete")
+		}
+	})
+	t.Run("LSM tree", func(t *testing.T) {
+		l := NewLSMTree(2, 10)
+		l.Put(1, 10)
+		l.Put(2, 20) // flushes run 0
+		l.Delete(1)  // stays in the memtable
+		s := l.Snapshot()
+		if len(s.Nodes) != 2 || s.Nodes[0].Label != "memtable: 1=x" || s.Nodes[0].Role != "head" || s.Nodes[1].Label != "run 0: 1=10 2=20" {
+			t.Errorf("%+v", s.Nodes)
+		}
+		if len(s.Edges) != 1 || s.Edges[0].Label != "older" {
+			t.Errorf("edges %+v", s.Edges)
+		}
+	})
+	t.Run("slotted page", func(t *testing.T) {
+		p := NewSlottedPage(64)
+		a, _ := p.Insert("alpha")
+		_, _ = p.Insert("bravo")
+		p.Delete(a)
+		if p.Delete(a) || p.Delete(99) {
+			t.Error("deleted a slot twice")
+		}
+		var labels []string
+		for _, n := range p.Snapshot().Nodes {
+			labels = append(labels, n.Label)
+		}
+		joined := strings.Join(labels, "|")
+		if labels[0] != "header: 2 slots" || !strings.Contains(joined, "slot 0: free") || !strings.Contains(joined, "slot 1: @") || !strings.Contains(joined, "free ") {
+			t.Errorf("labels %q", labels)
+		}
+	})
+}
+
+func TestWALLog(t *testing.T) {
+	rec, err := RecoverWAL("T1 write x 5; T1 read x; T2 write x 8\nT2 abort, flush x, flush q, crash")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var lines []string
+	for _, r := range rec.Log {
+		lines = append(lines, r.String())
+	}
+	want := []string{"1: T1 begin", "2: T1 update x 0 -> 5", "3: T2 begin", "4: T2 update x 5 -> 8", "5: T2 undo x back to 5", "6: T2 abort"}
+	if !slices.Equal(lines, want) {
+		t.Errorf("log\n%s\nwant\n%s", strings.Join(lines, "\n"), strings.Join(want, "\n"))
+	}
+	if !slices.Equal(rec.Losers, []string{"T1"}) || rec.Disk["x"] != 5 || rec.Recovered["x"] != 0 {
+		t.Errorf("losers %v, disk %v, recovered %v", rec.Losers, rec.Disk, rec.Recovered)
+	}
+	if !slices.Equal(rec.Items(), []string{"x"}) {
+		t.Errorf("items %v", rec.Items())
+	}
+	for _, bad := range []string{"flush", "T1 commit, T1 write x 1", "T1 fly"} {
+		if _, err := RecoverWAL(bad); !errors.Is(err, ErrInput) {
+			t.Errorf("RecoverWAL(%q): %v", bad, err)
+		}
+	}
+}
+
+func TestTwoPhaseLockingWaitsAndAborts(t *testing.T) {
+	// T1 never commits: T2 waits on it until T1 runs out of operations and
+	// commits at the end, releasing its lock.
+	ops, _ := ParseSchedule("w1(x) r2(x) c2")
+	run := TwoPhaseLocking(ops)
+	if !slices.Equal(run.Committed, []string{"T1", "T2"}) || run.Deadlocks != 0 {
+		t.Errorf("committed %v, deadlocks %d", run.Committed, run.Deadlocks)
+	}
+	waited := false
+	for _, s := range run.Steps {
+		if slices.Contains(s.Waiting, "T2") {
+			waited = true
+		}
+	}
+	if !waited {
+		t.Error("T2 never waited for T1's lock")
+	}
+	ops, _ = ParseSchedule("w1(x) a1 r2(x) c2 b3")
+	run = TwoPhaseLocking(ops)
+	if !slices.Equal(run.Aborted, []string{"T1"}) || !slices.Equal(run.Committed, []string{"T2", "T3"}) {
+		t.Errorf("aborted %v, committed %v", run.Aborted, run.Committed)
+	}
+}
+
+func TestNames(t *testing.T) {
+	if Level(9).String() != "level(9)" || Action(9).String() != "?" || Write.String() != "W" {
+		t.Error("names")
+	}
+	for _, s := range []string{"2", " REPEATABLE READ "} {
+		if l, err := ParseLevel(s); err != nil || l != RepeatableRead {
+			t.Errorf("ParseLevel(%q) = %v %v", s, l, err)
+		}
+	}
+	if _, err := ParseLevel("snapshot"); !errors.Is(err, ErrInput) {
+		t.Errorf("an unknown level: %v", err)
 	}
 }

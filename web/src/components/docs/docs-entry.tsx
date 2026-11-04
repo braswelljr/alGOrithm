@@ -8,6 +8,7 @@ import { TLDRCard } from '@/components/algorithm/tldr-card';
 import { EntryBadges } from '@/components/catalog/entry-badges';
 import { GoDoc } from '@/components/docs/go-doc';
 import { RealWorldCode } from '@/components/docs/real-world-code';
+import { OpenInEditor } from '@/components/editor/open-in-editor';
 import { PageHeading } from '@/components/shared/page-header';
 import { WasmGate } from '@/components/shared/wasm-gate';
 import { Button } from '@/components/ui/button';
@@ -114,6 +115,12 @@ function EntryDoc({ api, catalog, entry }: { api: AlgorithmApi; catalog: Catalog
               Measure its cost
             </Button>
           ) : null}
+          <OpenInEditor
+            id={entry.id}
+            program={snippet.go}
+            file={file || undefined}
+            size="md"
+          />
         </div>
       </header>
 

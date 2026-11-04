@@ -1,3 +1,3 @@
 module github.com/braswelljr/alGOrithm
 
-go 1.21
+go 1.27

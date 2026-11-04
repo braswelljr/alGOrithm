@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import type { MetadataRoute } from 'next';
 import { absoluteUrl } from '@/config/site';
@@ -18,6 +18,7 @@ const pages: { path: string; priority: number }[] = [
   { path: '/big-o/', priority: 0.8 },
   { path: '/system-design/', priority: 0.8 },
   { path: '/quiz/', priority: 0.7 },
+  { path: '/editor/', priority: 0.7 },
   { path: '/compare/', priority: 0.6 },
   { path: '/data/', priority: 0.6 },
   { path: '/docs/tags/', priority: 0.5 },
@@ -25,9 +26,17 @@ const pages: { path: string; priority: number }[] = [
   { path: '/shortcuts/', priority: 0.4 }
 ];
 
-/** Whether the site has a page at route, so a page still being built is left out. */
+const app = path.join(process.cwd(), 'src/app');
+/** The route groups, (site) and (docs): folders that add nothing to the address. */
+const groups = readdirSync(app).filter((d) => /^\(.+\)$/.test(d));
+
+/**
+ * Whether the site has a page at route, so a page still being built is left
+ * out. A page sits in src/app or inside one of its route groups; looking in
+ * src/app alone left every page but the entries out of the sitemap.
+ */
 function exists(route: string): boolean {
-  return existsSync(path.join(process.cwd(), 'src/app', route, 'page.tsx'));
+  return ['', ...groups].some((g) => existsSync(path.join(app, g, route, 'page.tsx')));
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

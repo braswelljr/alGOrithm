@@ -11,6 +11,7 @@ import {
   Play,
   ScrollText,
   Settings,
+  SquareTerminal,
   TrendingUp
 } from 'lucide-react';
 import type { NavigationGroup, NavSection } from '@/types/navigation';
@@ -37,6 +38,7 @@ export const NAVIGATION: NavSection[] = [
     items: [
       { label: 'Visualize', href: '/visualize/', icon: Play },
       { label: 'Structures', href: '/structures/', icon: Boxes },
+      { label: 'Editor', href: '/editor/', icon: SquareTerminal },
       { label: 'Compare', href: '/compare/', icon: GitCompare },
       { label: 'Your data', href: '/data/', icon: Database }
     ]

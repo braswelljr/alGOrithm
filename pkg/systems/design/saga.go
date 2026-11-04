@@ -87,7 +87,7 @@ func Saga(c SagaConfig) ([]string, Report, error) {
 		r.say("%d. %s", i+1, act)
 	}
 	style := map[bool]string{true: "orchestration: the orchestrator drives every step and every compensation", false: "choreography: each service reacts to the previous one's event"}[c.Orchestration]
-	r.say(style)
+	r.say("%s", style)
 	if c.FailAt > 0 {
 		r.say("step %d failed; %d compensations ran in reverse order, leaving no partial order behind", c.FailAt, len(done))
 	}

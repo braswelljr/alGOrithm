@@ -3,7 +3,8 @@
 /**
  * Bricks, a falling-blocks game, drawn on a canvas. The rules are in
  * lib/arena/bricks.ts; this keeps time and takes the keys and the mouse.
- * Keys: left and right move, up or X turns, down drops a row, Space drops to
+ * Keys: left and right move, up, X or R turns clockwise and Z back, down
+ * drops a row, Space drops to
  * the bottom. Mouse: moving over the well slides the piece under the pointer,
  * a click turns it, a right click drops it. A pad of keycaps does the same on
  * a touch screen.
@@ -12,6 +13,7 @@ import { useEffect, useRef, useState } from 'react';
 import type React from 'react';
 import { LuArrowDown, LuArrowLeft, LuArrowRight, LuChevronsDown, LuRotateCw } from 'react-icons/lu';
 import { Button } from '@/components/ui/button';
+import { useMediaQuery } from '@/hooks/use-media-query';
 import {
   cells,
   drop,
@@ -20,16 +22,18 @@ import {
   ghost,
   newBricks,
   rotate,
+  rotateBack,
   shift,
   type BricksState,
   type PieceKind
 } from '@/lib/arena/bricks';
 import { rng } from '@/lib/arena/snake';
-import { cellCap, useArenaFull } from './arena-screen';
+import { KeyHints } from './arena-screen';
 import type { GameProps } from './games';
 
-const ROWS = 20;
-const COLS = 10;
+// More, smaller cells than the classic 10 by 20, so the well fills later.
+const ROWS = 24;
+const COLS = 12;
 const COLOR: Record<PieceKind, string> = {
   I: '#00add8',
   O: '#fbbf24',
@@ -74,8 +78,11 @@ export function BricksGame({ paused, onScore, onOver }: GameProps) {
         ArrowLeft: (s) => shift(s, 0, -1),
         ArrowRight: (s) => shift(s, 0, 1),
         ArrowDown: (s) => fall(s, rand),
-        ArrowUp: rotate,
-        x: rotate,
+        // Turn the falling piece: up, X or R clockwise; Z back.
+        ArrowUp: (s) => rotate(s),
+        x: (s) => rotate(s),
+        r: (s) => rotate(s),
+        z: rotateBack,
         ' ': (s) => drop(s, rand)
       };
       const f = map[e.key] ?? map[e.key.toLowerCase()];
@@ -89,7 +96,7 @@ export function BricksGame({ paused, onScore, onOver }: GameProps) {
   }, [paused, rand]);
 
   return (
-    <div className="flex min-h-0 w-full flex-1 flex-col items-center gap-4 lg:flex-row lg:items-start lg:justify-center">
+    <div className="flex min-h-0 w-full flex-1 flex-col items-center gap-4 lg:flex-row lg:items-stretch lg:justify-center">
       <Well
         game={game}
         onAct={act}
@@ -97,12 +104,21 @@ export function BricksGame({ paused, onScore, onOver }: GameProps) {
       />
       <aside
         aria-label="Bricks: next and score"
-        className="flex flex-row flex-wrap gap-3 lg:w-48 lg:flex-col"
+        className="flex flex-row flex-wrap gap-3 lg:w-48 lg:flex-col lg:self-start"
       >
         <div className="bg-subtle ring-border rounded-xl p-3 ring-1">
           <p className="text-muted mb-2 text-xs tracking-widest uppercase">Next</p>
           <Preview kind={game.next} />
         </div>
+        <KeyHints
+          hints={[
+            ['← →', 'move'],
+            ['↑ X R', 'turn'],
+            ['Z', 'turn back'],
+            ['↓', 'down'],
+            ['Space', 'drop']
+          ]}
+        />
         <dl className="bg-subtle ring-border grid grid-cols-2 gap-2 rounded-xl p-3 font-mono text-sm ring-1 lg:grid-cols-1">
           <div>
             <dt className="text-muted text-xs uppercase">Lines</dt>
@@ -127,7 +143,7 @@ export function BricksGame({ paused, onScore, onOver }: GameProps) {
           <Pad
             label="Turn"
             icon={LuRotateCw}
-            onPress={() => act(rotate)}
+            onPress={() => act((st) => rotate(st))}
           />
           <Pad
             label="Right"
@@ -195,8 +211,9 @@ function Well({
 }) {
   const box = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
-  const full = useArenaFull();
   const [space, setSpace] = useState({ w: 0, h: 0 });
+  // Below lg the well takes the screen's width, and the page scrolls to its foot.
+  const narrow = useMediaQuery('(max-width: 63.99rem)');
 
   useEffect(() => {
     const el = box.current;
@@ -209,7 +226,12 @@ function Well({
   }, []);
 
   const cell = space.w
-    ? Math.max(12, Math.min(space.w / COLS, (space.h || 600) / ROWS, cellCap(full) + 4))
+    ? // As big as the space allows: the whole width on a narrow screen, the
+      // whole height (a tall 1:2 well) on a wide one.
+      Math.max(
+        16,
+        Math.floor(narrow || !space.h ? space.w / COLS : Math.min(space.w / COLS, space.h / ROWS))
+      )
     : 0;
 
   useEffect(() => {
@@ -271,14 +293,14 @@ function Well({
   return (
     <div
       ref={box}
-      className="flex min-h-[20rem] w-full max-w-md flex-1 items-start justify-center"
+      className="flex min-h-0 w-full flex-1 items-start justify-center"
     >
       <canvas
         ref={canvas}
         role="img"
         aria-label={`The well: ${game.lines} lines cleared`}
         onPointerMove={onMove}
-        onClick={() => onAct(rotate)}
+        onClick={() => onAct((st) => rotate(st))}
         onContextMenu={(e) => {
           e.preventDefault();
           onAct((s) => drop(s, rand));

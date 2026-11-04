@@ -250,3 +250,168 @@ func TestMinStackAndMonotonicQueue(t *testing.T) {
 		t.Errorf("snapshot roles %+v", snap.Nodes)
 	}
 }
+
+// TestDequeAgainstASlice runs random operations on a Deque, on a LIFO and a
+// FIFO view of one, and on a DoublyLinkedList, checking each against a slice.
+func TestDequeAgainstASlice(t *testing.T) {
+	r := rand.New(rand.NewSource(11))
+	d := structures.NewDeque[int]()
+	l := structures.NewDoublyLinkedList[int]()
+	var model []int
+	for step := 0; step < 5000; step++ {
+		v := r.Intn(1000)
+		switch r.Intn(6) {
+		case 0:
+			d.PushFront(v)
+			l.PushFront(v)
+			model = append([]int{v}, model...)
+		case 1:
+			d.PushBack(v)
+			l.PushBack(v)
+			model = append(model, v)
+		case 2:
+			got, ok := d.PopFront()
+			lv, lok := l.PopFront()
+			if ok != (len(model) > 0) || lok != ok {
+				t.Fatalf("step %d: PopFront ok %v %v with %d values", step, ok, lok, len(model))
+			}
+			if ok {
+				if got != model[0] || lv != model[0] {
+					t.Fatalf("step %d: PopFront %d %d, want %d", step, got, lv, model[0])
+				}
+				model = model[1:]
+			}
+		case 3:
+			got, ok := d.PopBack()
+			lv, lok := l.PopBack()
+			if ok != (len(model) > 0) || lok != ok {
+				t.Fatalf("step %d: PopBack ok %v %v", step, ok, lok)
+			}
+			if ok {
+				if got != model[len(model)-1] || lv != got {
+					t.Fatalf("step %d: PopBack %d %d, want %d", step, got, lv, model[len(model)-1])
+				}
+				model = model[:len(model)-1]
+			}
+		default:
+			f, fok := d.Front()
+			b, bok := d.Back()
+			if fok != (len(model) > 0) || bok != fok {
+				t.Fatalf("step %d: Front/Back ok %v %v", step, fok, bok)
+			}
+			if fok && (f != model[0] || b != model[len(model)-1]) {
+				t.Fatalf("step %d: front %d back %d, want %d and %d", step, f, b, model[0], model[len(model)-1])
+			}
+		}
+		if d.Len() != len(model) || l.Len() != len(model) {
+			t.Fatalf("step %d: len %d %d, want %d", step, d.Len(), l.Len(), len(model))
+		}
+	}
+	if !reflect.DeepEqual(d.Values(), model) && len(model) > 0 {
+		t.Errorf("values differ from the model")
+	}
+	snap := d.Snapshot()
+	if len(snap.Nodes) != len(model) || (len(model) > 1 && (snap.Nodes[0].Role != "front" || snap.Nodes[len(model)-1].Role != "back")) {
+		t.Errorf("snapshot roles %v", labels(snap))
+	}
+
+	var empty structures.Deque[string]
+	if _, ok := empty.Front(); ok {
+		t.Error("Front of an empty deque")
+	}
+	if _, ok := empty.Back(); ok {
+		t.Error("Back of an empty deque")
+	}
+	stack, queue := structures.AsStack(structures.NewDeque[int]()), structures.AsQueue(structures.NewDeque[int]())
+	for _, v := range []int{1, 2, 3} {
+		stack.Push(v)
+		queue.Enqueue(v)
+	}
+	if top, _ := stack.Peek(); top != 3 || stack.Len() != 3 {
+		t.Errorf("stack peek %d len %d", top, stack.Len())
+	}
+	if front, _ := queue.Peek(); front != 1 || queue.Len() != 3 {
+		t.Errorf("queue peek %d len %d", front, queue.Len())
+	}
+}
+
+func TestSmallAccessors(t *testing.T) {
+	q := structures.NewQueue("a", "b")
+	if v, ok := q.Peek(); !ok || v != "a" || q.Len() != 2 {
+		t.Errorf("queue peek %q len %d", v, q.Len())
+	}
+	if v, ok := structures.NewQueue[int]().Peek(); ok || v != 0 {
+		t.Error("peek of an empty queue")
+	}
+
+	b := structures.NewCircularBuffer[int](0, false) // held to 1 slot
+	if b.Cap() != 1 || b.Len() != 0 {
+		t.Errorf("cap %d len %d", b.Cap(), b.Len())
+	}
+	if _, ok := b.Peek(); ok {
+		t.Error("peek of an empty buffer")
+	}
+	b.Push(7)
+	if v, ok := b.Peek(); !ok || v != 7 || b.Len() != 1 || b.Push(8) {
+		t.Errorf("peek %d, len %d, a full non-overwriting buffer took a value", v, b.Len())
+	}
+
+	m := structures.NewMinStack(5, 3, 8)
+	if v, ok := m.Peek(); !ok || v != 8 || m.Len() != 3 {
+		t.Errorf("min stack peek %d len %d", v, m.Len())
+	}
+	if got := labels(m.Snapshot()); !reflect.DeepEqual(got, []string{"5 (min 5)", "3 (min 3)", "8 (min 3)"}) {
+		t.Errorf("min stack snapshot %v", got)
+	}
+	if m.Snapshot().Nodes[2].Role != "top" {
+		t.Error("the top is not marked")
+	}
+	var em structures.MinStack[int]
+	if _, ok := em.Peek(); ok {
+		t.Error("peek of an empty min stack")
+	}
+	if _, ok := em.Pop(); ok {
+		t.Error("pop of an empty min stack")
+	}
+
+	mq := structures.NewMonotonicQueue[int]()
+	if _, ok := mq.Peek(); ok {
+		t.Error("peek of an empty monotonic queue")
+	}
+	if _, ok := mq.Max(); ok {
+		t.Error("max of an empty monotonic queue")
+	}
+	mq.Enqueue(2)
+	mq.Enqueue(9)
+	if v, _ := mq.Peek(); v != 2 {
+		t.Errorf("monotonic peek %d", v)
+	}
+
+	ll := structures.NewLinkedList[int]()
+	if _, ok := ll.Tail(); ok {
+		t.Error("tail of an empty list")
+	}
+	ll.Prepend(2)
+	ll.Prepend(1)
+	if tail, _ := ll.Tail(); tail != 2 || !reflect.DeepEqual(ll.Values(), []int{1, 2}) {
+		t.Errorf("prepend into an empty list: %v", ll.Values())
+	}
+
+	dl := structures.NewDoublyLinkedList(1, 2, 3)
+	if dl.Remove(9) || !dl.Remove(3) || !dl.Remove(1) || !reflect.DeepEqual(dl.Backward(), []int{2}) {
+		t.Errorf("doubly linked remove: %v", dl.Values())
+	}
+	dl.PushFront(0)
+	if !reflect.DeepEqual(dl.Values(), []int{0, 2}) || dl.Len() != 2 {
+		t.Errorf("push front %v", dl.Values())
+	}
+
+	sl := structures.NewSortedList(3, 1, 2)
+	if sl.Remove(7) {
+		t.Error("removed a missing value")
+	}
+	snap := sl.Snapshot()
+	if got := labels(snap); !reflect.DeepEqual(got, []string{"1", "2", "3"}) || snap.Nodes[0].Role != "min" || snap.Nodes[2].Role != "max" || len(snap.Edges) != 2 {
+		t.Errorf("sorted list snapshot %v", got)
+	}
+}

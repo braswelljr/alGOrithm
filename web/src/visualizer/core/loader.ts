@@ -9,6 +9,12 @@ export interface LoadOptions {
   wasmUrl?: string;
   /** Where Go's wasm_exec.js is served. Default: /wasm_exec.js */
   execUrl?: string;
+  /**
+   * Loads Go's runtime and returns the wasm's URL, for a host that chooses
+   * where the builds come from (the site: a release's, else its own); when
+   * set, wasmUrl and execUrl are not used.
+   */
+  resolve?: () => Promise<string>;
 }
 
 let loading: Promise<AlgorithmApi> | undefined;
@@ -76,8 +82,14 @@ async function startOne(
   return wrapApi(Reflect.get(globalThis, 'alGOrithm'));
 }
 
-async function boot({ wasmUrl = '/algorithm.wasm', execUrl = '/wasm_exec.js' }: LoadOptions) {
-  await loadScript(execUrl);
+async function boot({
+  wasmUrl: fixedUrl = '/algorithm.wasm',
+  execUrl = '/wasm_exec.js',
+  resolve
+}: LoadOptions) {
+  let wasmUrl = fixedUrl;
+  if (resolve) wasmUrl = await resolve();
+  else await loadScript(execUrl);
   try {
     return await startAlgorithm(fetch(wasmUrl));
   } catch {

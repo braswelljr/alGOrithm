@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"strings"
+	"unicode"
 
 	"github.com/braswelljr/alGOrithm/internal/core"
 )
@@ -14,11 +15,11 @@ func Learn() string {
 	b.WriteString("# Learning paths\n\nOrdered walks through the catalog, generated from `core.Paths()` (`go run ./tools/gendocs`). Each step is an entry to run, what to notice while it runs, and the command that shows it; `algorithm learn ID` prints the same in the terminal, and the site's Learn page opens each step in the visualizer.\n\n")
 	b.WriteString("| Path | Level | For | Steps | First |\n|------|-------|-----|-------|-------|\n")
 	for _, p := range core.Paths() {
-		fmt.Fprintf(&b, "| [%s](#%s) | %s | %s | %d | %s |\n", p.Title, p.ID, p.Level, p.Audience, len(p.Steps), links(p.Prerequisites))
+		fmt.Fprintf(&b, "| [%s](#%s) | %s | %s | %d | %s |\n", p.Title, anchor(p.Title), p.Level, p.Audience, len(p.Steps), links(p.Prerequisites))
 	}
 	for _, p := range core.Paths() {
 		v := p.View()
-		fmt.Fprintf(&b, "\n<a id=\"%s\"></a>\n\n## %s\n\n%s\n\n- Level: %s, for %s.\n", p.ID, p.Title, p.Summary, p.Level, p.Audience)
+		fmt.Fprintf(&b, "\n## %s\n\n%s\n\n- Level: %s, for %s.\n", p.Title, p.Summary, p.Level, p.Audience)
 		if len(p.Prerequisites) > 0 {
 			fmt.Fprintf(&b, "- Walk first: %s.\n", links(p.Prerequisites))
 		}
@@ -44,7 +45,23 @@ func links(ids []string) string {
 		if p, ok := core.PathByID(id); ok {
 			title = p.Title
 		}
-		out[i] = fmt.Sprintf("[%s](#%s)", title, id)
+		out[i] = fmt.Sprintf("[%s](#%s)", title, anchor(title))
 	}
 	return strings.Join(out, ", ")
+}
+
+// anchor is the id a Markdown renderer gives a heading (GitHub's rule): lower
+// case, letters, digits, spaces and hyphens kept, spaces turned to hyphens.
+// Links point at the headings themselves, so the page needs no HTML anchors.
+func anchor(heading string) string {
+	var b strings.Builder
+	for _, r := range strings.ToLower(heading) {
+		switch {
+		case r == ' ':
+			b.WriteByte('-')
+		case r == '-' || r == '_' || unicode.IsLetter(r) || unicode.IsDigit(r):
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
 }

@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"slices"
 	"strconv"
@@ -145,7 +146,8 @@ func runCompare(args []string, s Streams) error {
 			operands = append(operands, a)
 		}
 	}
-	if len(ids) == 0 {
+	chosen := len(ids) > 0
+	if !chosen {
 		for _, e := range core.InCategory("sorting") {
 			ids = append(ids, e.ID)
 		}
@@ -159,9 +161,27 @@ func runCompare(args []string, s Streams) error {
 			return err
 		}
 	}
-	results, err := core.Compare(ids, core.Input{Values: values, Target: o.target, Options: o.opts})
-	if err != nil {
-		return err
+	in := core.Input{Values: values, Target: o.target, Options: o.opts}
+	var results []core.Result
+	if chosen {
+		// Entries the caller named: an input one of them refuses is an error.
+		if results, err = core.Compare(ids, in); err != nil {
+			return err
+		}
+	} else {
+		// Every sort: one that refuses this input (Bogo Sort takes at most 8
+		// values) is left out, and the reader is told.
+		for _, id := range ids {
+			r, err := core.Compare([]string{id}, in)
+			if errors.Is(err, core.ErrInput) {
+				fmt.Fprintf(s.Err, "algorithm: skipping %s: %v\n", id, err)
+				continue
+			}
+			if err != nil {
+				return err
+			}
+			results = append(results, r...)
+		}
 	}
 	if o.asJSON {
 		return writeJSON(s.Out, results)

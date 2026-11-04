@@ -245,7 +245,6 @@ func (q *quiz) pairCandidates() []candidate {
 	}
 	var out []candidate
 	for k, e := range q.ev {
-		k, e := k, e // each question keeps its own (go 1.21 loop variables)
 		if (e.Kind != trace.Compare && e.Kind != trace.Swap) || len(e.Indices) != 2 ||
 			!inRange(e.Indices[0], n) || !inRange(e.Indices[1], n) || e.Indices[0] == e.Indices[1] {
 			continue

@@ -3,6 +3,7 @@ package compilers
 import (
 	"errors"
 	"slices"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -316,5 +317,209 @@ func TestTriColorBarrier(t *testing.T) {
 	freed, lost, _ := TriColor(h, true)
 	if len(lost) != 0 || len(freed) != 0 {
 		t.Errorf("with a barrier nothing live is freed: freed %v, lost %v", freed, lost)
+	}
+}
+
+func TestThreeAddressCallsAndBranches(t *testing.T) {
+	got := ThreeAddress(mustParse(t, "fn sq(x) { return x * x; } let y = -sq(3); if y < 0 { print y; } else { print 0; } if true { print 1; } sq(2);"))
+	want := []string{
+		"func sq(x):",
+		"  t1 = x * x",
+		"  return t1",
+		"end sq",
+		"  param 3",
+		"  t2 = call sq, 1",
+		"  t3 = -t2",
+		"  y = t3",
+		"  t4 = y < 0",
+		"  if_false t4 goto L1",
+		"  print y",
+		"  goto L2",
+		"L1:",
+		"  print 0",
+		"L2:",
+		"  if_false true goto L3",
+		"  print 1",
+		"L3:",
+		"  param 2",
+		"  t5 = call sq, 1",
+	}
+	if !slices.Equal(got, want) {
+		t.Errorf("got\n%s\nwant\n%s", strings.Join(got, "\n"), strings.Join(want, "\n"))
+	}
+}
+
+func TestRun(t *testing.T) {
+	for src, want := range programs {
+		out, err := Run(src)
+		if err != nil || !slices.Equal(out, want) {
+			t.Errorf("Run(%q) = %v (%v), want %v", src, out, err, want)
+		}
+	}
+	if out, err := Run("fn sq(x) { return x * x; } let y = -sq(3); if y < 0 { print y; } sq(2);"); err != nil || !slices.Equal(out, []string{"-9"}) {
+		t.Errorf("Run = %v %v", out, err)
+	}
+	var e *Error
+	if _, err := Run("let = 3;"); !errors.Is(err, ErrInput) || !errors.As(err, &e) {
+		t.Errorf("a syntax error: %v", err)
+	}
+	if _, err := Run("print x;"); !errors.Is(err, ErrInput) || !errors.As(err, &e) || e.Line != 1 {
+		t.Errorf("a type error: %v", err)
+	}
+	if _, err := Run("print 1 / 0;"); !errors.Is(err, ErrRuntime) {
+		t.Errorf("division by zero: %v", err)
+	}
+	if _, err := Run("let z = 0; print 5 % z;"); !errors.Is(err, ErrRuntime) {
+		t.Errorf("modulo by zero: %v", err)
+	}
+	if _, err := Run("fn f(n) { return f(n + 1); } print f(1);"); !errors.Is(err, ErrRuntime) || !strings.Contains(err.Error(), "nested calls") {
+		t.Errorf("unbounded recursion: %v", err)
+	}
+	if out, err := Run("fn none() { let a = 1; } print none();"); err != nil || !slices.Equal(out, []string{"0"}) {
+		t.Errorf("a function that ends without return gives 0: %v %v", out, err)
+	}
+	if out, err := Run("let a = 3; while a > 0 { if a == 1 { a = 0; } else { a = a - 1; } } print a; print !true || 2 >= 2; print 1 != 2;"); err != nil || !slices.Equal(out, []string{"0", "true", "true"}) {
+		t.Errorf("Run = %v %v", out, err)
+	}
+}
+
+func TestTreeLabelsAndPreorder(t *testing.T) {
+	prog := mustParse(t, "let a = 1 + 2;\nfn f(x) { return !x; }\nif true { f(a); }")
+	got := prog.Tree()
+	want := []string{
+		"program",
+		"  let a",
+		"    +",
+		"      1",
+		"      2",
+		"  fn f",
+		"    param x",
+		"    block",
+		"      return",
+		"        !",
+		"          x",
+		"  if",
+		"    true",
+		"    block",
+		"      expr",
+		"        call f",
+		"          a",
+	}
+	if !slices.Equal(got, want) {
+		t.Errorf("tree\n%s\nwant\n%s", strings.Join(got, "\n"), strings.Join(want, "\n"))
+	}
+	pre := prog.Preorder()
+	if len(pre) != len(want) {
+		t.Fatalf("%d nodes in preorder, %d in the tree", len(pre), len(want))
+	}
+	for i, n := range pre {
+		if strings.TrimSpace(want[i]) != n.Label() {
+			t.Errorf("preorder %d is %q, tree line %q", i, n.Label(), want[i])
+		}
+	}
+	if pre[0].Kind != ProgramNode || pre[2].Kind != BinaryNode || pre[3].Kind != NumberNode {
+		t.Errorf("kinds %s %s %s", pre[0].Kind, pre[2].Kind, pre[3].Kind)
+	}
+}
+
+func TestEqual(t *testing.T) {
+	a, b := mustParse(t, "let a = 1 + 2;"), mustParse(t, "\n\n  let a   = 1+2;")
+	if !Equal(a, b) {
+		t.Error("the same program in another layout differs")
+	}
+	if Equal(a, mustParse(t, "let a = 1 - 2;")) || Equal(a, mustParse(t, "let a = 1;")) || Equal(a, mustParse(t, "let b = 1 + 2;")) {
+		t.Error("different programs are equal")
+	}
+	if Equal(a, nil) || !Equal(nil, nil) {
+		t.Error("nil handling")
+	}
+}
+
+func TestListingAndTokenEnd(t *testing.T) {
+	code, err := Compile(mustParse(t, "let a = 2; print a == 2;"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	l := code.Listing()
+	if len(l) != len(code.Code) || l[0] != "  0  PUSH 2" || !strings.HasSuffix(l[len(l)-1], "HALT") {
+		t.Errorf("listing\n%s", strings.Join(l, "\n"))
+	}
+	for i, line := range l {
+		if !strings.HasPrefix(strings.TrimSpace(line), strconv.Itoa(i)+" ") {
+			t.Errorf("line %d: %q", i, line)
+		}
+	}
+	if !slices.Contains(l, "  5  PRINT bool") {
+		t.Errorf("a bool print: %v", l)
+	}
+	if _, err := Compile(mustParse(t, "print q;")); !errors.Is(err, ErrInput) {
+		t.Errorf("compiling a bad program: %v", err)
+	}
+	toks, err := Lex("let ab = 10;")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, tk := range toks {
+		if tk.Text != "" && tk.End() != tk.Pos+len(tk.Text) {
+			t.Errorf("%+v ends at %d", tk, tk.End())
+		}
+	}
+	if toks[1].Text != "ab" || toks[1].End() != 6 {
+		t.Errorf("ab is %+v, ending at %d", toks[1], toks[1].End())
+	}
+}
+
+func TestSyntaxErrorsPointAtTheToken(t *testing.T) {
+	cases := []struct {
+		src       string
+		line, col int
+		msg       string
+	}{
+		{"let = 3;", 1, 5, "found \"=\""},
+		{"let a = 3", 1, 10, "found the end"},
+		{"print 1 +;", 1, 10, ""},
+		{"if 1 < 2 print 1;", 1, 10, "expected \"{\""},
+		{"if true { print 1;", 1, 19, "expected \"}\", found the end"},
+		{"if true { } else print 2;", 1, 18, "expected \"{\""},
+		{"if true { } else if { }", 1, 21, ""},
+		{"fn 3() { }", 1, 4, "expected a function name"},
+		{"fn f x { }", 1, 6, "expected \"(\""},
+		{"fn f(a b) { }", 1, 8, "expected \",\""},
+		{"fn f(1) { }", 1, 6, "expected a parameter name"},
+		{"fn f() return 1;", 1, 8, "expected \"{\""},
+		{"while 1 {\n  x = ;\n}", 2, 7, ""},
+		{"return ;", 1, 8, ""},
+		{"f(1;", 1, 4, ""},
+		{"let a = (1 + 2;", 1, 15, ""},
+	}
+	for _, c := range cases {
+		_, err := Parse(c.src)
+		var e *Error
+		if !errors.As(err, &e) || !errors.Is(err, ErrInput) {
+			t.Errorf("%q: err %v, want a positioned syntax error", c.src, err)
+			continue
+		}
+		if e.Line != c.line || e.Col != c.col || !strings.Contains(e.Msg, c.msg) {
+			t.Errorf("%q: %v, want %d:%d containing %q", c.src, err, c.line, c.col, c.msg)
+		}
+	}
+	for _, src := range []string{"1 +", "(1", "1 2", "", "*"} {
+		if _, _, err := RecursiveDescent(src); !errors.Is(err, ErrInput) {
+			t.Errorf("RecursiveDescent(%q): %v", src, err)
+		}
+		if _, _, err := Pratt(src); !errors.Is(err, ErrInput) {
+			t.Errorf("Pratt(%q): %v", src, err)
+		}
+	}
+	for _, src := range []string{"1 $ 2", "let @"} {
+		if _, err := Parse(src); !errors.Is(err, ErrInput) {
+			t.Errorf("a lexing error through Parse(%q): %v", src, err)
+		}
+		if _, _, err := Pratt(src); !errors.Is(err, ErrInput) {
+			t.Errorf("a lexing error through Pratt(%q): %v", src, err)
+		}
+		if _, _, err := RecursiveDescent(src); !errors.Is(err, ErrInput) {
+			t.Errorf("a lexing error through RecursiveDescent(%q): %v", src, err)
+		}
 	}
 }

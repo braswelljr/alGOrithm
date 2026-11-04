@@ -39,7 +39,9 @@ write(L.mono.file, markSvg(id, mono('#000000')));
 for (const [concept, f] of Object.entries(L.concepts)) write(f.file, marks.faviconSvg(concept));
 write(set.safariPinnedTab.file, markSvg(id, mono('#000000')));
 write(set.faviconSvg.file, marks.faviconSvg(id, true));
-write(L.readme, marks.faviconSvg(id));
+// The README shows its logo with Markdown, which cannot size an image, so the
+// file says its own size: 96 px, rather than as wide as the page.
+write(L.readme, marks.faviconSvg(id).replace('<svg ', '<svg width="96" height="96" '));
 
 /** The drawing inside an SVG file in public/: its shapes, without the document or its style. */
 function shapesOf(file) {

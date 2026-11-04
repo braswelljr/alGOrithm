@@ -77,7 +77,11 @@ test('bricks fall, turn, clear lines and end at the top', async () => {
   const rand = rng(7);
   let s = b.newBricks(6, 4, rand);
   // A full bottom row but one cell clears when an I fills it.
-  s = { ...s, well: [...new Array(20).fill(null), 'O', 'O', 'O', null], piece: { kind: 'I', turn: 1, row: 0, col: 1 } };
+  s = {
+    ...s,
+    well: [...new Array(20).fill(null), 'O', 'O', 'O', null],
+    piece: { kind: 'I', turn: 1, row: 0, col: 1 }
+  };
   assert.ok(b.fits(s, s.piece));
   s = b.drop(s, rand);
   assert.equal(s.lines, 1);
@@ -87,8 +91,22 @@ test('bricks fall, turn, clear lines and end at the top', async () => {
   assert.notEqual(b.rotate(t).piece.turn, 0);
   // Stacking past the top ends the game.
   let full = b.newBricks(4, 4, rand);
-  full = { ...full, well: ['O', 'O', null, 'O', 'O', 'O', null, 'O', 'O', 'O', null, 'O', 'O', 'O', null, 'O'] };
+  full = {
+    ...full,
+    well: ['O', 'O', null, 'O', 'O', 'O', null, 'O', 'O', 'O', null, 'O', 'O', 'O', null, 'O']
+  };
   for (let i = 0; i < 6 && !full.over; i++) full = b.drop(full, rand);
   assert.equal(full.over, true);
   assert.equal(b.linePoints(4, 0), 800);
+});
+
+test('a brick turns back the way it turned', async () => {
+  const b = await import('../src/lib/arena/bricks.ts');
+  const s = {
+    ...b.newBricks(24, 12, rng(3)),
+    piece: { kind: 'T' as const, turn: 0, row: 5, col: 4 }
+  };
+  const there = b.rotate(s);
+  assert.equal(there.piece.turn, 1);
+  assert.equal(b.rotateBack(there).piece.turn, 0);
 });

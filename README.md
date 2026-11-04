@@ -1,14 +1,56 @@
-<p align="center">
-  <a href="https://algorithm.vercel.app"><img src="docs/assets/logo.svg" alt="alGOrithm" width="96"></a>
-</p>
+# alGOrithm
 
-# AL[GO](#)RITHM
+[![alGOrithm logo](docs/assets/logo.svg)](https://algorithm.vercel.app)
 
-Algorithms, data structures and operating-system concepts in Go, to read, to import, to run on your own data, and to watch step by step. Try it in the browser at [algorithm.vercel.app](https://algorithm.vercel.app).
+**Algorithms and data structures in Go, step by step: a library, a command and a visualizer that runs the real Go code in your browser.**
 
-- **A Go library**: one package per topic under `pkg/` (`sorting`, `graphs`, `cryptography`, `structures`, `scheduling`, `concurrency`, ...), generic where it makes sense, documented, tested, and depending on nothing but the standard library.
-- **A command**: `algorithm` runs any entry on your values, a CSV or JSON file or generated data, prints every step, compares entries, prints their source, and serves them as a JSON API or as tools for AI assistants (MCP).
-- **A visualizer**: a website that runs the same Go code compiled to WebAssembly in the browser: animated sorts and searches, pathfinding on mazes, dynamic-programming tables, data structures drawn as you operate them, Gantt charts of CPU schedules, page frames, disk head paths, and threads racing. Nothing you load leaves the browser.
+[![Tests](https://github.com/braswelljr/alGOrithm/actions/workflows/go.yml/badge.svg)](https://github.com/braswelljr/alGOrithm/actions/workflows/go.yml)
+[![Lint](https://github.com/braswelljr/alGOrithm/actions/workflows/lint.yml/badge.svg)](https://github.com/braswelljr/alGOrithm/actions/workflows/lint.yml)
+[![Web](https://github.com/braswelljr/alGOrithm/actions/workflows/web.yml/badge.svg)](https://github.com/braswelljr/alGOrithm/actions/workflows/web.yml)
+[![Release](https://github.com/braswelljr/alGOrithm/actions/workflows/release.yml/badge.svg)](https://github.com/braswelljr/alGOrithm/actions/workflows/release.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/braswelljr/alGOrithm.svg)](https://pkg.go.dev/github.com/braswelljr/alGOrithm)
+[![Go Report Card](https://goreportcard.com/badge/github.com/braswelljr/alGOrithm)](https://goreportcard.com/report/github.com/braswelljr/alGOrithm)
+[![Go 1.27+](https://img.shields.io/badge/go-1.27%2B-00add8?logo=go&logoColor=white)](go.mod)
+[![MIT license](https://img.shields.io/github/license/braswelljr/alGOrithm)](LICENSE)
+[![The visualizer, live](https://img.shields.io/badge/visualizer-algorithm.vercel.app-00add8)](https://algorithm.vercel.app)
+
+**alGOrithm** is an open-source collection of **696 algorithms, data structures and computer-science
+simulations in 59 categories**, written in Go with nothing but the standard library: sorting and
+searching, graphs and pathfinding, dynamic programming, string matching, cryptography and
+hashing, trees, heaps, tries and caches, CPU scheduling, paging and deadlock, concurrency,
+networking, databases, distributed systems, system design, machine learning, digital logic and
+compilers. Every entry is documented with its time and space complexity (Big O), tested, and
+traced, so the same code can be read, imported, run on your own data and watched step by step.
+
+Try it in the browser, no install: **[algorithm.vercel.app](https://algorithm.vercel.app)**.
+
+- **[Visualize](https://algorithm.vercel.app/visualize/)** a sort, a search, a pathfinder or a scheduler on your data, and step through every comparison and swap.
+- **[Read the docs](https://algorithm.vercel.app/docs/)** of every entry: what it does, what it costs, its Go source and how to call it.
+- **[Learn](https://algorithm.vercel.app/learn/)** along 20 paths, from your first sort to how an operating system works.
+- **[Quiz yourself](https://algorithm.vercel.app/quiz/)** on real runs: predict the next step.
+- **[Measure Big O](https://algorithm.vercel.app/big-o/)**: time an entry on growing inputs and fit its curve.
+- **[System design](https://algorithm.vercel.app/system-design/)**: case studies with live architectures you can change.
+- **[Play the arena](https://algorithm.vercel.app/shortcuts/)**: race the pathfinders, beat the sorts at swaps, and more.
+
+## Features
+
+- **A Go library**: one package per topic under `pkg/` (`sorting`, `graphs`, `cryptography`,
+  `structures`, `scheduling`, `concurrency`, ...), generic where it makes sense (`cmp.Ordered`,
+  `comparable`), every exported function documented with its cost and what it does to its input,
+  and **no third-party dependencies**.
+- **A command**: `algorithm` runs any entry on your values, a CSV or JSON file or generated data,
+  prints every step, compares entries, prints their source, and serves them as a JSON API
+  (`algorithm serve`, [OpenAPI](api/openapi.yaml)) or as tools for AI assistants (`algorithm mcp`).
+- **A visualizer**: the same Go code compiled to WebAssembly: animated sorts and searches,
+  pathfinding on mazes, dynamic-programming tables, data structures drawn as you operate them,
+  Gantt charts of CPU schedules, page frames, disk head paths, threads racing, circuits and
+  system architectures. **Nothing you load leaves your browser.**
+- **Traced**: every algorithm `X` has a `TraceX` that reports each step to a `trace.Recorder`;
+  replaying a sort's events rebuilds its result.
+- **Tested**: every entry runs its example in CI, every sort and search runs a shared correctness
+  suite, structures are checked against models under random operations, everything runs under the
+  race detector on Linux, macOS and Windows, and CI keeps a coverage floor (every `pkg/` package
+  at 90% or more, no exported function untested).
 
 ## Install
 
@@ -40,9 +82,9 @@ As a library:
 
 ```go
 import (
-	"github.com/braswelljr/alGOrithm/pkg/algorithms/pathfinding"
-	"github.com/braswelljr/alGOrithm/pkg/algorithms/sorting"
-	"github.com/braswelljr/alGOrithm/pkg/structures"
+ "github.com/braswelljr/alGOrithm/pkg/algorithms/pathfinding"
+ "github.com/braswelljr/alGOrithm/pkg/algorithms/sorting"
+ "github.com/braswelljr/alGOrithm/pkg/structures"
 )
 
 sorted := sorting.Quick([]string{"pear", "apple", "fig"}) // [apple fig pear]
@@ -100,7 +142,7 @@ alGOrithm/
 How a container hands values back, and what implements each in `structures` and `structures/heaps`:
 
 | Principle | Also called | Structure | Go interface |
-|-----------|-------------|-----------|--------------|
+| ----------- | ------------- | ----------- | -------------- |
 | Last in, first out | LIFO, FILO | `Stack`, a `Deque` used at one end | `structures.LIFO` |
 | First in, first out | FIFO, LILO | `Queue`, a `Deque` used at both ends | `structures.FIFO` |
 | Most urgent first | priority | `heaps.MinHeap`, `heaps.PriorityHeap` | `heaps.PriorityQueue` |
@@ -219,7 +261,11 @@ New here? Walk one of the 20 [learning paths](docs/learn.md), or run `algorithm 
 
 - [Getting started](docs/guides/getting-started.md): the command, the library and the visualizer.
 - [Understanding Big O](docs/guides/big-o.md): what the notation means, why each cost is what it is, and how `algorithm bench` measures it.
+- [System design](docs/guides/system-design.md): sizing a problem, drawing the boxes, and the trade-offs.
+- [Learning paths](docs/learn.md): 20 ordered walks through the catalog.
 - [Catalog](docs/catalog.md): every entry with its cost and how to run it.
+- [Cheat sheets](docs/cheatsheets.md): every category's costs and key ideas on one page.
+- [API reference](https://pkg.go.dev/github.com/braswelljr/alGOrithm) on pkg.go.dev, and the [HTTP API](api/openapi.yaml).
 - [Contributing](CONTRIBUTING.md), and the contributor docs in [`docs/`](docs/README.md): the rules the code follows, how to add an algorithm, testing, CI, and the design of the visualizer.
 
 ## Author

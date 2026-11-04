@@ -227,7 +227,7 @@ func dirtyRead(l Level) Anomaly {
 	db.abort(t1, "")
 	db.commit(t2)
 	occurs := v == 100
-	db.say(verdict(occurs, "T2 saw 100, a value that never existed", "T2 saw only committed data"))
+	db.say("%s", verdict(occurs, "T2 saw 100, a value that never existed", "T2 saw only committed data"))
 	return Anomaly{Name: "dirty read", Occurs: occurs, Story: db.story}
 }
 
@@ -240,7 +240,7 @@ func nonRepeatableRead(l Level) Anomaly {
 	b := db.read(t1, "x")
 	db.commit(t1)
 	occurs := a != b
-	db.say(verdict(occurs, fmt.Sprintf("T1 read x twice and got %d, then %d", a, b), "T1 read the same x twice"))
+	db.say("%s", verdict(occurs, fmt.Sprintf("T1 read x twice and got %d, then %d", a, b), "T1 read the same x twice"))
 	return Anomaly{Name: "non-repeatable read", Occurs: occurs, Story: db.story}
 }
 
@@ -253,7 +253,7 @@ func phantom(l Level) Anomaly {
 	c2 := db.count(t1, 10)
 	db.commit(t1)
 	occurs := c1 != c2
-	db.say(verdict(occurs, fmt.Sprintf("the same count gave %d, then %d: a phantom row appeared", c1, c2), "the count did not change"))
+	db.say("%s", verdict(occurs, fmt.Sprintf("the same count gave %d, then %d: a phantom row appeared", c1, c2), "the count did not change"))
 	return Anomaly{Name: "phantom", Occurs: occurs, Story: db.story}
 }
 
@@ -266,7 +266,7 @@ func lostUpdate(l Level) Anomaly {
 	db.write(t2, "counter", b+1)
 	ok1, ok2 := db.commit(t1), db.commit(t2)
 	occurs := ok1 && ok2 && db.committed["counter"] == 11
-	db.say(verdict(occurs, "both increments committed, but the counter is 11, not 12", fmt.Sprintf("the counter is %d and no increment was silently lost", db.committed["counter"])))
+	db.say("%s", verdict(occurs, "both increments committed, but the counter is 11, not 12", fmt.Sprintf("the counter is %d and no increment was silently lost", db.committed["counter"])))
 	return Anomaly{Name: "lost update", Occurs: occurs, Story: db.story}
 }
 
@@ -284,7 +284,7 @@ func writeSkew(l Level) Anomaly {
 	db.commit(t1)
 	db.commit(t2)
 	occurs := db.committed["alice"]+db.committed["bob"] == 0
-	db.say(verdict(occurs, "both doctors went off call: each check passed on its own snapshot", "at least one doctor is still on call"))
+	db.say("%s", verdict(occurs, "both doctors went off call: each check passed on its own snapshot", "at least one doctor is still on call"))
 	return Anomaly{Name: "write skew", Occurs: occurs, Story: db.story}
 }
 

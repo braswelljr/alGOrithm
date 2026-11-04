@@ -2,6 +2,7 @@
 
 import { useId, useMemo, useState } from 'react';
 import { CircleAlert, Download, History, Upload } from 'lucide-react';
+import { OpenInEditor } from '@/components/editor/open-in-editor';
 import { Button } from '@/components/shared/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { buttonVariants } from '@/components/ui/button';
@@ -76,6 +77,11 @@ export function RunToolbar({
         <CopyButton text={() => location.href}>Copy link</CopyButton>
         <CopyButton text={() => snippet.cli}>Copy command</CopyButton>
         <CopyButton text={() => snippet.go}>Copy Go</CopyButton>
+        <OpenInEditor
+          id={entry.id}
+          program={snippet.go}
+          file={entry.file || undefined}
+        />
         <Button
           size="sm"
           disabled={!result}

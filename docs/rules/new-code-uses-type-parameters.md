@@ -4,7 +4,7 @@ Anything that works on values is generic, with the standard constraints: `cmp.Or
 
 ## Why
 
-A sort written for `[]int` cannot sort `[]string`; a container of `interface{}` needs a type assertion on every read and finds mistakes at run time. Type parameters remove both at no cost to the reader: `func Quick[T cmp.Ordered](s []T) []T` reads like the `int` version. The module's minimum is Go 1.21 (`go.mod`), which has `cmp.Ordered`, `slices` and the built-in `min` and `max`, so no constraint package of our own is needed.
+A sort written for `[]int` cannot sort `[]string`; a container of `interface{}` needs a type assertion on every read and finds mistakes at run time. Type parameters remove both at no cost to the reader: `func Quick[T cmp.Ordered](s []T) []T` reads like the `int` version. The module's minimum is Go 1.27 (`go.mod`), which has `cmp.Ordered`, `slices` and the built-in `min` and `max`, so no constraint package of our own is needed.
 
 One limit is deliberate: a `trace.Event` carries `int` values, so a generic sort reports a `Set` with its value only when `T` is an integer type (`sorting.set` checks), and with just the index otherwise. Sorts that work by comparing and swapping need no values at all, so their traces are complete for any type.
 

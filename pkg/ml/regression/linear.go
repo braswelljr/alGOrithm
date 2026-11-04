@@ -50,7 +50,7 @@ func Multiple(xs [][]float64, ys []float64) ([]float64, error) {
 			for j := 0; j < d; j++ {
 				a[i][j] += v[i] * v[j]
 			}
-			a[i][d] += v[i] * ys[k]
+			a[i][d] += v[i] * ys[k] //nolint:gosec // checkXY made len(ys) == len(xs)
 		}
 	}
 	return solve(a)

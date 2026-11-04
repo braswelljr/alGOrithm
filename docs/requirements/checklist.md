@@ -9,7 +9,7 @@ Kept ticked so the history is easy to find.
 - [x] One package per topic, grouped by domain under `pkg/` (`algorithms`, `math`, `security`, `structures`, `os`, `ml`, `systems`, `computing`), plus `pkg/trace` and `pkg/dataset`; the old `core/` tree is gone.
 - [x] Package names unique across `pkg/`, checked by `TestDir`; the root package embeds all of `pkg/` and finds a package's source by its name.
 - [x] `pkg/structures` split into focused packages (linear structures and principles at the top; `heaps`, `searchtrees`, `ranges`, `lookup`, `probabilistic`, `spatial`, `persistent`, `buffers`, `arrays`, `sets`, `trees`, `collections` under it), every entry ID unchanged.
-- [x] Generic APIs (`cmp.Ordered`, `comparable`, `any`) on Go 1.21; `(value, ok)` everywhere something can be missing.
+- [x] Generic APIs (`cmp.Ordered`, `comparable`, `any`) on Go 1.27; `(value, ok)` everywhere something can be missing.
 - [x] Bugs fixed on the way: radix sort on duplicates and negatives, Vigenère ignoring its key, the heap sifting the wrong way, empty pops, linked-list removal, three searches crashing on empty or uniform input, breadth-first search, insertion sort, merge sort stability, Hill decryption and key invertibility, McCarthy 91, the ordered list (now `SortedList`, which keeps order), A* tie-breaking, the k-d tree's range search on ties.
 - [x] The registry in `internal/core`: every entry, by category, each with an example, a source file and a documented function; options for numeric settings; Go and command snippets that compile.
 - [x] Kinds, levels and tags for every entry, from one vocabulary (`internal/core/tags.go`); `algorithm list --tag/--kind/--level` and `algorithm tags`.

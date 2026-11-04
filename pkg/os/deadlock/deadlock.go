@@ -78,7 +78,8 @@ func Safe(available []int, maximum, allocation [][]int) (bool, []int, []Step, er
 // exceed p's remaining need or what is available, and the state after
 // granting it must be safe.
 func Request(p int, request, available []int, maximum, allocation [][]int) (bool, error) {
-	if p < 0 || p >= len(maximum) || len(request) != len(available) {
+	if p < 0 || p >= len(maximum) || p >= len(allocation) || len(request) != len(available) ||
+		len(maximum[p]) != len(request) || len(allocation[p]) != len(request) {
 		return false, ErrInput
 	}
 	for r := range request {

@@ -10,6 +10,7 @@ on:
       - "web/**"
       - "**.go"
       - go.mod
+      - web/runtime/go.mod
       - Makefile
       - .github/workflows/web.yml
   pull_request:
@@ -17,6 +18,7 @@ on:
       - "web/**"
       - "**.go"
       - go.mod
+      - web/runtime/go.mod
       - Makefile
       - .github/workflows/web.yml
 
@@ -37,10 +39,12 @@ jobs:
         with:
           persist-credentials: false
 
+      # One toolchain for both wasm builds, since the page runs them with one
+      # wasm_exec.js; the terminal's module (web/runtime) needs the newer Go.
       - name: Set up Go
         uses: actions/setup-go@v7
         with:
-          go-version-file: go.mod
+          go-version-file: web/runtime/go.mod
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v6
