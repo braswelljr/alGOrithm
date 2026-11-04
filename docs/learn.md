@@ -1495,8 +1495,8 @@ Size a system, give it IDs, keep it up, then design real ones: a URL shortener, 
    algorithm run payment-system --example
    ```
 
-14. **Thundering Herd and Request Coalescing** (`request-coalescing`): A hot key expires: one database read instead of a hundred.
+14. **Cache Stampede** (`cache-stampede`): A hot key expires: with the lock fix, one database read instead of dozens.
 
    ```bash
-   algorithm run request-coalescing --example
+   algorithm run cache-stampede --example
    ```

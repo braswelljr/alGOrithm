@@ -26,13 +26,6 @@
 /bin/
 /algorithm
 /dist/
-web/apps/site/public/dev-build.json
-web/apps/site/public/algorithm.wasm
-web/apps/site/public/wasm_exec.js
-web/apps/site/public/algorithm.wasm.gz
-web/apps/site/public/algorithm.wasm.br
-web/packages/visualizer/assets/algorithm.wasm
-web/packages/visualizer/assets/wasm_exec.js
 coverage.out
 
 # The visualizer: dependencies, build output and the generated wasm
@@ -43,3 +36,6 @@ web/next-env.d.ts
 web/tsconfig.tsbuildinfo
 web/public/algorithm.wasm
 web/public/wasm_exec.js
+web/public/algorithm.wasm.gz
+web/public/algorithm.wasm.br
+web/public/dev-build.json

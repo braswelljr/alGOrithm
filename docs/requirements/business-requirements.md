@@ -12,7 +12,7 @@ A practical toolkit to learn and teach computer science, from logic gates to dis
 |----|-----------|
 | BR-1 | **Teach.** Each implementation is written to be read: one file per algorithm, the cost stated, the reasoning in the comments, and every step observable through its trace. |
 | BR-2 | **Be easy to find.** One package per topic, a generated catalog of every entry with its cost and how to run it, and a page per entry in the visualizer's docs. |
-| BR-3 | **Be safe to install.** The Go module depends on nothing but the standard library; the command ships as release binaries; the visualizer ships as an npm package. |
+| BR-3 | **Be safe to install.** The Go module depends on nothing but the standard library; the command ships as release binaries; the visualizer is a static website. |
 | BR-4 | **Be correct, and show it.** Tests that fail when the answer is wrong, textbook examples where there are some, and every registered entry run end to end, on every change, on three operating systems. |
 | BR-5 | **Cover the concepts courses teach.** Algorithms, math, security, data structures and their access principles (LIFO, FIFO, priority), operating systems, machine learning, systems (networking, databases, distributed) and computing fundamentals (logic, circuits, data representation, automata, compilers, architecture), each at the beginner, intermediate and advanced levels. |
 | BR-6 | **Use real data.** Values typed, files (CSV, JSON, text), standard input, URLs in the browser, and seeded generators, with every bad value reported where it is. |
@@ -30,7 +30,7 @@ A practical toolkit to learn and teach computer science, from logic gates to dis
 | Students and self-learners | Readable code, the complexity and why, every step shown on data they choose, a path to follow, and a game to test themselves |
 | Teachers | Shareable, replayable runs and quizzes (a link or a seed), examples matching the textbooks, learning paths by level, an embeddable visualizer |
 | Go developers | A generic, documented, dependency-free library with a stable API |
-| Tool builders | A JSON API, MCP tools, and an npm package |
+| Tool builders | A JSON API and MCP tools |
 | Contributors | A clear place for a new entry, a worked example, fast feedback (`make dev`, CI) |
 | The maintainer (braswelljr) | Consistent code, a history that reads as a changelog, control over what is published, and credit on the site and in search results |
 

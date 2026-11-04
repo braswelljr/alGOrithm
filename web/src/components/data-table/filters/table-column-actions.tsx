@@ -1,0 +1,110 @@
+/**
+ * niko-table, created by Semir N. (Semkoo, https://github.com/Semkoo) with AI assistance.
+ *
+ * Before reporting anything: please check the changelog first.
+ *  - In-repo: ./CHANGELOG.md
+ *  - Docs site: https://niko-table.com/changelog
+ *
+ * Found a bug or have a fix? Open an issue or PR on GitHub so other
+ * users (and future LLMs reading this code) benefit:
+ * https://github.com/Semkoo/niko-table-registry
+ */
+import React from 'react';
+import { MoreVertical } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
+
+export interface TableColumnActionsProps {
+  children: React.ReactNode;
+  className?: string;
+  /**
+   * Optional label shown at the top of the dropdown.
+   * @default "Column Actions"
+   */
+  label?: string;
+  /**
+   * Whether to show a visual indicator when actions are active.
+   */
+  isActive?: boolean;
+  /**
+   * Custom trigger element. If not provided, uses a MoreVertical icon button.
+   */
+  /** Rendered *as* the trigger, so it must be a single element the
+   *  trigger can attach its props and ref to. */
+  trigger?: React.ReactElement;
+  /**
+   * Alignment of the dropdown content.
+   * @default "end"
+   */
+  align?: 'start' | 'center' | 'end';
+}
+
+/**
+ * A simple dropdown container for composing column actions.
+ *
+ * Use with `*Options` components to compose actions in a single dropdown:
+ *
+ * @example
+ * ```tsx
+ * <TableColumnActions>
+ *   <TableColumnSortOptions />
+ *   <TableColumnPinOptions />
+ *   <TableColumnHideOptions />
+ * </TableColumnActions>
+ * ```
+ *
+ * For standalone dropdowns, use the `*Menu` variants instead:
+ * ```tsx
+ * <TableColumnSortMenu />
+ * <TableColumnPin />
+ * ```
+ */
+export function TableColumnActions({
+  children,
+  className,
+  label = 'Column Actions',
+  isActive = false,
+  trigger,
+  align = 'end'
+}: TableColumnActionsProps) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        render={
+          trigger ?? (
+            <Button
+              rounded="full"
+              variant="ghost"
+              size="icon"
+              className={cn(
+                'size-7 transition-opacity group-hover:opacity-100 dark:text-stone-400',
+                isActive ? 'text-primary opacity-100' : 'opacity-0',
+                className
+              )}
+            >
+              <MoreVertical className="size-4" />
+              <span className="sr-only">{label}</span>
+            </Button>
+          )
+        }
+      />
+      <DropdownMenuContent
+        align={align}
+        className="w-48"
+      >
+        <DropdownMenuLabel className="text-sm font-normal text-stone-600 dark:text-stone-400">
+          {label}
+        </DropdownMenuLabel>
+        {children}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+TableColumnActions.displayName = 'TableColumnActions';

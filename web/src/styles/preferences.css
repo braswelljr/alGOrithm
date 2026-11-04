@@ -1,0 +1,165 @@
+/* The reader's display preferences (src/store/preferences.ts), as attributes on
+   one wrapper (components/settings/preferences-scope.tsx) that these rules key
+   off. Ported from gsl-special-courses, with stone for zinc and this site's
+   tokens (--muted, --border, --control) moved along with the stone scale. */
+
+/* Copies of the stone steps the contrast rules move, read from here so a step
+   that is redefined never reads its own new value. */
+:root {
+  --ds-stone-200: var(--color-stone-200);
+  --ds-stone-300: var(--color-stone-300);
+  --ds-stone-400: var(--color-stone-400);
+  --ds-stone-500: var(--color-stone-500);
+  --ds-stone-600: var(--color-stone-600);
+  --ds-stone-700: var(--color-stone-700);
+  --ds-stone-800: var(--color-stone-800);
+}
+
+/* Spacing is the density times the text size, so controls, table buttons,
+   inputs and the sidebar keep their proportions around larger text. */
+[data-preferences] {
+  --preference-space: 0.25rem;
+  --preference-scale: 1;
+  --spacing: calc(var(--preference-space) * var(--preference-scale));
+}
+[data-preferences][data-density='compact'] {
+  --preference-space: 0.225rem;
+}
+[data-preferences][data-density='comfortable'] {
+  --preference-space: 0.28rem;
+}
+
+/* Large: base text reads at lg, lg at xl, and the small sizes step up with it. */
+[data-preferences][data-text-size='large'] {
+  --preference-scale: 1.125;
+  --text-xs: 1rem;
+  --text-xs--line-height: 1.5rem;
+  --text-xsm: 1rem;
+  --text-xsm--line-height: 1.5rem;
+  --text-sm: 1.125rem;
+  --text-sm--line-height: 1.75rem;
+  --text-base: 1.125rem;
+  --text-base--line-height: 1.75rem;
+  --text-lg: 1.25rem;
+  --text-lg--line-height: 1.75rem;
+}
+
+/* Larger: one step further. */
+[data-preferences][data-text-size='larger'] {
+  --preference-scale: 1.25;
+  --text-xs: 1.125rem;
+  --text-xs--line-height: 1.75rem;
+  --text-xsm: 1.125rem;
+  --text-xsm--line-height: 1.75rem;
+  --text-sm: 1.25rem;
+  --text-sm--line-height: 1.875rem;
+  --text-base: 1.25rem;
+  --text-base--line-height: 1.875rem;
+  --text-lg: 1.5rem;
+  --text-lg--line-height: 2rem;
+}
+
+/* Standard, stated rather than left to the theme, so a preview in Settings that
+   scopes itself to the standard size still shows the standard size while the
+   page around it is set larger. */
+[data-preferences][data-text-size='standard'],
+[data-preferences] [data-type-fixed] {
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-xsm: 0.8125rem;
+  --text-xsm--line-height: 1.125rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.75rem;
+}
+[data-preferences] [data-type-fixed] {
+  --spacing: 0.25rem;
+}
+
+/* Standard contrast, stated for the same reason: a preview of it must not
+   inherit the higher-contrast page around it. */
+[data-preferences][data-contrast='standard'] {
+  --color-stone-200: var(--ds-stone-200);
+  --color-stone-300: var(--ds-stone-300);
+  --color-stone-400: var(--ds-stone-400);
+  --color-stone-500: var(--ds-stone-500);
+  --color-stone-600: var(--ds-stone-600);
+  --color-stone-700: var(--ds-stone-700);
+  --color-stone-800: var(--ds-stone-800);
+}
+
+/* Higher contrast: muted text and hairlines each move two steps towards the
+   text color, in both themes, so secondary copy and borders stop fading out. */
+[data-preferences][data-contrast='high'] {
+  --color-stone-200: var(--ds-stone-400);
+  --color-stone-300: var(--ds-stone-500);
+  --color-stone-400: var(--ds-stone-600);
+  --color-stone-500: var(--ds-stone-700);
+  --color-stone-600: var(--ds-stone-800);
+  --muted: color-mix(in oklab, var(--fg) 82%, var(--bg));
+  --border: color-mix(in oklab, var(--fg) 45%, var(--bg));
+  --control: color-mix(in oklab, var(--fg) 70%, var(--bg));
+}
+.dark [data-preferences][data-contrast='high'] {
+  --color-stone-400: var(--ds-stone-300);
+  --color-stone-500: var(--ds-stone-300);
+  --color-stone-700: var(--ds-stone-500);
+  --color-stone-800: var(--ds-stone-600);
+}
+
+/* Underlined links, so a link is told from text by its shape and not only by
+   its color. Buttons rendered as links are left alone. */
+[data-preferences][data-underline-links='true'] a:not([data-slot='button']) {
+  text-decoration-line: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* Wider text spacing, to the measures WCAG 1.4.12 sets: letters 0.12em, words
+   0.16em, lines at least 1.5. Important, because the tracking utilities on
+   headings would otherwise pull them back in. Not inside a scope that says
+   standard, which is how a preview of the standard spacing stays standard. */
+[data-preferences][data-text-spacing='wide'] *:not([data-text-spacing='standard'] *) {
+  letter-spacing: 0.12em !important;
+  word-spacing: 0.16em !important;
+}
+[data-preferences][data-text-spacing='wide'] :is(p, li, dd, td, label, span, a) {
+  line-height: 1.6;
+}
+
+/* Heavier text: every weight a step up, and unstyled text off the regular
+   weight, for screens where thin strokes break up. */
+[data-preferences][data-bold-text='true'] {
+  --font-weight-normal: 500;
+  --font-weight-medium: 600;
+  --font-weight-semibold: 700;
+  --font-weight-bold: 800;
+  font-weight: 500;
+}
+
+/* A focus indicator that cannot be missed: a thick outline in the text color
+   with a gap of ground around it, so it shows on every surface, primary fills
+   included. */
+[data-preferences][data-focus='strong'] :focus-visible {
+  outline: 3px solid var(--color-stone-950) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 5px var(--color-white) !important;
+}
+.dark [data-preferences][data-focus='strong'] :focus-visible {
+  outline-color: var(--color-white) !important;
+  box-shadow: 0 0 0 5px var(--color-stone-950) !important;
+}
+
+/* Reduced motion, chosen here rather than only in the operating system. */
+/* Not inside the arena, whose games move whatever the setting; every other
+   preference (text size, contrast, spacing, bold, focus) applies there too. */
+[data-preferences][data-motion='reduce'] *:not([data-arena], [data-arena] *),
+[data-preferences][data-motion='reduce'] *:not([data-arena], [data-arena] *)::before,
+[data-preferences][data-motion='reduce'] *:not([data-arena], [data-arena] *)::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}

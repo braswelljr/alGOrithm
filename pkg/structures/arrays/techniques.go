@@ -1,6 +1,8 @@
 package arrays
 
-import "github.com/braswelljr/alGOrithm/pkg/trace"
+import (
+	"github.com/braswelljr/alGOrithm/pkg/trace"
+)
 
 // Reverse reverses s in place with two pointers walking inward, and returns
 // it.

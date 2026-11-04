@@ -107,6 +107,11 @@
       "skillPath": "html/SKILL.md",
       "computedHash": "3cdff568d692ae5dd1adebfbbcae39f07eaf27e6a578be5de9a4549ac295a804"
     },
+    "next-best-practices": {
+      "source": "vercel-labs/next-skills",
+      "sourceType": "github",
+      "computedHash": "db85045827ebeb83ac8dbc992b69188755eeb74dcf01cbf5e694d58aa494a106"
+    },
     "semantic-html": {
       "source": "schalkneethling/webdev-agent-skills",
       "sourceType": "github",

@@ -62,21 +62,19 @@ hooks: ## Install the Git hooks in lefthook.yml
 wasm: ## Check that the browser build compiles
 	GOOS=js GOARCH=wasm go vet ./cmd/algorithm-wasm
 
-WASM_PKG := $(WEB_DIR)/packages/visualizer/assets
-WASM_SITE := $(WEB_DIR)/apps/site/public
+WASM_OUT := $(WEB_DIR)/public
 
 .PHONY: web/wasm
-web/wasm: ## Build the WebAssembly into the npm package's assets and the site's public/
-	mkdir -p $(WASM_PKG) $(WASM_SITE)
-	GOOS=js GOARCH=wasm go build -trimpath $(LDFLAGS) -o $(WASM_PKG)/algorithm.wasm ./cmd/algorithm-wasm
+web/wasm: ## Build the WebAssembly into the site's public/
+	mkdir -p $(WASM_OUT)
+	GOOS=js GOARCH=wasm go build -trimpath $(LDFLAGS) -o $(WASM_OUT)/algorithm.wasm ./cmd/algorithm-wasm
 	@# Optional: binaryen's wasm-opt shrinks the build further; skipped when it is not installed.
-	@if command -v wasm-opt >/dev/null 2>&1; then wasm-opt -Oz --enable-bulk-memory --enable-sign-ext --enable-nontrapping-float-to-int $(WASM_PKG)/algorithm.wasm -o $(WASM_PKG)/algorithm.wasm && echo "wasm-opt: done"; else echo "wasm-opt: not installed, skipped"; fi
-	cp "$$(go env GOROOT)/lib/wasm/wasm_exec.js" $(WASM_PKG)/wasm_exec.js
-	cp $(WASM_PKG)/algorithm.wasm $(WASM_PKG)/wasm_exec.js $(WASM_SITE)/
+	@if command -v wasm-opt >/dev/null 2>&1; then wasm-opt -Oz --enable-bulk-memory --enable-sign-ext --enable-nontrapping-float-to-int $(WASM_OUT)/algorithm.wasm -o $(WASM_OUT)/algorithm.wasm && echo "wasm-opt: done"; else echo "wasm-opt: not installed, skipped"; fi
+	cp "$$(go env GOROOT)/lib/wasm/wasm_exec.js" $(WASM_OUT)/wasm_exec.js
 	@# Precompressed copies for hosts that serve them as they are (nginx gzip_static,
 	@# Caddy precompressed); Vercel compresses on its own.
-	gzip -9 -k -f $(WASM_SITE)/algorithm.wasm
-	@if command -v brotli >/dev/null 2>&1; then brotli -q 11 -f -k $(WASM_SITE)/algorithm.wasm; else echo "brotli: not installed, .br skipped"; fi
+	gzip -9 -k -f $(WASM_OUT)/algorithm.wasm
+	@if command -v brotli >/dev/null 2>&1; then brotli -q 11 -f -k $(WASM_OUT)/algorithm.wasm; else echo "brotli: not installed, .br skipped"; fi
 
 .PHONY: web/install
 web/install: ## Install the website's dependencies
@@ -89,7 +87,7 @@ web/dev: web/wasm ## Run the visualizer locally with live reload
 .PHONY: web/build
 web/build: web/wasm ## Build the visualizer for production, then check its size budgets
 	cd $(WEB_DIR) && pnpm build
-	cd $(WEB_DIR)/apps/site && pnpm budget
+	cd $(WEB_DIR) && pnpm budget
 
 .PHONY: web/test
 web/test: web/wasm ## Lint, type-check and test the visualizer against the real wasm
@@ -105,7 +103,7 @@ release/snapshot: ## Build every release archive into dist/ without publishing
 
 .PHONY: clean
 clean: ## Remove build output, coverage and test binaries
-	rm -rf bin dist coverage.out *.test $(WASM_PKG)/algorithm.wasm $(WASM_PKG)/wasm_exec.js $(WASM_SITE)/algorithm.wasm $(WASM_SITE)/algorithm.wasm.gz $(WASM_SITE)/algorithm.wasm.br $(WASM_SITE)/wasm_exec.js $(WASM_SITE)/dev-build.json
+	rm -rf bin dist coverage.out *.test $(WASM_OUT)/algorithm.wasm $(WASM_OUT)/algorithm.wasm.gz $(WASM_OUT)/algorithm.wasm.br $(WASM_OUT)/wasm_exec.js $(WASM_OUT)/dev-build.json
 
 .PHONY: help
 help: ## List the targets

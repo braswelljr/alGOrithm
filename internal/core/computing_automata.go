@@ -9,44 +9,36 @@ import (
 	"github.com/braswelljr/alGOrithm/pkg/trace"
 )
 
-// MachineOutput is an automaton as the visualizer draws it: states,
-// transitions merged by state pair, the input it read, and one step per
-// move.
-type MachineOutput struct {
-	States   []MachineState `json:"states"`
-	Edges    []MachineEdge  `json:"edges"`
-	Input    string         `json:"input,omitempty"`
-	Steps    []MachineStep  `json:"steps"`
-	Accepted *bool          `json:"accepted,omitempty"`
-}
-
-// MachineState is one state; Start and Accept say how to draw it.
-type MachineState struct {
-	Name   string `json:"name"`
-	Start  bool   `json:"start,omitempty"`
-	Accept bool   `json:"accept,omitempty"`
-}
-
-// MachineEdge is a transition from one state to another, with every symbol
-// that takes it in Label.
-type MachineEdge struct {
-	From  int    `json:"from"`
-	To    int    `json:"to"`
-	Label string `json:"label"`
-}
-
-// MachineStep is one move: the active states, the edges just taken, how
-// much input is read, and a tape, a stack or an output when the machine has
-// one.
-type MachineStep struct {
-	Active   []int  `json:"active"`
-	Edges    []int  `json:"edges,omitempty"`
-	Head     int    `json:"head"`
-	Tape     string `json:"tape,omitempty"`
-	TapeHead int    `json:"tapeHead,omitempty"`
-	Stack    string `json:"stack,omitempty"`
-	Output   string `json:"output,omitempty"`
-	Note     string `json:"note,omitempty"`
+// automataEntries is every entry of the automata category.
+func automataEntries() []Entry {
+	return []Entry{
+		busyBeaverEntry(),
+		cfgDerivationEntry(),
+		cykParsingEntry(),
+		dfaEntry(),
+		dfaMinimizationEntry(),
+		dfaProductEntry(),
+		elementaryCellularAutomatonEntry(),
+		gameOfLifeEntry(),
+		grammarAmbiguityEntry(),
+		haltingProblemEntry(),
+		lambdaCalculusEntry(),
+		mealyMachineEntry(),
+		mooreMachineEntry(),
+		nfaEntry(),
+		pdaAnbnEntry(),
+		pdaBalancedParenthesesEntry(),
+		primitiveRecursionEntry(),
+		pumpingLemmaEntry(),
+		pushdownAutomatonEntry(),
+		regexBacktrackingBlowupEntry(),
+		subsetConstructionEntry(),
+		thompsonConstructionEntry(),
+		turingIncrementEntry(),
+		turingMachineEntry(),
+		turingPalindromeEntry(),
+		turingUnaryAdditionEntry(),
+	}
 }
 
 func machineOutput(g automata.Graph, steps []automata.Step, input string, accepted *bool) *MachineOutput {
@@ -150,27 +142,67 @@ F 0 F
 F 1 F`
 )
 
-func automataEntries() []Entry {
-	run := func(e *Entry, f func(in Input, r trace.Recorder) (Output, error)) {
-		kind := e.Input
-		e.Run = func(in Input, r trace.Recorder) (Output, error) {
-			if kind == Text || kind == TwoTexts {
-				if err := checkMachine(in, kind); err != nil {
-					return Output{}, err
-				}
+func automataRun(e *Entry, f func(in Input, r trace.Recorder) (Output, error)) {
+	kind := e.Input
+	e.Run = func(in Input, r trace.Recorder) (Output, error) {
+		if kind == Text || kind == TwoTexts {
+			if err := checkMachine(in, kind); err != nil {
+				return Output{}, err
 			}
-			return f(in, r)
 		}
+		return f(in, r)
 	}
-	limit := Option{"limit", "most moves", 1000, 1, 100_000}
-	var out []Entry
+}
 
-	// Finite automata.
+var automataLimit = Option{"limit", "most moves", 1000, 1, 100_000}
+
+func automataPda(id, name, machine, summary, example string) Entry {
+	e := automataEntry(id, name, "pda.go", "PDA.Run", summary, "O(n)", "O(n)", Text, &Input{Text: example})
+	e.Traced = true
+	automataRun(&e, func(in Input, r trace.Recorder) (Output, error) {
+		if len(in.Text) > maxWord {
+			return Output{}, inputError(fmt.Sprintf("give at most %d characters", maxWord))
+		}
+		p, err := automata.ParsePDA(machine)
+		if err != nil {
+			return Output{}, wrap(err)
+		}
+		return runOutput(p.Graph(), p.TraceRun(in.Text, r), in.Text), nil
+	})
+	e.Call = func(in Input) (string, string) {
+		return automataSetup("p", "ParsePDA", machine), fmt.Sprintf("p.Accepts(%q)", in.Text)
+	}
+	return e
+}
+
+var automataCnfAnBn = "S -> A T | A B\nT -> S B\nA -> a\nB -> b"
+
+func automataTm(id, name, machine, summary, example string) Entry {
+	e := automataEntry(id, name, "turing.go", "TM.Run", summary, "O(moves)", "O(moves)", Text, &Input{Text: example})
+	e.Traced = true
+	e.Options = []Option{automataLimit}
+	automataRun(&e, func(in Input, r trace.Recorder) (Output, error) {
+		if len(in.Text) > maxWord {
+			return Output{}, inputError(fmt.Sprintf("give a tape of at most %d characters", maxWord))
+		}
+		m, err := automata.ParseTM(machine)
+		if err != nil {
+			return Output{}, wrap(err)
+		}
+		return tmOutput(m.Graph(), m.TraceRun(strings.TrimSpace(in.Text), in.opt("limit", 1000), r)), nil
+	})
+	e.Call = func(in Input) (string, string) {
+		return automataSetup("m", "ParseTM", machine), fmt.Sprintf("m.Run(%q, %d).Tape", strings.TrimSpace(in.Text), in.opt("limit", 1000))
+	}
+	return e
+}
+
+func dfaEntry() Entry {
 	dfa := automataEntry("dfa", "Deterministic Finite Automaton", "dfa.go", "DFA.Run",
 		"A machine with finitely many states reads a string one character at a time, each character moving it along exactly one arrow; it accepts if it ends in an accepting state.",
 		"O(n)", "O(1)", TwoTexts, &Input{Text: exMultiplesOf3, Other: "1001"})
 	dfa.Traced = true
-	run(&dfa, func(in Input, r trace.Recorder) (Output, error) {
+	automataRun(&dfa, func(in Input, r trace.Recorder) (Output, error) {
 		d, err := automata.ParseDFA(in.Text)
 		if err != nil {
 			return Output{}, wrap(err)
@@ -180,13 +212,16 @@ func automataEntries() []Entry {
 	dfa.Call = func(in Input) (string, string) {
 		return automataSetup("d", "ParseDFA", in.Text), fmt.Sprintf("d.Accepts(%q)", in.Other)
 	}
+	return dfa
+}
 
+func dfaProductEntry() Entry {
 	prod := automataEntry("dfa-product", "Product of Two DFAs", "dfa.go", "Product",
 		"Run two DFAs side by side as one whose states are pairs: accept when both accept (intersection) or, with union on, when either does. Regular languages are closed under both.",
 		"O(|A| * |B| * k)", "O(|A| * |B|)", TwoTexts, &Input{Text: exMultiplesOf3, Other: exEven, Options: map[string]int{"union": 0}})
 	prod.Traced = true
 	prod.Options = []Option{{"union", "1 for union, 0 for intersection", 0, 0, 1}}
-	run(&prod, func(in Input, r trace.Recorder) (Output, error) {
+	automataRun(&prod, func(in Input, r trace.Recorder) (Output, error) {
 		if len(in.Other) > maxMachine {
 			return Output{}, inputError("the second DFA is too long")
 		}
@@ -205,12 +240,15 @@ func automataEntries() []Entry {
 		return automataSetup("a", "ParseDFA", in.Text) + automataSetup("b", "ParseDFA", in.Other),
 			fmt.Sprintf("automata.Product(a, b, %v).States", in.opt("union", 0) == 1)
 	}
+	return prod
+}
 
+func nfaEntry() Entry {
 	nfa := automataEntry("nfa", "Nondeterministic Finite Automaton", "nfa.go", "NFA.Run",
 		"A machine that may have several arrows on one character, or arrows taken without reading (ε). Simulate it by keeping the set of every state it could be in.",
 		"O(n * (V + E))", "O(V)", TwoTexts, &Input{Text: exEndsInAB, Other: "abab"})
 	nfa.Traced = true
-	run(&nfa, func(in Input, r trace.Recorder) (Output, error) {
+	automataRun(&nfa, func(in Input, r trace.Recorder) (Output, error) {
 		n, err := automata.ParseNFA(in.Text)
 		if err != nil {
 			return Output{}, wrap(err)
@@ -220,12 +258,15 @@ func automataEntries() []Entry {
 	nfa.Call = func(in Input) (string, string) {
 		return automataSetup("n", "ParseNFA", in.Text), fmt.Sprintf("n.Accepts(%q)", in.Other)
 	}
+	return nfa
+}
 
+func subsetConstructionEntry() Entry {
 	sub := automataEntry("subset-construction", "Subset Construction (NFA to DFA)", "nfa.go", "Subset",
 		"Turn an NFA into a DFA that accepts the same strings: each DFA state is a set of NFA states, found by following every character from every set found so far.",
 		"O(2^V * k) worst, usually far less", "O(2^V)", Text, &Input{Text: exEndsInAB})
 	sub.Traced = true
-	run(&sub, func(in Input, r trace.Recorder) (Output, error) {
+	automataRun(&sub, func(in Input, r trace.Recorder) (Output, error) {
 		n, err := automata.ParseNFA(in.Text)
 		if err != nil {
 			return Output{}, wrap(err)
@@ -236,12 +277,15 @@ func automataEntries() []Entry {
 	sub.Call = func(in Input) (string, string) {
 		return automataSetup("n", "ParseNFA", in.Text), "automata.Subset(n).States"
 	}
+	return sub
+}
 
+func dfaMinimizationEntry() Entry {
 	minimize := automataEntry("dfa-minimization", "DFA Minimization (table filling)", "minimize.go", "Minimize",
 		"Find the smallest DFA for the same language: mark every accepting and rejecting pair as different, keep marking pairs whose moves lead to marked pairs, then merge what is left.",
 		"O(k * n^3)", "O(n^2)", Text, &Input{Text: exMinimize})
 	minimize.Traced = true
-	run(&minimize, func(in Input, r trace.Recorder) (Output, error) {
+	automataRun(&minimize, func(in Input, r trace.Recorder) (Output, error) {
 		d, err := automata.ParseDFA(in.Text)
 		if err != nil {
 			return Output{}, wrap(err)
@@ -252,13 +296,15 @@ func automataEntries() []Entry {
 	minimize.Call = func(in Input) (string, string) {
 		return automataSetup("d", "ParseDFA", in.Text), "automata.Minimize(d).DFA.States"
 	}
+	return minimize
+}
 
-	// Regular expressions.
+func thompsonConstructionEntry() Entry {
 	th := automataEntry("thompson-construction", "Thompson's Construction (regex to NFA)", "regex.go", "Thompson",
 		"Build an NFA from a regular expression, one small machine per character, joined with ε-moves for |, * and +; then match by simulating it. No backtracking, so never exponential.",
 		"O(m) to build, O(n * m) to match", "O(m)", TwoTexts, &Input{Text: "(a|b)*abb", Other: "babb"})
 	th.Traced = true
-	run(&th, func(in Input, r trace.Recorder) (Output, error) {
+	automataRun(&th, func(in Input, r trace.Recorder) (Output, error) {
 		n, err := automata.TraceThompson(strings.TrimSpace(in.Text), r)
 		if err != nil {
 			return Output{}, wrap(err)
@@ -270,7 +316,10 @@ func automataEntries() []Entry {
 	th.Call = func(in Input) (string, string) {
 		return "", fmt.Sprintf("automata.MatchNFA(%q, %q)", strings.TrimSpace(in.Text), in.Other)
 	}
+	return th
+}
 
+func regexBacktrackingBlowupEntry() Entry {
 	blow := automataEntry("regex-backtracking-blowup", "Regex Backtracking Blowup", "regex.go", "MatchBacktrack",
 		"Match (a?)^n a^n against a^n both ways: a backtracking engine tries about 2^n choices, while simulating the Thompson NFA takes n * m steps. The reason some regex engines can be frozen by one input.",
 		"O(2^n) backtracking, O(n^2) with the NFA", "O(n)", Simulation, &Input{Options: map[string]int{"n": 12}})
@@ -294,35 +343,29 @@ func automataEntries() []Entry {
 		k := in.opt("n", 12)
 		return "", fmt.Sprintf("automata.MatchBacktrack(%q, %q)", strings.Repeat("a?", k)+strings.Repeat("a", k), strings.Repeat("a", k))
 	}
+	return blow
+}
 
-	// Transducers.
-	mealy := automataEntry("mealy-machine", "Mealy Machine (vending machine)", "transducer.go", "Transducer.Run",
+func mealyMachineEntry() Entry {
+	return transducerEntry("mealy-machine", "Mealy Machine (vending machine)",
 		"A finite machine that writes on its transitions: a vending machine for a 15-cent drink, with n a nickel and d a dime, writes \"drink\" on the move that reaches 15.",
-		"O(n)", "O(n)", TwoTexts, &Input{Text: automata.VendingMealy, Other: "ndnnd"})
-	mealy.Traced = true
-	run(&mealy, func(in Input, r trace.Recorder) (Output, error) {
-		m, err := automata.ParseMealy(in.Text)
-		if err != nil {
-			return Output{}, wrap(err)
-		}
-		res, err := m.TraceRun(in.Other, r)
-		if err != nil {
-			return Output{}, wrap(err)
-		}
-		o := runOutput(m.Graph(), res, in.Other)
-		o.Text = res.Steps[len(res.Steps)-1].Output
-		return o, nil
-	})
-	mealy.Call = func(in Input) (string, string) {
-		return automataSetup("m", "ParseMealy", in.Text), fmt.Sprintf("m.Translate(%q)", in.Other)
-	}
+		automata.VendingMealy, "ParseMealy", automata.ParseMealy)
+}
 
-	moore := automataEntry("moore-machine", "Moore Machine (vending machine)", "transducer.go", "Transducer.Run",
+func mooreMachineEntry() Entry {
+	return transducerEntry("moore-machine", "Moore Machine (vending machine)",
 		"The same vending machine as a Moore machine: the output belongs to the states (15 and 20 drop a drink), so it needs more states than the Mealy machine but its output never depends on the move.",
-		"O(n)", "O(n)", TwoTexts, &Input{Text: automata.VendingMoore, Other: "ndnnd"})
-	moore.Traced = true
-	run(&moore, func(in Input, r trace.Recorder) (Output, error) {
-		m, err := automata.ParseMoore(in.Text)
+		automata.VendingMoore, "ParseMoore", automata.ParseMoore)
+}
+
+// transducerEntry is a Mealy or Moore machine entry: the two differ only in
+// how the machine is read (parseName names the parser in the Go snippet).
+func transducerEntry(id, name, summary, example, parseName string, parse func(string) (*automata.Transducer, error)) Entry {
+	e := automataEntry(id, name, "transducer.go", "Transducer.Run", summary,
+		"O(n)", "O(n)", TwoTexts, &Input{Text: example, Other: "ndnnd"})
+	e.Traced = true
+	automataRun(&e, func(in Input, r trace.Recorder) (Output, error) {
+		m, err := parse(in.Text)
 		if err != nil {
 			return Output{}, wrap(err)
 		}
@@ -334,42 +377,28 @@ func automataEntries() []Entry {
 		o.Text = res.Steps[len(res.Steps)-1].Output
 		return o, nil
 	})
-	moore.Call = func(in Input) (string, string) {
-		return automataSetup("m", "ParseMoore", in.Text), fmt.Sprintf("m.Translate(%q)", in.Other)
+	e.Call = func(in Input) (string, string) {
+		return automataSetup("m", parseName, in.Text), fmt.Sprintf("m.Translate(%q)", in.Other)
 	}
+	return e
+}
 
-	out = append(out, dfa, prod, nfa, sub, minimize, th, blow, mealy, moore)
+func pdaBalancedParenthesesEntry() Entry {
+	return automataPda("pda-balanced-parentheses", "Pushdown Automaton: Balanced Parentheses", automata.Balanced,
+		"A finite machine plus a stack: push on \"(\", pop on \")\", and accept when only the bottom marker $ is left. The stack is the memory a DFA lacks.", "(()(()))")
+}
 
-	// Pushdown automata.
-	pda := func(id, name, machine, summary, example string) Entry {
-		e := automataEntry(id, name, "pda.go", "PDA.Run", summary, "O(n)", "O(n)", Text, &Input{Text: example})
-		e.Traced = true
-		run(&e, func(in Input, r trace.Recorder) (Output, error) {
-			if len(in.Text) > maxWord {
-				return Output{}, inputError(fmt.Sprintf("give at most %d characters", maxWord))
-			}
-			p, err := automata.ParsePDA(machine)
-			if err != nil {
-				return Output{}, wrap(err)
-			}
-			return runOutput(p.Graph(), p.TraceRun(in.Text, r), in.Text), nil
-		})
-		e.Call = func(in Input) (string, string) {
-			return automataSetup("p", "ParsePDA", machine), fmt.Sprintf("p.Accepts(%q)", in.Text)
-		}
-		return e
-	}
-	out = append(out,
-		pda("pda-balanced-parentheses", "Pushdown Automaton: Balanced Parentheses", automata.Balanced,
-			"A finite machine plus a stack: push on \"(\", pop on \")\", and accept when only the bottom marker $ is left. The stack is the memory a DFA lacks.", "(()(()))"),
-		pda("pda-anbn", "Pushdown Automaton: a^n b^n", automata.AnBn,
-			"Accept a's followed by the same number of b's: push one A per a, pop one per b. No DFA can do it (see the pumping lemma), a PDA can.", "aaabbb"))
+func pdaAnbnEntry() Entry {
+	return automataPda("pda-anbn", "Pushdown Automaton: a^n b^n", automata.AnBn,
+		"Accept a's followed by the same number of b's: push one A per a, pop one per b. No DFA can do it (see the pumping lemma), a PDA can.", "aaabbb")
+}
 
+func pushdownAutomatonEntry() Entry {
 	custom := automataEntry("pushdown-automaton", "Pushdown Automaton", "pda.go", "PDA.Run",
 		"Run your own deterministic PDA: each rule reads a character (or _ for none), pops the top (or _), pushes a string and moves.",
 		"O(n)", "O(n)", TwoTexts, &Input{Text: automata.AnBn, Other: "aabb"})
 	custom.Traced = true
-	run(&custom, func(in Input, r trace.Recorder) (Output, error) {
+	automataRun(&custom, func(in Input, r trace.Recorder) (Output, error) {
 		p, err := automata.ParsePDA(in.Text)
 		if err != nil {
 			return Output{}, wrap(err)
@@ -379,14 +408,15 @@ func automataEntries() []Entry {
 	custom.Call = func(in Input) (string, string) {
 		return automataSetup("p", "ParsePDA", in.Text), fmt.Sprintf("p.Accepts(%q)", in.Other)
 	}
-	out = append(out, custom)
+	return custom
+}
 
-	// Grammars.
+func cfgDerivationEntry() Entry {
 	derive := automataEntry("cfg-derivation", "Context-Free Grammar Derivation", "grammar.go", "Grammar.Derive",
 		"Find a leftmost derivation of a string: start from the start symbol and keep replacing the leftmost nonterminal by one of its rules until only the string is left.",
 		"exponential worst case (bounded)", "the same", TwoTexts, &Input{Text: "S -> a S b | ε", Other: "aaabbb"})
 	derive.Traced = true
-	run(&derive, func(in Input, r trace.Recorder) (Output, error) {
+	automataRun(&derive, func(in Input, r trace.Recorder) (Output, error) {
 		g, err := automata.ParseGrammar(in.Text)
 		if err != nil {
 			return Output{}, wrap(err)
@@ -400,30 +430,38 @@ func automataEntries() []Entry {
 	derive.Call = func(in Input) (string, string) {
 		return automataSetup("g", "ParseGrammar", in.Text), fmt.Sprintf("g.Derive(%q)", in.Other)
 	}
+	return derive
+}
 
-	cnfAnBn := "S -> A T | A B\nT -> S B\nA -> a\nB -> b"
+func cykParsingEntry() Entry {
 	cyk := automataEntry("cyk-parsing", "CYK Parsing", "grammar.go", "Grammar.CYK",
 		"Decide whether a grammar in Chomsky normal form derives a string by filling a triangle: which nonterminals derive each substring, from every way to split it in two.",
-		"O(n^3 * |G|)", "O(n^2 * |N|)", TwoTexts, &Input{Text: cnfAnBn, Other: "aaabbb"})
+		"O(n^3 * |G|)", "O(n^2 * |N|)", TwoTexts, &Input{Text: automataCnfAnBn, Other: "aaabbb"})
 	cyk.Traced = true
-	run(&cyk, func(in Input, r trace.Recorder) (Output, error) {
+	automataRun(&cyk, func(in Input, r trace.Recorder) (Output, error) {
 		return cykOutput(in, r, false)
 	})
 	cyk.Call = func(in Input) (string, string) {
 		return automataSetup("g", "ParseGrammar", in.Text), fmt.Sprintf("g.CYK(%q)", in.Other)
 	}
+	return cyk
+}
 
+func grammarAmbiguityEntry() Entry {
 	amb := automataEntry("grammar-ambiguity", "Grammar Ambiguity (counting parse trees)", "grammar.go", "Grammar.CYK",
 		"A grammar is ambiguous when one string has two parse trees. E -> E + E parses a+a+a two ways ((a+a)+a and a+(a+a)); CYK can count the trees.",
 		"O(n^3 * |G|)", "O(n^2 * |N|)", TwoTexts, &Input{Text: "E -> E R | a\nR -> P E\nP -> +", Other: "a+a+a+a"})
 	amb.Traced = true
-	run(&amb, func(in Input, r trace.Recorder) (Output, error) {
+	automataRun(&amb, func(in Input, r trace.Recorder) (Output, error) {
 		return cykOutput(in, r, true)
 	})
 	amb.Call = func(in Input) (string, string) {
 		return automataSetup("g", "ParseGrammar", in.Text), fmt.Sprintf("g.CYK(%q)", in.Other)
 	}
+	return amb
+}
 
+func pumpingLemmaEntry() Entry {
 	pump := automataEntry("pumping-lemma", "Pumping Lemma (a^n b^n is not regular)", "grammar.go", "Pumping",
 		"If a DFA with p states accepted a^n b^n, every long string could be split x y z with y repeatable. Try every split of a^p b^p: pumping y always breaks the balance, so no DFA exists.",
 		"O(p^3)", "O(p^2)", Simulation, &Input{Options: map[string]int{"p": 4}})
@@ -439,34 +477,16 @@ func automataEntries() []Entry {
 		return Output{Lines: lines, Number: ptr(len(splits))}, nil
 	}
 	pump.Call = func(in Input) (string, string) { return "", fmt.Sprintf("len(automata.Pumping(%d))", in.opt("p", 4)) }
-	out = append(out, derive, cyk, amb, pump)
+	return pump
+}
 
-	// Turing machines.
-	tm := func(id, name, machine, summary, example string) Entry {
-		e := automataEntry(id, name, "turing.go", "TM.Run", summary, "O(moves)", "O(moves)", Text, &Input{Text: example})
-		e.Traced = true
-		e.Options = []Option{limit}
-		run(&e, func(in Input, r trace.Recorder) (Output, error) {
-			if len(in.Text) > maxWord {
-				return Output{}, inputError(fmt.Sprintf("give a tape of at most %d characters", maxWord))
-			}
-			m, err := automata.ParseTM(machine)
-			if err != nil {
-				return Output{}, wrap(err)
-			}
-			return tmOutput(m.Graph(), m.TraceRun(strings.TrimSpace(in.Text), in.opt("limit", 1000), r)), nil
-		})
-		e.Call = func(in Input) (string, string) {
-			return automataSetup("m", "ParseTM", machine), fmt.Sprintf("m.Run(%q, %d).Tape", strings.TrimSpace(in.Text), in.opt("limit", 1000))
-		}
-		return e
-	}
+func turingMachineEntry() Entry {
 	tmCustom := automataEntry("turing-machine", "Turing Machine", "turing.go", "TM.Run",
 		"Run your own Turing machine: a finite control, a tape that never ends and a head that reads, writes and moves. Each rule is \"STATE READ -> NEXT WRITE MOVE\".",
 		"O(moves)", "O(moves)", TwoTexts, &Input{Text: automata.UnaryAdd, Other: "11+111"})
 	tmCustom.Traced = true
-	tmCustom.Options = []Option{limit}
-	run(&tmCustom, func(in Input, r trace.Recorder) (Output, error) {
+	tmCustom.Options = []Option{automataLimit}
+	automataRun(&tmCustom, func(in Input, r trace.Recorder) (Output, error) {
 		m, err := automata.ParseTM(in.Text)
 		if err != nil {
 			return Output{}, wrap(err)
@@ -476,6 +496,10 @@ func automataEntries() []Entry {
 	tmCustom.Call = func(in Input) (string, string) {
 		return automataSetup("m", "ParseTM", in.Text), fmt.Sprintf("m.Run(%q, %d).Tape", in.Other, in.opt("limit", 1000))
 	}
+	return tmCustom
+}
+
+func busyBeaverEntry() Entry {
 	bb := automataEntry("busy-beaver", "Busy Beaver (3 states)", "turing.go", "TM.Run",
 		"The 3-state, 2-symbol busy beaver: started on a blank tape it writes 6 ones and halts after 14 moves, the most ones any 3-state machine can leave. Busy beaver numbers grow faster than anything computable.",
 		"O(1): 14 moves", "O(1)", Simulation, &Input{})
@@ -490,16 +514,25 @@ func automataEntries() []Entry {
 	bb.Call = func(Input) (string, string) {
 		return automataSetup("m", "ParseTM", automata.BusyBeaver3), `m.Run("", 1000).Ones`
 	}
-	out = append(out, tmCustom,
-		tm("turing-increment", "Turing Machine: Binary Increment", automata.Increment,
-			"Add 1 to a binary number on the tape: run right to the end, then carry left, turning 1s into 0s until a 0 or a blank takes the 1.", "1011"),
-		tm("turing-palindrome", "Turing Machine: Palindromes", automata.Palindrome,
-			"Decide whether a string of a and b reads the same both ways: erase the first symbol, remember it in the state, check and erase the last, and walk back. O(n^2) moves.", "abba"),
-		tm("turing-unary-addition", "Turing Machine: Unary Addition", automata.UnaryAdd,
-			"Add two numbers written in unary (111+11 is 3 + 2): turn the + into a 1 and erase the last 1.", "111+11"),
-		bb)
+	return bb
+}
 
-	// Cellular automata.
+func turingIncrementEntry() Entry {
+	return automataTm("turing-increment", "Turing Machine: Binary Increment", automata.Increment,
+		"Add 1 to a binary number on the tape: run right to the end, then carry left, turning 1s into 0s until a 0 or a blank takes the 1.", "1011")
+}
+
+func turingPalindromeEntry() Entry {
+	return automataTm("turing-palindrome", "Turing Machine: Palindromes", automata.Palindrome,
+		"Decide whether a string of a and b reads the same both ways: erase the first symbol, remember it in the state, check and erase the last, and walk back. O(n^2) moves.", "abba")
+}
+
+func turingUnaryAdditionEntry() Entry {
+	return automataTm("turing-unary-addition", "Turing Machine: Unary Addition", automata.UnaryAdd,
+		"Add two numbers written in unary (111+11 is 3 + 2): turn the + into a 1 and erase the last 1.", "111+11")
+}
+
+func elementaryCellularAutomatonEntry() Entry {
 	elem := automataEntry("elementary-cellular-automaton", "Elementary Cellular Automaton", "cellular.go", "Elementary",
 		"A row of cells, each alive or dead; each generation a cell looks at itself and its two neighbors and the rule number's bits say what it becomes. Rule 30 is chaos from one cell; rule 110 can compute anything.",
 		"O(gens * width)", "O(gens * width)", Simulation, &Input{Options: map[string]int{"rule": 30, "width": 31, "gens": 15}})
@@ -520,14 +553,17 @@ func automataEntries() []Entry {
 	elem.Call = func(in Input) (string, string) {
 		return "", fmt.Sprintf("automata.Elementary(%d, automata.Center(%d), %d)", in.opt("rule", 30), in.opt("width", 31), in.opt("gens", 15))
 	}
+	return elem
+}
 
+func gameOfLifeEntry() Entry {
 	life := automataEntry("game-of-life", "Conway's Game of Life", "cellular.go", "Life",
 		"A grid of cells: a live cell with two or three live neighbors survives, a dead cell with exactly three is born, everything else dies. Gliders walk, oscillators blink, and it can compute anything.",
 		"O(gens * rows * cols)", "O(gens * rows * cols)", Text,
 		&Input{Text: ".#........\n..#.......\n###.......\n..........\n..........\n......###.\n..........\n..........", Options: map[string]int{"gens": 12}})
 	life.Traced = true
 	life.Options = []Option{{"gens", "generations", 12, 1, 200}}
-	run(&life, func(in Input, r trace.Recorder) (Output, error) {
+	automataRun(&life, func(in Input, r trace.Recorder) (Output, error) {
 		board, err := automata.ParseLife(in.Text)
 		if err != nil {
 			return Output{}, wrap(err)
@@ -549,9 +585,10 @@ func automataEntries() []Entry {
 	life.Call = func(in Input) (string, string) {
 		return automataSetup("b", "ParseLife", in.Text), fmt.Sprintf("automata.Alive(automata.Life(b, %d)[%d])", in.opt("gens", 12), in.opt("gens", 12))
 	}
-	out = append(out, elem, life)
+	return life
+}
 
-	// Computability.
+func haltingProblemEntry() Entry {
 	halt := automataEntry("halting-problem", "The Halting Problem (diagonal argument)", "halting.go", "Halting",
 		"No program can decide whether every program halts. Play it out: list programs, ask a would-be decider about each on its own number, and build D that does the opposite. D differs from every program on the list.",
 		"O(p^2 * budget)", "O(p^2)", Simulation, &Input{Options: map[string]int{"budget": 100}})
@@ -596,7 +633,10 @@ func automataEntries() []Entry {
 	halt.Call = func(in Input) (string, string) {
 		return "", fmt.Sprintf("automata.Halting(automata.Programs, %d).D", in.opt("budget", 100))
 	}
+	return halt
+}
 
+func primitiveRecursionEntry() Entry {
 	pr := automataEntry("primitive-recursion", "Primitive Recursion and Ackermann", "primitive.go", "Rec",
 		"Build add, multiply and power from zero, successor and a loop whose count is fixed in advance (primitive recursion), then watch Ackermann's function outgrow them all: computable, but not primitive recursive. See also the ackermann entry.",
 		"O(value) applications", "O(1)", Simulation, &Input{Options: map[string]int{"n": 3}})
@@ -622,13 +662,16 @@ func automataEntries() []Entry {
 		return Output{Table: t, Lines: lines}, nil
 	}
 	pr.Call = func(in Input) (string, string) { return "", fmt.Sprintf("automata.Pow().Apply(%d, 2)", in.opt("n", 3)) }
+	return pr
+}
 
+func lambdaCalculusEntry() Entry {
 	lam := automataEntry("lambda-calculus", "Lambda Calculus (beta reduction)", "lambda.go", "Reduce",
 		"Computation as substitution: (λx.M) N becomes M with N for x, the leftmost outermost first. Numbers, booleans and arithmetic are all functions (Church encodings): PLUS 2 3 reduces to 5.",
 		"O(steps * term size)", "O(term size)", Text, &Input{Text: "PLUS 2 3", Options: map[string]int{"limit": 200}})
 	lam.Traced = true
 	lam.Options = []Option{{"limit", "most reduction steps", 200, 1, 2000}}
-	run(&lam, func(in Input, r trace.Recorder) (Output, error) {
+	automataRun(&lam, func(in Input, r trace.Recorder) (Output, error) {
 		term, err := automata.ParseLambda(in.Text)
 		if err != nil {
 			return Output{}, wrap(err)
@@ -645,8 +688,7 @@ func automataEntries() []Entry {
 		return fmt.Sprintf("t, err := automata.ParseLambda(%q)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\tsteps := automata.Reduce(t, %d)\n\t", in.Text, in.opt("limit", 200)),
 			"automata.Describe(steps[len(steps)-1])"
 	}
-	out = append(out, halt, pr, lam)
-	return out
+	return lam
 }
 
 func b2i(b bool) int {

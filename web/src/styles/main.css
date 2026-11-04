@@ -1,0 +1,88 @@
+@import 'tailwindcss';
+/* React Flow's own layout rules (nodes placed absolutely, the pane and its
+   viewport); the visualizer's styles below draw over them. */
+@import '@xyflow/react/dist/base.css';
+@import './theme.css';
+@import '../visualizer/styles.css';
+@import '../visualizer/theme.css';
+@import './preferences.css';
+
+/* The visualizer's surfaces follow the theme's. */
+.av-root {
+  --av-bg: var(--bg);
+  --av-fg: var(--fg);
+  --av-muted: var(--muted);
+  --av-card: var(--card);
+  --av-border: var(--border);
+  --av-subtle: var(--subtle);
+  --av-accent: var(--accent);
+  --av-accent-fg: var(--accent-fg);
+  --av-accent-fill: var(--accent-fill);
+  --av-danger: var(--danger);
+}
+
+/* Mobile and installed-app basics (docs/workflows/performance.md). */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* No sideways page scroll on a phone: wide content (tables, code, views)
+     scrolls inside its own box instead. */
+  body {
+    overflow-x: clip;
+  }
+  /* Installed as an app (display: standalone), keep content clear of the
+     notch and the home indicator. */
+  @media (display-mode: standalone) {
+    body {
+      padding-top: env(safe-area-inset-top);
+      padding-right: env(safe-area-inset-right);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+    }
+  }
+  /* iOS zooms into any field under 16px; keep every field at 16px or more on
+     touch screens. */
+  @media (pointer: coarse) {
+    input,
+    select,
+    textarea {
+      font-size: max(16px, 1em);
+    }
+  }
+  pre {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  /* Readers who ask for less data or motion get no decorative animation. */
+  @media (prefers-reduced-data: reduce) {
+    [data-decorative] {
+      display: none !important;
+    }
+  }
+}
+
+/* Print: the page's content only, ink on paper (the cheat sheets). */
+@media print {
+  header,
+  footer,
+  [data-slot='sidebar'],
+  [data-slot='sidebar-gap'],
+  [data-slot='header-actions'] {
+    display: none !important;
+  }
+  :root {
+    --bg: white;
+    --card: white;
+    --fg: black;
+    --muted: #333;
+    --border: #999;
+  }
+  main {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+}

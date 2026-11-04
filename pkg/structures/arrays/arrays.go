@@ -12,7 +12,9 @@
 // Indices into the array being worked on, so trace.Replay rebuilds the result.
 package arrays
 
-import "github.com/braswelljr/alGOrithm/pkg/trace"
+import (
+	"github.com/braswelljr/alGOrithm/pkg/trace"
+)
 
 type rec struct{ r trace.Recorder }
 

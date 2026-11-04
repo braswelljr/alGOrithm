@@ -105,7 +105,7 @@ make web/install
 make dev
 ```
 
-It runs these same packages, compiled to WebAssembly, in your browser: animate a sort, a search, a path through a maze or a dynamic-programming table on your data; operate a stack, tree or hash table and watch it change; see a CPU schedule as a Gantt chart and threads racing. Your data stays in the browser. The components are also an npm package, `@braswelljr/algorithm-visualizer`, for your own React app.
+It runs these same packages, compiled to WebAssembly, in your browser: animate a sort, a search, a path through a maze or a dynamic-programming table on your data; operate a stack, tree or hash table and watch it change; see a CPU schedule as a Gantt chart and threads racing. Your data stays in the browser.
 
 ## Worth knowing
 

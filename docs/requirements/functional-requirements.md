@@ -98,7 +98,7 @@ Number blocks: 1 to 9 every entry; 10 to 99 algorithms and math; 90 to 199 data 
 
 ## The visualizer
 
-Built in `web/` (the npm package and the site); its design is in the [visualizer design](../design/visualizer.md), and its state in the [checklist](checklist.md).
+Built in `web/` (one Next.js app); its design is in the [visualizer design](../design/visualizer.md), and its state in the [checklist](checklist.md).
 
 | ID | Requirement | State |
 |----|-------------|-------|
@@ -108,7 +108,7 @@ Built in `web/` (the npm package and the site); its design is in the [visualizer
 | FR-303 | Data comes from typed values, files, URLs or generators, validated with errors at the bad value, and stays in the browser. | Built |
 | FR-304 | Every view's state is in its URL and opens paused; runs can be exported and imported, and replayed from the history. | Built |
 | FR-305 | Every entry has a documentation page with its summary, cost, why the cost is what it is, doc comment, Go source, and its command and Go snippet. | Built; the "why" part is being built |
-| FR-306 | The components are published as `@braswelljr/algorithm-visualizer` for use in other React apps, with no animation library in the published package. | Built; publishing is open |
+| FR-306 | Withdrawn: the visualizer is part of the site, not a published package (the Go module is the library). | - |
 | FR-307 | A learn page lists every path with its level and prerequisites; a path page shows its steps, each opening the visualizer with that entry and its suggested input. | Built |
 | FR-308 | A Big O page explains growth classes with an interactive chart of the classes for a chosen n, and measures a chosen entry in the browser (`measure`), plotting its counts against the fitted curve. | Being built |
 | FR-309 | The quiz is a game: modes (classic with lives, time attack, streak), a domain and level choice, the real view of the run paused at each question, large answer cards with keys 1 to 4, scoring with a streak multiplier and a time bonus, a results screen reviewing each question with "replay this step", a seed in the link so the same game can be replayed, and high scores kept in the browser. Every entry's page can start a short quiz on it. | Being built |

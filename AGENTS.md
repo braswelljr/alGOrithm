@@ -5,7 +5,7 @@ This file provides guidance to agents when working with code in this repository.
 ## Project Overview
 
 **alGOrithm** (`github.com/braswelljr/alGOrithm`) is a collection of algorithms, data structures
-and operating-system concepts in Go, built for learning and for use. It is usable four ways:
+and operating-system concepts in Go, built for learning and for use. It is usable three ways:
 
 - **as a Go library**: one package per topic, grouped by domain under `pkg/`
   (`pkg/algorithms/sorting`, `pkg/security/cryptography`, `pkg/os/scheduling`, `pkg/ml/clustering`,
@@ -13,9 +13,8 @@ and operating-system concepts in Go, built for learning and for use. It is usabl
 - **as a command**: `algorithm` (`cmd/algorithm`) runs any entry on your data, prints every
   step, compares entries, prints their source and a Go snippet, and serves everything as a JSON
   API (`algorithm serve`) and as MCP tools (`algorithm mcp`);
-- **as an npm package**: `@braswelljr/algorithm-visualizer` (`web/packages/visualizer`), React
-  components and a typed player that run the same Go code as WebAssembly;
-- **as a website**: `web/apps/site`, the visualizer and generated documentation for every entry.
+- **as a website**: `web/`, one Next.js app (static export) that runs the same Go code as
+  WebAssembly: the visualizer, docs for every entry, learning paths, the quiz and Big O.
 
 ## Architecture at a glance
 
@@ -32,7 +31,7 @@ internal/core   Entries(): the one list of every entry, by category, Execute, Co
         +--> cmd/algorithm-wasm  globalThis.alGOrithm for the browser (JSON in, JSON out)
         +--> tools/gendocs     README catalog and docs/catalog.md
 algorithm.go        embeds the pkg/ source (Source, File, Doc, PackageDoc)
-web/                pnpm workspace: packages/visualizer (npm) and apps/site (Next.js static export)
+web/                one Next.js app (static export): src/components/ui primitives, src/visualizer, the pages
 ```
 
 - A topic package never imports `internal/`, the command, or another topic package (except
@@ -61,8 +60,13 @@ alGOrithm/
     trace/            # Event, Kind, Recorder, Nop, Log, Replay, Snapshot, Row
     dataset/          # Parse, ReadCSV/Table, ParseJSON, Generate
   internal/
-    core/             # the registry: registry.go (types, Categories, Entries), tags.go (Kind, Level, Tags),
-                      # one file per group of entries, execute.go, snippet.go, helpers.go
+    core/             # the registry: registry.go (types, Categories, Entries), output.go (Output and its shapes),
+                      # one file per domain: algorithms.go, math.go, security.go, structures.go, os.go, ml.go,
+                      # systems.go, computing.go, split by category past ~1,500 lines (algorithms_sorting.go,
+                      # os_filesystems.go, ...), each with one <category>Entries() and one constructor per entry;
+                      # playground.go (+ playground_<domain or category>.go) for structure adapters; helpers.go
+                      # for what several domains share; tags.go, why.go, realworld.go, notes.go, paths.go,
+                      # quiz.go, bench.go, execute.go, snippet.go. TestLayout keeps the layout.
     cli/              # cli.go (dispatch), options.go, commands.go, print.go, serve.go, mcp.go
     check/            # check.Sort / check.Search: the suites every sort and search runs
     version/          # AppName, Version, Get
@@ -71,7 +75,7 @@ alGOrithm/
   tools/
     dev/              # `make dev`: build, start the site, watch, rebuild, test, reload
     gendocs/          # generated docs; its test fails when they are stale
-  web/                # pnpm workspace: packages/visualizer, apps/site; web/AGENTS.md has its conventions
+  web/                # one Next.js app; web/AGENTS.md has its layout and conventions
   docs/               # guides/ and catalog.md (generated) for users; rules, workflows, requirements, design (map: docs/README.md)
   .agents/skills/, .claude/skills/, skills-lock.json
   .goreleaser.yaml, .github/workflows/ (go.yml, lint.yml, web.yml, release.yml)
@@ -86,10 +90,10 @@ make test          # go test -race ./...
 make lint          # golangci-lint run (v2)
 make format        # golangci-lint fmt
 make ci            # vet + format check + lint + test + wasm compile
-make web/wasm      # wasm into web/packages/visualizer/assets and web/apps/site/public
+make web/wasm      # wasm and wasm_exec.js into web/public
 make web/install   # pnpm install in web/
 make web/test      # wasm, then lint, type-check and test the package and the site
-make web/build     # wasm, then build the package and the static site (web/apps/site/out)
+make web/build     # wasm, then the static site (web/out), then the size budgets
 make release/check # validate .goreleaser.yaml (needs goreleaser v2 installed)
 go run ./tools/gendocs   # regenerate the README catalog and docs/catalog.md after changing entries
 ```
@@ -186,7 +190,7 @@ nothing depends on following a link.
 - **Generated lists come from the registry** - the README catalog and `docs/catalog.md` are written by `tools/gendocs`, never by hand; its test fails when they are stale. ([file](docs/rules/generated-lists-come-from-the-registry.md))
 - **Unfinished work is marked unfinished** - in the doc comment, the docs and the checklist. ([file](docs/rules/unfinished-work-is-marked-unfinished.md))
 - **No em dashes, and US spelling** - everywhere. ([file](docs/rules/no-em-dashes-and-us-spelling.md))
-- **Diagrams are plain text** - `+`, `-`, `|` and arrows in a `text` block, never Mermaid. ([file](docs/rules/diagrams-are-plain-text.md))
+- **Diagrams are plain text** - in the repository's docs, `+`, `-`, `|` and arrows in a `text` block, never Mermaid; the website may draw Mermaid through `MermaidDiagram`. ([file](docs/rules/diagrams-are-plain-text.md))
 
 ### Visualizer
 
@@ -235,7 +239,7 @@ every entry through the real wasm) and the site's tests. Method:
 |------|--------------|
 | `go.yml` | build, `gofmt` check, `go vet`, `go test -race` on Linux, macOS and Windows; wasm build and a command smoke test on Linux |
 | `lint.yml` | `go mod verify`, golangci-lint v2 on the whole tree |
-| `web.yml` | wasm, then the workspace's lint, type-check, tests, build, npm pack; keeps the static site |
+| `web.yml` | wasm, then the site's lint, type-check, tests, build and size budgets; keeps the static site |
 | `release.yml` | on a `vX.Y.Z` tag: tests, then GoReleaser (archives for linux/darwin/windows/freebsd, checksums, Homebrew formula when `HOMEBREW_TAP_TOKEN` is set) |
 
 All read Go from `go.mod`; every workflow is `permissions: contents: read` except the release
@@ -247,17 +251,18 @@ job (`contents: write`). An agent never pushes a tag: it hands the commands over
 (`golang-testing`, `golang-naming`, `golang-documentation`, `golang-error-handling`,
 `golang-performance`, `golang-design-patterns`, `golang-safety`, `golang-concurrency`,
 `golang-context`, `golang-observability`), `brainstorming`, and for `web/`:
-`vercel-react-best-practices`, `shadcn`, `atomic-design`, `zod`, `gsap`,
+`vercel-react-best-practices`, `next-best-practices`, `shadcn`, `atomic-design`, `zod`, `gsap`,
 `gsap-framer-scroll-animation`, `emil-design-eng`, `apple-design`, `web-design-guidelines`,
 `semantic-html`, `html`, `frontend-developer-skill`.
 
 ## Important Files
 
-- `internal/core/registry.go` - the types, the categories and `Entries()`.
-- `internal/core/algorithms.go`, `structures.go`, `os.go` - every entry.
+- `internal/core/registry.go` - the types, the categories and `Entries()`, which lists each category's `<category>Entries()` in `Categories` order.
+- `internal/core/<domain>.go` and `<domain>_<category>.go` - every entry, one small constructor each (`shellSortEntry()` in `algorithms_sorting.go`); add a new entry to its domain's file, never to a new "more" or numbered file.
+- `internal/core/output.go` - `Output` and every shape a view draws; `playground*.go` - the structure adapters.
 - `trace/trace.go` - events, recorders, snapshots.
 - `internal/check/check.go` - the sort and search suites.
 - `pkg/structures/principles.go` - LIFO, FIFO; `pkg/structures/heaps/heaps.go` - PriorityQueue.
 - `concurrency/simulate.go` - the deterministic thread simulations.
-- `cmd/algorithm-wasm/main.go` - the browser API; `web/packages/visualizer/src/` - its typed client and the player.
+- `cmd/algorithm-wasm/main.go` - the browser API; `web/src/visualizer/` - its typed client and the player.
 - `docs/requirements/checklist.md` and `docs/requirements/roadmap.md` - what is open and what to add next.

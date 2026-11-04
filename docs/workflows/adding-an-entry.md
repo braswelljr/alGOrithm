@@ -8,7 +8,7 @@ A new algorithm, data structure or simulation is one file in its topic's package
 sorting/shell.go                (Shell, TraceShell: the code)
         |
         v
-internal/core/algorithms.go: mk("shell-sort", ...)     <- the one line that registers it
+internal/core/algorithms_sorting.go: shellSortEntry()   <- the constructor that registers it
         |
    +----+----------------+----------------------+-----------------------+
    v                     v                      v                       v
@@ -64,13 +64,15 @@ and, being generic, one line in `TestGenericSortsTakeStrings`. A search is a row
 
 ## Step 3: register it
 
-One line in `sortingEntries` in [`internal/core/algorithms.go`](../../internal/core/algorithms.go):
+Add the entry to its domain's file: the registry has one file per domain (`algorithms.go`, `math.go`, `security.go`, `structures.go`, `os.go`, `ml.go`, `systems.go`, `computing.go`), split by category once a domain passes about 1,500 lines, so a sort goes in [`internal/core/algorithms_sorting.go`](../../internal/core/algorithms_sorting.go). Never start a "more", numbered or "split" file; `TestLayout` fails on one. Write one small constructor and list it in the category's `<category>Entries()`:
 
 ```go
-mk("shell-sort", "Shell Sort", "shell.go", "Shell", "Insertion sort over a shrinking sequence of gaps, so values far from their place move early.", "about O(n^(4/3)), O(n^2) worst", "O(1)", sorting.TraceShell[int]),
+func shellSortEntry() Entry {
+	return sortingMk("shell-sort", "Shell Sort", "shell.go", "Shell", "Insertion sort over a shrinking sequence of gaps, so values far from their place move early.", "about O(n^(4/3)), O(n^2) worst", "O(1)", sorting.TraceShell[int])
+}
 ```
 
-`mk` fills in the category, import path, input kind and the shared `Example` (`sortExample`); entries of other kinds set `Example` themselves. The ID is lower-case and hyphenated and never changes once published: it is in URLs, scripts and the MCP tools.
+and `shellSortEntry(),` in `sortingEntries()`. `sortingMk` fills in the category, import path, input kind and the shared example; entries of other kinds set `Example` themselves. A new category also gets a `<category>Entries()` in its domain's file and a line in `Entries()` in `registry.go`, in `Categories` order. The ID is lower-case and hyphenated and never changes once published: it is in URLs, scripts and the MCP tools.
 
 ## Step 4: regenerate and check
 
@@ -94,7 +96,7 @@ The registry tests cover the new entry as soon as it is registered: `TestRegistr
 
 1. The type in `structures/<name>.go`, generic, with `(value, ok)` for anything that can find nothing ([rule](../rules/absent-and-empty-are-told-apart-from-a-value.md)), and a `Snapshot() trace.Snapshot` that describes its shape (`Layout` `"row"`, `"tree"` or `"set"`, nodes with labels and roles such as `top`, `head`, `root`, and edges). If it has an access order, add its compile-time check to `structures/principles.go` ([rule](../rules/access-principles.md)).
 2. Tests in `structures/structures_test.go`, including every method on an empty value.
-3. A playground adapter in [`internal/core/structures.go`](../../internal/core/structures.go): a small type with `Snapshot` and `apply(op Op, r trace.Recorder) (string, error)`, which runs one operation, records `Push` or `Pop`, and says what happened in words:
+3. A playground adapter in `internal/core/playground_<category>.go` (or [`playground.go`](../../internal/core/playground.go) for the shared pieces): a small type with `Snapshot` and `apply(op Op, r trace.Recorder) (string, error)`, which runs one operation, records `Push` or `Pop`, and says what happened in words:
 
 ```go
 type stackP struct{ s *structures.Stack[int] }
@@ -102,12 +104,12 @@ type stackP struct{ s *structures.Stack[int] }
 func (p *stackP) Snapshot() trace.Snapshot { return p.s.Snapshot() }
 ```
 
-and a `structureEntry(...)` line in `structureEntries` naming its operations (`"push VALUE"`, `"pop"`) and the operation each starting value goes through, plus its example operations in the `examples` map. The site builds its buttons from the operations list.
+and a constructor in its domain's file that calls `structureEntry(...)` (or a row in `structureSpecs` in `playground.go`), listed in its category's `<category>Entries()`, naming its operations (`"push VALUE"`, `"pop"`) and the operation each starting value goes through, plus its example operations in the `structuresExamples` map (in `helpers.go`, since more than one domain uses it). The site builds its buttons from the operations list.
 
 ## An operating-system simulation
 
 1. The simulation in its package (`scheduling`, `memory`, `disk`, `deadlock`, `concurrency`), deterministic: seeded when it involves chance ([rule](../rules/simulations-are-deterministic.md)), tested against a textbook example where there is one.
-2. An entry in [`internal/core/os.go`](../../internal/core/os.go) with the numeric settings it reads as `Options` (with defaults and bounds, read with `in.opt(name, default)`) and an output the views know how to draw: `Timeline` spans for a Gantt chart or thread lanes, `Table` for frames over time or per-process statistics, `Track` for a disk head, `Steps` with snapshots for memory maps, `Summary` for named numbers. From the round robin entry:
+2. An entry in its category's file (`internal/core/os.go` or `os_<category>.go`, such as [`os_scheduling.go`](../../internal/core/os_scheduling.go)) with the numeric settings it reads as `Options` (with defaults and bounds, read with `in.opt(name, default)`) and an output the views know how to draw: `Timeline` spans for a Gantt chart or thread lanes, `Table` for frames over time or per-process statistics, `Track` for a disk head, `Steps` with snapshots for memory maps, `Summary` for named numbers. From the round robin entry:
 
 ```go
 mk("round-robin", "Round Robin", "RoundRobin", "Each ready process runs for one time quantum in turn; good response, nothing starves.",

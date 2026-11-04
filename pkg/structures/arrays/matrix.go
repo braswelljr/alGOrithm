@@ -2,7 +2,6 @@ package arrays
 
 import (
 	"strconv"
-	"strings"
 )
 
 type Matrix struct {
@@ -291,44 +290,6 @@ func (a *Matrix) Transform(b *Matrix) *Matrix {
 
 	// return the matrix
 	return c
-}
-
-// ConvertStringToMatrix - converts a string to a matrix
-//
-//	@param s - the s to be converted
-//	@param n - the size of the matrix
-//	@return matrix - the matrix
-func ConvertStringToMatrix(s string, n int) *Matrix {
-	// create a new matrix
-	a := NewMatrix(n, n)
-
-	// split the string by new lines
-	lines := strings.Split(s, " ")
-
-	// loop through the lines
-	for i := 0; i < len(lines); i++ {
-		// split the line by spaces
-		values := strings.Split(lines[i], " ")
-
-		// loop through the values
-		for j := 0; j < len(values); j++ {
-			// convert the value to an integer
-			value, _ := strconv.Atoi(values[j])
-
-			// check if the matrix is empty
-			if a.Rows == 0 && a.Cols == 0 {
-				// set the number of rows and columns
-				a.Rows = len(lines)
-				a.Cols = len(values)
-			}
-
-			// set the value
-			a.Data[i][j] = value
-		}
-	}
-
-	// return the matrix
-	return a
 }
 
 // ConvertToString - converts a matrix to a string

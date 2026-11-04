@@ -38,4 +38,4 @@ The Quiz page (`/quiz/`) is a game built on the same questions, with the visuali
 
 A right answer scores 100 times the streak multiplier (x1 for streaks of 1 to 3, x2 for 4 to 6, x3 for 7 to 9, x4 after) plus up to 50 for answering fast. Choose a topic and a difficulty, or press "Quiz me" on any entry's run or docs page for 5 questions on that entry. The link keeps the settings and the seed, so a shared link replays the same questions; best scores stay in your browser only. With reduced motion, nothing tweens and answers reveal at once, but the timers still count.
 
-The rules are `gameReducer` in [`web/packages/visualizer/src/core/game.ts`](../../web/packages/visualizer/src/core/game.ts), a pure reducer tested transition by transition; the questions come from `core.Quiz` in [`internal/core/quiz.go`](../../internal/core/quiz.go).
+The rules are `gameReducer` in [`web/src/visualizer/core/game.ts`](../../web/src/visualizer/core/game.ts), a pure reducer tested transition by transition; the questions come from `core.Quiz` in [`internal/core/quiz.go`](../../internal/core/quiz.go).

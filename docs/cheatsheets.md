@@ -229,7 +229,6 @@ Primes, factors and powers.
 
 | Entry | Time | Space | Key idea |
 |-------|------|-------|----------|
-| Base Conversion | O(n^2) | O(n) | Write a number of any length in another base from 2 to 36. |
 | Binary GCD (Stein) | O(log^2 n) bit operations | O(1) | The greatest common divisor with only shifts and subtraction, taking out shared factors of two first. |
 | Chinese Remainder Theorem | O(k log M) | O(1) | The x that leaves given remainders for given moduli, combining one congruence at a time; the moduli need not be coprime. |
 | Collatz Sequence | O(steps) | O(1) | Halve even numbers, take 3n+1 of odd ones, until 1: every start tried so far gets there. |
@@ -1115,7 +1114,6 @@ Designing real systems: estimates, IDs, case studies, data patterns and reliabil
 | Powers of Two | O(1) | O(1) | 2^10 is about a thousand, 2^20 a million, 2^30 a billion: the table for sizing data in your head. |
 | Design a Proximity Service | O(candidates) per search | O(businesses) | Index businesses by geohash and search the user's cell and its eight neighbors: a few candidates instead of a city-wide scan. |
 | Utilization vs Latency (M/M/1) | O(customers) | O(1) | Why services run well below 100%: an M/M/1 queue's latency is 2x at half load, 10x at 90%, with a simulation beside the formula. |
-| Thundering Herd and Request Coalescing | O(ticks x clients) | O(1) | A hot key expires and every request hits the database at once; coalescing sends one read and the rest wait for it. |
 | Resharding Cost | O(keys log shards) | O(shards) | Grow from 4 to 5 shards: hash mod n moves 80% of the keys, consistent hashing about a third, close to the least possible 20%. |
 | Design Ride Matching | O(riders x rings^2) | O(drivers) | Drivers in a grid of cells, and each rider matched to the nearest free driver by searching rings of cells outward. |
 | The Saga Pattern | O(steps) | O(steps) | A transaction across services as local steps, each with a compensation; a failure undoes the finished steps in reverse order. |

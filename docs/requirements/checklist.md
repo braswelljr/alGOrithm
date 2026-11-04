@@ -26,7 +26,7 @@ Kept ticked so the history is easy to find.
 - [x] The dev loop: `make dev` (`tools/dev`) builds, serves, watches, rebuilds, tests and reloads.
 - [x] Releases: `.goreleaser.yaml` and the Release workflow.
 - [x] `Entry.Params` and `Entry.Options`: the site can show only the fields an entry reads.
-- [x] `web/`: the pnpm workspace (`packages/visualizer` and `apps/site`) with topic grouping, filters, the operating-system views, points and graph views, React Flow structures, the code view and docs pages, replay history, export and import, snippets, embed mode and dev reload.
+- [x] `web/`: one Next.js app (`src/visualizer` and the pages) with topic grouping, filters, the operating-system views, points and graph views, React Flow structures, the code view and docs pages, replay history, export and import, snippets, embed mode and dev reload.
 
 ## Being built
 

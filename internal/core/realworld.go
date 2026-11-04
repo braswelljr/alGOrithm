@@ -129,7 +129,7 @@ var realWorld = map[string][]RealWorld{
 	"closest-pair":          {use("Air traffic", "Finding the closest pair of points flags aircraft or ships getting too near each other.")},
 	"reservoir-sampling":    {use("Sampling streams", "Reservoir sampling picks a fair sample from logs or streams of unknown length, as monitoring and analytics tools do.")},
 	"monte-carlo-pi":        {use("Simulation", "Monte Carlo methods estimate risk in finance, light in rendering and particles in physics.")},
-	"base-convert":          {use("Encodings", "Base conversion turns numbers into hex for colors and memory addresses, and into short ids like YouTube-style codes.")},
+	"base-conversion":       {use("Encodings", "Base conversion turns numbers into hex for colors and memory addresses, and into short ids like YouTube-style codes.")},
 	"popcount":              {use("Bitboards and similarity", "Counting set bits scores chess bitboards and Hamming distance between hashes; CPUs have a POPCNT instruction for it.")},
 	"gray-code":             {use("Rotary encoders", "Gray code lets position sensors change one bit at a time, avoiding misreads between positions.")},
 

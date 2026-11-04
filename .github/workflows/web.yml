@@ -74,21 +74,17 @@ jobs:
         working-directory: web
         run: pnpm test
 
-      - name: Build the package and the site
+      - name: Build the site
         working-directory: web
         run: pnpm build
 
       - name: Check the size budgets (docs/workflows/performance.md)
-        working-directory: web/apps/site
+        working-directory: web
         run: pnpm budget
-
-      - name: Pack the npm package
-        working-directory: web/packages/visualizer
-        run: pnpm pack --pack-destination ../../../dist-npm
 
       - name: Keep the static site
         uses: actions/upload-artifact@v6
         with:
           name: site
-          path: web/apps/site/out
+          path: web/out
           retention-days: 7

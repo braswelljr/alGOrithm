@@ -1,7 +1,4 @@
-# The visualizer package and the site that uses it.
-packages:
-  - packages/*
-  - apps/*
+# One app, no workspace: this file holds pnpm settings only.
 
 # Packages whose install scripts may run.
 allowBuilds:

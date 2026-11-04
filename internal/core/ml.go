@@ -12,10 +12,52 @@ import (
 	"github.com/braswelljr/alGOrithm/pkg/trace"
 )
 
-// The machine-learning entries: clustering, regression, classification and
-// tiny neural networks. Their packages work in float64; the options that
-// carry a fraction are whole numbers in stated units (a rate in thousandths,
-// a radius in tenths), because options are integers.
+// clusteringEntries is every entry of the clustering category.
+func clusteringEntries() []Entry {
+	return []Entry{
+		dbscanEntry(),
+		hierarchicalClusteringEntry(),
+		kMeansEntry(),
+		kMeansPlusPlusEntry(),
+		silhouetteScoreEntry(),
+	}
+}
+
+// regressionEntries is every entry of the regression category.
+func regressionEntries() []Entry {
+	return []Entry{
+		gradientDescentEntry(),
+		linearRegressionEntry(),
+		logisticRegressionEntry(),
+		multipleLinearRegressionEntry(),
+		polynomialRegressionEntry(),
+		regressionMetricsEntry(),
+	}
+}
+
+// classificationEntries is every entry of the classification category.
+func classificationEntries() []Entry {
+	return []Entry{
+		confusionMatrixEntry(),
+		decisionTreeEntry(),
+		gaussianNaiveBayesEntry(),
+		kFoldCrossValidationEntry(),
+		kNearestNeighborsEntry(),
+		naiveBayesTextEntry(),
+		perceptronEntry(),
+		precisionRecallF1Entry(),
+		trainTestSplitEntry(),
+	}
+}
+
+// neuralEntries is every entry of the neural category.
+func neuralEntries() []Entry {
+	return []Entry{
+		activationFunctionsEntry(),
+		softmaxCrossEntropyEntry(),
+		xorNetworkEntry(),
+	}
+}
 
 const (
 	blobsExample = "# x y: three groups\n1 1\n2 1\n1 2\n2 2\n3 2\n8 8\n9 8\n8 9\n9 9\n8 7\n15 2\n16 2\n15 3\n16 3\n17 3"
@@ -92,13 +134,14 @@ func parseSetup(vars, pkg, fn, text string) string {
 	return fmt.Sprintf("%s, err := %s.%s(%s)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\t", vars, pkg, fn, "`"+text+"`")
 }
 
-func clusteringEntries() []Entry {
-	k := Option{"k", "clusters", 3, 1, 50}
-	ex := &Input{Text: blobsExample, Options: map[string]int{"k": 3, "seed": 1}}
+var clusteringK = Option{"k", "clusters", 3, 1, 50}
 
+var clusteringEx = &Input{Text: blobsExample, Options: map[string]int{"k": 3, "seed": 1}}
+
+func kMeansEntry() Entry {
 	km := entry("k-means", "K-Means Clustering", "ml/clustering/kmeans.go", "KMeans")
-	km.Summary, km.Time, km.Space, km.Input, km.Traced, km.Example = "Put each point with its nearest center, move each center to the mean of its points, repeat until nothing moves.", "O(n * k * d) per round", "O(n + k * d)", Points, true, ex
-	km.Options = []Option{k, seedOption}
+	km.Summary, km.Time, km.Space, km.Input, km.Traced, km.Example = "Put each point with its nearest center, move each center to the mean of its points, repeat until nothing moves.", "O(n * k * d) per round", "O(n + k * d)", Points, true, clusteringEx
+	km.Options = []Option{clusteringK, seedOption}
 	km.Limits = fmt.Sprintf("at most %d points", clustering.MaxPoints)
 	km.Run = func(in Input, r trace.Recorder) (Output, error) {
 		o, err := mlOpts(&km, in)
@@ -122,10 +165,13 @@ func clusteringEntries() []Entry {
 	km.Call = func(in Input) (string, string) {
 		return parseSetup("pts", "clustering", "Parse", in.Text), fmt.Sprintf("clustering.KMeans(pts, %d, %d)", in.opt("k", 3), in.opt("seed", 1))
 	}
+	return km
+}
 
+func kMeansPlusPlusEntry() Entry {
 	pp := entry("k-means-plus-plus", "K-Means++ Seeding", "ml/clustering/kmeans.go", "KMeansPlusPlus")
-	pp.Summary, pp.Time, pp.Space, pp.Input, pp.Example = "Pick starting centers far apart: each next one with probability proportional to its squared distance from the nearest chosen.", "O(n * k * d)", "O(n + k * d)", Points, ex
-	pp.Options = []Option{k, seedOption}
+	pp.Summary, pp.Time, pp.Space, pp.Input, pp.Example = "Pick starting centers far apart: each next one with probability proportional to its squared distance from the nearest chosen.", "O(n * k * d)", "O(n + k * d)", Points, clusteringEx
+	pp.Options = []Option{clusteringK, seedOption}
 	pp.Run = func(in Input, _ trace.Recorder) (Output, error) {
 		o, err := mlOpts(&pp, in)
 		if err != nil {
@@ -148,7 +194,10 @@ func clusteringEntries() []Entry {
 	pp.Call = func(in Input) (string, string) {
 		return parseSetup("pts", "clustering", "Parse", in.Text), fmt.Sprintf("clustering.KMeansPlusPlus(pts, %d, %d)", in.opt("k", 3), in.opt("seed", 1))
 	}
+	return pp
+}
 
+func dbscanEntry() Entry {
 	db := entry("dbscan", "DBSCAN", "ml/clustering/dbscan.go", "DBSCAN")
 	db.Summary, db.Time, db.Space, db.Input, db.Traced = "Clusters by density: points with enough neighbors within a radius grow a cluster; the rest is noise. Finds the number of clusters itself.", "O(n^2 * d)", "O(n)", Points, true
 	db.Example = &Input{Text: blobsExample + "\n12 12\n0 9", Options: map[string]int{"eps": 15, "min": 3}}
@@ -178,11 +227,14 @@ func clusteringEntries() []Entry {
 	db.Call = func(in Input) (string, string) {
 		return parseSetup("pts", "clustering", "Parse", in.Text), fmt.Sprintf("clustering.DBSCAN(pts, %g, %d)", float64(in.opt("eps", 15))/10, in.opt("min", 3))
 	}
+	return db
+}
 
+func hierarchicalClusteringEntry() Entry {
 	hc := entry("hierarchical-clustering", "Agglomerative Hierarchical Clustering", "ml/clustering/hierarchical.go", "Agglomerative")
 	hc.Summary, hc.Time, hc.Space, hc.Input, hc.Traced = "Start with every point alone and keep joining the two nearest clusters; the merges form a dendrogram you can cut into k clusters.", "O(n^3)", "O(n^2)", Points, true
 	hc.Example = &Input{Text: blobsExample, Options: map[string]int{"linkage": 0, "k": 3}}
-	hc.Options = []Option{{"linkage", "linkage: 0 single, 1 complete, 2 average", 0, 0, 2}, k}
+	hc.Options = []Option{{"linkage", "linkage: 0 single, 1 complete, 2 average", 0, 0, 2}, clusteringK}
 	hc.Limits = "at most 300 points"
 	hc.Run = func(in Input, r trace.Recorder) (Output, error) {
 		o, err := mlOpts(&hc, in)
@@ -209,7 +261,10 @@ func clusteringEntries() []Entry {
 	hc.Call = func(in Input) (string, string) {
 		return parseSetup("pts", "clustering", "Parse", in.Text), fmt.Sprintf("clustering.Agglomerative(pts, clustering.Linkage(%d))", in.opt("linkage", 0))
 	}
+	return hc
+}
 
+func silhouetteScoreEntry() Entry {
 	sil := entry("silhouette-score", "Silhouette Score", "ml/clustering/silhouette.go", "Silhouette")
 	sil.Summary, sil.Time, sil.Space, sil.Input, sil.Example = "How well each point sits in its cluster, from -1 to 1, here for k-means at every k from 2 to the option: the best k scores highest.", "O(n^2 * d)", "O(n)", Points, &Input{Text: blobsExample, Options: map[string]int{"k": 6, "seed": 1}}
 	sil.Options = []Option{{"k", "largest k to try", 6, 2, 20}, seedOption}
@@ -250,40 +305,44 @@ func clusteringEntries() []Entry {
 			fmt.Sprintf("res, err := clustering.KMeans(pts, 3, %d)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\t", in.opt("seed", 1))
 		return setup, "clustering.Silhouette(pts, res.Labels)"
 	}
-	return []Entry{km, pp, db, hc, sil}
+	return sil
 }
 
-func regressionEntries() []Entry {
-	ex := &Input{Text: lineExample}
-	xy := func(in Input) ([]float64, []float64, error) {
-		xs, ys, err := regression.Parse(in.Text)
-		if err != nil {
-			return nil, nil, wrap(err)
-		}
-		return regression.Column(xs, 0), ys, nil
-	}
-	setupXY := func(in Input) string { return parseSetup("xs, ys", "regression", "Parse", in.Text) }
-	fitSummary := func(x, y []float64, predict func(float64) float64) map[string]float64 {
-		preds := make([]float64, len(x))
-		for i, v := range x {
-			preds[i] = predict(v)
-		}
-		mse, _ := regression.MSE(y, preds)
-		r2, _ := regression.R2(y, preds)
-		return map[string]float64{"mean squared error": mse, "R^2": r2}
-	}
-	withPoints := func(x, y []float64) []Point {
-		rows := make([][]float64, len(x))
-		for i := range x {
-			rows[i] = []float64{x[i], y[i]}
-		}
-		return pointsOf(rows)
-	}
+var regressionEx = &Input{Text: lineExample}
 
+func regressionXy(in Input) ([]float64, []float64, error) {
+	xs, ys, err := regression.Parse(in.Text)
+	if err != nil {
+		return nil, nil, wrap(err)
+	}
+	return regression.Column(xs, 0), ys, nil
+}
+
+func regressionSetupXY(in Input) string { return parseSetup("xs, ys", "regression", "Parse", in.Text) }
+
+func regressionFitSummary(x, y []float64, predict func(float64) float64) map[string]float64 {
+	preds := make([]float64, len(x))
+	for i, v := range x {
+		preds[i] = predict(v)
+	}
+	mse, _ := regression.MSE(y, preds)
+	r2, _ := regression.R2(y, preds)
+	return map[string]float64{"mean squared error": mse, "R^2": r2}
+}
+
+func regressionWithPoints(x, y []float64) []Point {
+	rows := make([][]float64, len(x))
+	for i := range x {
+		rows[i] = []float64{x[i], y[i]}
+	}
+	return pointsOf(rows)
+}
+
+func linearRegressionEntry() Entry {
 	lin := entry("linear-regression", "Linear Regression", "ml/regression/linear.go", "Linear")
-	lin.Summary, lin.Time, lin.Space, lin.Input, lin.Example = "The straight line through the data with the smallest squared errors, in closed form: slope = cov(x, y) / var(x).", "O(n)", "O(1)", Points, ex
+	lin.Summary, lin.Time, lin.Space, lin.Input, lin.Example = "The straight line through the data with the smallest squared errors, in closed form: slope = cov(x, y) / var(x).", "O(n)", "O(1)", Points, regressionEx
 	lin.Run = func(in Input, _ trace.Recorder) (Output, error) {
-		x, y, err := xy(in)
+		x, y, err := regressionXy(in)
 		if err != nil {
 			return Output{}, err
 		}
@@ -291,12 +350,17 @@ func regressionEntries() []Entry {
 		if err != nil {
 			return Output{}, wrap(err)
 		}
-		sum := fitSummary(x, y, func(v float64) float64 { return s*v + b })
+		sum := regressionFitSummary(x, y, func(v float64) float64 { return s*v + b })
 		sum["slope"], sum["intercept"] = s, b
-		return Output{Points: withPoints(x, y), Lines: []string{fmt.Sprintf("y = %.4g x + %.4g", s, b)}, Summary: sum}, nil
+		return Output{Points: regressionWithPoints(x, y), Lines: []string{fmt.Sprintf("y = %.4g x + %.4g", s, b)}, Summary: sum}, nil
 	}
-	lin.Call = func(in Input) (string, string) { return setupXY(in), "regression.Linear(regression.Column(xs, 0), ys)" }
+	lin.Call = func(in Input) (string, string) {
+		return regressionSetupXY(in), "regression.Linear(regression.Column(xs, 0), ys)"
+	}
+	return lin
+}
 
+func multipleLinearRegressionEntry() Entry {
 	mul := entry("multiple-linear-regression", "Multiple Linear Regression", "ml/regression/linear.go", "Multiple")
 	mul.Summary, mul.Time, mul.Space, mul.Input = "A plane (or hyperplane) through data with several features, by solving the normal equations (X^T X) c = X^T y.", "O(n * d^2 + d^3)", "O(d^2)", Text
 	mul.Example = &Input{Text: "# size (m^2), rooms, age (years), price (thousands)\n50 2 30 150\n70 3 20 210\n90 3 10 270\n60 2 25 175\n120 4 5 360\n80 3 15 240\n100 4 12 295\n65 2 40 170"}
@@ -324,8 +388,11 @@ func regressionEntries() []Entry {
 		r2, _ := regression.R2(ys, preds)
 		return Output{Lines: []string{"y = " + strings.Join(terms, " + ")}, Summary: map[string]float64{"mean squared error": mse, "R^2": r2}}, nil
 	}
-	mul.Call = func(in Input) (string, string) { return setupXY(in), "regression.Multiple(xs, ys)" }
+	mul.Call = func(in Input) (string, string) { return regressionSetupXY(in), "regression.Multiple(xs, ys)" }
+	return mul
+}
 
+func gradientDescentEntry() Entry {
 	gd := entry("gradient-descent", "Gradient Descent (linear regression)", "ml/regression/gradient.go", "GradientDescent")
 	gd.Summary, gd.Time, gd.Space, gd.Input, gd.Example = "Learn a line by stepping downhill on the error, epoch after epoch; the loss curve shows learning, or diverging when the rate is too high.", "O(n * epochs)", "O(epochs)", Points, &Input{Text: lineExample, Options: map[string]int{"rate": 20, "epochs": 300}}
 	gd.Options = []Option{{"rate", "learning rate, in thousandths", 20, 1, 10_000}, {"epochs", "epochs", 300, 1, 100_000}}
@@ -334,7 +401,7 @@ func regressionEntries() []Entry {
 		if err != nil {
 			return Output{}, err
 		}
-		x, y, err := xy(in)
+		x, y, err := regressionXy(in)
 		if err != nil {
 			return Output{}, err
 		}
@@ -344,12 +411,15 @@ func regressionEntries() []Entry {
 		}
 		vals, lines := lossCurve(f.Loss)
 		lines = append([]string{fmt.Sprintf("learned y = %.4g x + %.4g", f.Slope, f.Intercept)}, lines...)
-		return Output{Points: withPoints(x, y), Values: vals, Lines: lines, Summary: map[string]float64{"slope": f.Slope, "intercept": f.Intercept, "final loss": f.Loss[len(f.Loss)-1]}}, nil
+		return Output{Points: regressionWithPoints(x, y), Values: vals, Lines: lines, Summary: map[string]float64{"slope": f.Slope, "intercept": f.Intercept, "final loss": f.Loss[len(f.Loss)-1]}}, nil
 	}
 	gd.Call = func(in Input) (string, string) {
-		return setupXY(in), fmt.Sprintf("regression.GradientDescent(regression.Column(xs, 0), ys, %g, %d)", float64(in.opt("rate", 20))/1000, in.opt("epochs", 300))
+		return regressionSetupXY(in), fmt.Sprintf("regression.GradientDescent(regression.Column(xs, 0), ys, %g, %d)", float64(in.opt("rate", 20))/1000, in.opt("epochs", 300))
 	}
+	return gd
+}
 
+func polynomialRegressionEntry() Entry {
 	poly := entry("polynomial-regression", "Polynomial Regression", "ml/regression/linear.go", "Polynomial")
 	poly.Summary, poly.Time, poly.Space, poly.Input = "A curve c0 + c1 x + c2 x^2 + ... by least squares on the powers of x; raise the degree to see overfitting.", "O(n * degree^2 + degree^3)", "O(n * degree)", Points
 	poly.Example = &Input{Text: "# x y, a parabola with noise\n-3 9.2\n-2 4.1\n-1 0.8\n0 0.1\n1 1.2\n2 3.9\n3 9.1\n4 15.8", Options: map[string]int{"degree": 2}}
@@ -359,7 +429,7 @@ func regressionEntries() []Entry {
 		if err != nil {
 			return Output{}, err
 		}
-		x, y, err := xy(in)
+		x, y, err := regressionXy(in)
 		if err != nil {
 			return Output{}, err
 		}
@@ -371,12 +441,15 @@ func regressionEntries() []Entry {
 		for j, v := range c {
 			terms = append(terms, fmt.Sprintf("%.4g x^%d", v, j))
 		}
-		return Output{Points: withPoints(x, y), Lines: []string{"y = " + strings.Join(terms, " + ")}, Summary: fitSummary(x, y, func(v float64) float64 { return regression.Eval(c, v) })}, nil
+		return Output{Points: regressionWithPoints(x, y), Lines: []string{"y = " + strings.Join(terms, " + ")}, Summary: regressionFitSummary(x, y, func(v float64) float64 { return regression.Eval(c, v) })}, nil
 	}
 	poly.Call = func(in Input) (string, string) {
-		return setupXY(in), fmt.Sprintf("regression.Polynomial(regression.Column(xs, 0), ys, %d)", in.opt("degree", 2))
+		return regressionSetupXY(in), fmt.Sprintf("regression.Polynomial(regression.Column(xs, 0), ys, %d)", in.opt("degree", 2))
 	}
+	return poly
+}
 
+func logisticRegressionEntry() Entry {
 	lg := entry("logistic-regression", "Logistic Regression", "ml/regression/logistic.go", "FitLogistic")
 	lg.Summary, lg.Time, lg.Space, lg.Input = "A yes-or-no model: the sigmoid of a weighted sum gives P(yes), learned by gradient descent on the log loss.", "O(n * d * epochs)", "O(d + epochs)", Text
 	lg.Example = &Input{Text: "# hours studied, hours slept, passed (0 or 1)\n1 4 0\n2 5 0\n3 4 0\n2 8 0\n4 6 0\n5 7 1\n6 5 1\n7 8 1\n8 6 1\n6 8 1\n3 7 0\n5 4 0", Options: map[string]int{"rate": 300, "epochs": 2000}}
@@ -409,15 +482,18 @@ func regressionEntries() []Entry {
 		return Output{Points: pointsOf(xs), Values: vals, Lines: lines, Summary: map[string]float64{"training accuracy": float64(right) / float64(len(xs)), "final log loss": m.Loss[len(m.Loss)-1]}}, nil
 	}
 	lg.Call = func(in Input) (string, string) {
-		setup := setupXY(in) + "labels, err := regression.Binary(ys)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\t"
+		setup := regressionSetupXY(in) + "labels, err := regression.Binary(ys)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\t"
 		return setup, fmt.Sprintf("regression.FitLogistic(xs, labels, %g, %d)", float64(in.opt("rate", 300))/1000, in.opt("epochs", 2000))
 	}
+	return lg
+}
 
+func regressionMetricsEntry() Entry {
 	met := entry("regression-metrics", "Mean Squared Error and R^2", "ml/regression/metrics.go", "R2")
 	met.Summary, met.Time, met.Space, met.Input = "How good predictions are: the mean squared error, and R^2, the share of the variance they explain.", "O(n)", "O(1)", Points
 	met.Example = &Input{Text: "# actual predicted\n3 2.5\n5 5.2\n7 6.8\n9 9.5\n11 10.6"}
 	met.Run = func(in Input, _ trace.Recorder) (Output, error) {
-		actual, pred, err := xy(in)
+		actual, pred, err := regressionXy(in)
 		if err != nil {
 			return Output{}, err
 		}
@@ -426,22 +502,35 @@ func regressionEntries() []Entry {
 			return Output{}, wrap(err)
 		}
 		r2, _ := regression.R2(actual, pred)
-		return Output{Points: withPoints(actual, pred), Summary: map[string]float64{"mean squared error": mse, "root mean squared error": math.Sqrt(mse), "R^2": r2}}, nil
+		return Output{Points: regressionWithPoints(actual, pred), Summary: map[string]float64{"mean squared error": mse, "root mean squared error": math.Sqrt(mse), "R^2": r2}}, nil
 	}
-	met.Call = func(in Input) (string, string) { return setupXY(in), "regression.R2(regression.Column(xs, 0), ys)" }
-	return []Entry{lin, mul, gd, poly, lg, met}
+	met.Call = func(in Input) (string, string) {
+		return regressionSetupXY(in), "regression.R2(regression.Column(xs, 0), ys)"
+	}
+	return met
 }
 
-func classificationEntries() []Entry {
-	labeled := func(in Input) ([][]float64, []string, error) {
-		xs, ls, err := classification.Parse(in.Text)
-		return xs, ls, wrap(err)
-	}
-	setupLabeled := func(in Input) string { return parseSetup("xs, labels", "classification", "Parse", in.Text) }
-	setupQuery := func(in Input) string {
-		return setupLabeled(in) + fmt.Sprintf("query, err := classification.ParseRow(%q)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\t", in.Other)
-	}
+func classificationLabeled(in Input) ([][]float64, []string, error) {
+	xs, ls, err := classification.Parse(in.Text)
+	return xs, ls, wrap(err)
+}
 
+func classificationSetupLabeled(in Input) string {
+	return parseSetup("xs, labels", "classification", "Parse", in.Text)
+}
+
+func classificationSetupQuery(in Input) string {
+	return classificationSetupLabeled(in) + fmt.Sprintf("query, err := classification.ParseRow(%q)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\t", in.Other)
+}
+
+func classificationConfusion(in Input) (classification.Confusion, error) {
+	c, err := classification.ConfusionMatrix(strings.Fields(in.Text), strings.Fields(in.Other))
+	return c, wrap(err)
+}
+
+var classificationConfEx = &Input{Text: "cat cat cat dog dog dog dog bird bird cat", Other: "cat dog cat dog dog cat dog bird cat cat"}
+
+func kNearestNeighborsEntry() Entry {
 	knn := entry("k-nearest-neighbors", "K-Nearest Neighbors", "ml/classification/knn.go", "KNN")
 	knn.Summary, knn.Time, knn.Space, knn.Input, knn.Traced = "Classify a new point by a vote of the k training points nearest it. No training at all: every query does the work.", "O(n * d + n log n) per query", "O(n)", TwoTexts, true
 	knn.Example = &Input{Text: labeledPts, Other: "5 6", Options: map[string]int{"k": 3}}
@@ -451,7 +540,7 @@ func classificationEntries() []Entry {
 		if err != nil {
 			return Output{}, err
 		}
-		xs, ls, err := labeled(in)
+		xs, ls, err := classificationLabeled(in)
 		if err != nil {
 			return Output{}, err
 		}
@@ -470,14 +559,17 @@ func classificationEntries() []Entry {
 		return out, nil
 	}
 	knn.Call = func(in Input) (string, string) {
-		return setupQuery(in), fmt.Sprintf("classification.KNN(xs, labels, query, %d)", in.opt("k", 3))
+		return classificationSetupQuery(in), fmt.Sprintf("classification.KNN(xs, labels, query, %d)", in.opt("k", 3))
 	}
+	return knn
+}
 
+func gaussianNaiveBayesEntry() Entry {
 	gnb := entry("gaussian-naive-bayes", "Gaussian Naive Bayes", "ml/classification/bayes.go", "FitGaussianNB")
 	gnb.Summary, gnb.Time, gnb.Space, gnb.Input = "Per class, a bell curve for each feature; the most probable class wins, pretending the features are independent.", "O(n * d) to fit, O(classes * d) to predict", "O(classes * d)", TwoTexts
 	gnb.Example = &Input{Text: irisExample, Other: "4.8 1.6"}
 	gnb.Run = func(in Input, _ trace.Recorder) (Output, error) {
-		xs, ls, err := labeled(in)
+		xs, ls, err := classificationLabeled(in)
 		if err != nil {
 			return Output{}, err
 		}
@@ -500,9 +592,12 @@ func classificationEntries() []Entry {
 		return out, nil
 	}
 	gnb.Call = func(in Input) (string, string) {
-		return setupQuery(in) + "m, err := classification.FitGaussianNB(xs, labels)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\t", "m.Predict(query)"
+		return classificationSetupQuery(in) + "m, err := classification.FitGaussianNB(xs, labels)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\t", "m.Predict(query)"
 	}
+	return gnb
+}
 
+func naiveBayesTextEntry() Entry {
 	tnb := entry("naive-bayes-text", "Naive Bayes Spam Filter", "ml/classification/bayes.go", "FitTextNB")
 	tnb.Summary, tnb.Time, tnb.Space, tnb.Input = "Count words per class, then score a new message by how likely each class is to produce its words (with add-one smoothing).", "O(words) to fit and to predict", "O(classes * vocabulary)", TwoTexts
 	tnb.Example = &Input{Text: spamExample, Other: "win free money now"}
@@ -526,7 +621,10 @@ func classificationEntries() []Entry {
 		setup := parseSetup("docs, labels", "classification", "ParseDocs", in.Text) + "m, err := classification.FitTextNB(docs, labels)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\t"
 		return setup, fmt.Sprintf("m.Predict(%q)", in.Other)
 	}
+	return tnb
+}
 
+func perceptronEntry() Entry {
 	per := entry("perceptron", "Perceptron", "ml/classification/perceptron.go", "FitPerceptron")
 	per.Summary, per.Time, per.Space, per.Input = "The first learning machine: nudge a line toward every example it gets wrong. It stops if a line separates the classes, and never does on XOR.", "O(n * d * epochs)", "O(d + epochs)", Text
 	per.Example = &Input{Text: "# x y class: yes above the line y = x\n1 3 yes\n2 5 yes\n3 6 yes\n4 7 yes\n2 1 no\n4 2 no\n5 3 no\n6 4 no", Options: map[string]int{"epochs": 100}}
@@ -536,7 +634,7 @@ func classificationEntries() []Entry {
 		if err != nil {
 			return Output{}, err
 		}
-		xs, ls, err := labeled(in)
+		xs, ls, err := classificationLabeled(in)
 		if err != nil {
 			return Output{}, err
 		}
@@ -561,9 +659,12 @@ func classificationEntries() []Entry {
 		if cs := classification.Classes(ls); len(cs) > 1 {
 			pos = cs[1]
 		}
-		return setupLabeled(in), fmt.Sprintf("classification.FitPerceptron(xs, classification.Signs(labels, %q), %d)", pos, in.opt("epochs", 100))
+		return classificationSetupLabeled(in), fmt.Sprintf("classification.FitPerceptron(xs, classification.Signs(labels, %q), %d)", pos, in.opt("epochs", 100))
 	}
+	return per
+}
 
+func decisionTreeEntry() Entry {
 	tree := entry("decision-tree", "Decision Tree (CART)", "ml/classification/tree.go", "BuildTree")
 	tree.Summary, tree.Time, tree.Space, tree.Input = "Ask the yes-or-no question that best splits the classes (lowest Gini impurity), then ask again on each side.", "O(d * n^2 * depth)", "O(n) per level", Text
 	tree.Example = &Input{Text: irisExample, Options: map[string]int{"depth": 3}}
@@ -573,7 +674,7 @@ func classificationEntries() []Entry {
 		if err != nil {
 			return Output{}, err
 		}
-		xs, ls, err := labeled(in)
+		xs, ls, err := classificationLabeled(in)
 		if err != nil {
 			return Output{}, err
 		}
@@ -590,18 +691,16 @@ func classificationEntries() []Entry {
 		return Output{Points: pointsOf(xs), Lines: n.Lines(), Summary: map[string]float64{"training accuracy": float64(right) / float64(len(xs))}}, nil
 	}
 	tree.Call = func(in Input) (string, string) {
-		return setupLabeled(in), fmt.Sprintf("classification.BuildTree(xs, labels, %d)", in.opt("depth", 3))
+		return classificationSetupLabeled(in), fmt.Sprintf("classification.BuildTree(xs, labels, %d)", in.opt("depth", 3))
 	}
+	return tree
+}
 
-	confusion := func(in Input) (classification.Confusion, error) {
-		c, err := classification.ConfusionMatrix(strings.Fields(in.Text), strings.Fields(in.Other))
-		return c, wrap(err)
-	}
-	confEx := &Input{Text: "cat cat cat dog dog dog dog bird bird cat", Other: "cat dog cat dog dog cat dog bird cat cat"}
+func confusionMatrixEntry() Entry {
 	cm := entry("confusion-matrix", "Confusion Matrix", "ml/classification/evaluate.go", "ConfusionMatrix")
-	cm.Summary, cm.Time, cm.Space, cm.Input, cm.Example = "A table of the true class against the predicted one: the diagonal is right, everything else shows which classes get mixed up.", "O(n + classes^2)", "O(classes^2)", TwoTexts, confEx
+	cm.Summary, cm.Time, cm.Space, cm.Input, cm.Example = "A table of the true class against the predicted one: the diagonal is right, everything else shows which classes get mixed up.", "O(n + classes^2)", "O(classes^2)", TwoTexts, classificationConfEx
 	cm.Run = func(in Input, _ trace.Recorder) (Output, error) {
-		c, err := confusion(in)
+		c, err := classificationConfusion(in)
 		if err != nil {
 			return Output{}, err
 		}
@@ -617,11 +716,14 @@ func classificationEntries() []Entry {
 	cm.Call = func(in Input) (string, string) {
 		return "", fmt.Sprintf("classification.ConfusionMatrix(%#v, %#v)", strings.Fields(in.Text), strings.Fields(in.Other))
 	}
+	return cm
+}
 
+func precisionRecallF1Entry() Entry {
 	prf := entry("precision-recall-f1", "Precision, Recall and F1", "ml/classification/evaluate.go", "Confusion.Scores")
-	prf.Summary, prf.Time, prf.Space, prf.Input, prf.Example = "Per class: of the predictions, how many were right (precision); of the truth, how much was found (recall); and their balance (F1).", "O(classes^2)", "O(classes)", TwoTexts, confEx
+	prf.Summary, prf.Time, prf.Space, prf.Input, prf.Example = "Per class: of the predictions, how many were right (precision); of the truth, how much was found (recall); and their balance (F1).", "O(classes^2)", "O(classes)", TwoTexts, classificationConfEx
 	prf.Run = func(in Input, _ trace.Recorder) (Output, error) {
-		c, err := confusion(in)
+		c, err := classificationConfusion(in)
 		if err != nil {
 			return Output{}, err
 		}
@@ -635,7 +737,10 @@ func classificationEntries() []Entry {
 	prf.Call = func(in Input) (string, string) {
 		return fmt.Sprintf("c, err := classification.ConfusionMatrix(%#v, %#v)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\t", strings.Fields(in.Text), strings.Fields(in.Other)), "c.Scores()"
 	}
+	return prf
+}
 
+func trainTestSplitEntry() Entry {
 	split := entry("train-test-split", "Train/Test Split", "ml/classification/evaluate.go", "TrainTestSplit")
 	split.Summary, split.Time, split.Space, split.Input = "Shuffle the examples and hold some back, so a model is judged on data it never trained on.", "O(n)", "O(n)", Simulation
 	split.Example = &Input{Options: map[string]int{"n": 10, "test": 30, "seed": 1}}
@@ -654,7 +759,10 @@ func classificationEntries() []Entry {
 	split.Call = func(in Input) (string, string) {
 		return "", fmt.Sprintf("classification.TrainTestSplit(%d, %g, %d)", in.opt("n", 10), float64(in.opt("test", 30))/100, in.opt("seed", 1))
 	}
+	return split
+}
 
+func kFoldCrossValidationEntry() Entry {
 	cv := entry("k-fold-cross-validation", "K-Fold Cross-Validation", "ml/classification/evaluate.go", "CrossValidateKNN")
 	cv.Summary, cv.Time, cv.Space, cv.Input = "Split the data into k folds, test on each in turn while training on the rest, and average: every example is tested exactly once.", "O(n^2 * d) for k-NN", "O(n)", Text
 	cv.Example = &Input{Text: irisExample, Options: map[string]int{"folds": 4, "k": 3, "seed": 1}}
@@ -664,7 +772,7 @@ func classificationEntries() []Entry {
 		if err != nil {
 			return Output{}, err
 		}
-		xs, ls, err := labeled(in)
+		xs, ls, err := classificationLabeled(in)
 		if err != nil {
 			return Output{}, err
 		}
@@ -682,12 +790,12 @@ func classificationEntries() []Entry {
 		return out, nil
 	}
 	cv.Call = func(in Input) (string, string) {
-		return setupLabeled(in), fmt.Sprintf("classification.CrossValidateKNN(xs, labels, %d, %d, %d)", in.opt("folds", 4), in.opt("k", 3), in.opt("seed", 1))
+		return classificationSetupLabeled(in), fmt.Sprintf("classification.CrossValidateKNN(xs, labels, %d, %d, %d)", in.opt("folds", 4), in.opt("k", 3), in.opt("seed", 1))
 	}
-	return []Entry{knn, gnb, tnb, per, tree, cm, prf, split, cv}
+	return cv
 }
 
-func neuralEntries() []Entry {
+func xorNetworkEntry() Entry {
 	xor := entry("xor-network", "Neural Network Learning XOR", "ml/neural/mlp.go", "MLP.Train")
 	xor.Summary, xor.Time, xor.Space, xor.Input = "A two-layer network learns XOR by backpropagation: errors flow backward through the weights by the chain rule.", "O(epochs * n * weights)", "O(units + epochs)", Simulation
 	xor.Example = &Input{Options: map[string]int{"hidden": 4, "epochs": 5000, "rate": 500, "seed": 1}}
@@ -722,7 +830,10 @@ func neuralEntries() []Entry {
 		setup := fmt.Sprintf("m, err := neural.NewMLP([]int{2, %d, 1}, %d)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\txs, ys := neural.XOR()\n\t", in.opt("hidden", 4), in.opt("seed", 1))
 		return setup, fmt.Sprintf("m.Train(xs, ys, %g, %d)", float64(in.opt("rate", 500))/1000, in.opt("epochs", 5000))
 	}
+	return xor
+}
 
+func activationFunctionsEntry() Entry {
 	act := entry("activation-functions", "Activation Functions", "ml/neural/neural.go", "Activation")
 	act.Summary, act.Time, act.Space, act.Input = "Sigmoid, tanh and ReLU, and their slopes, from x = -4 to 4: why ReLU keeps gradients alive and sigmoid lets them fade.", "O(1) each", "O(1)", Simulation
 	act.Example = &Input{}
@@ -741,7 +852,10 @@ func neuralEntries() []Entry {
 	act.Call = func(Input) (string, string) {
 		return "", "neural.Sigmoid.F(1), neural.Tanh.F(1), neural.ReLU.F(1)"
 	}
+	return act
+}
 
+func softmaxCrossEntropyEntry() Entry {
 	sm := entry("softmax-cross-entropy", "Softmax and Cross-Entropy", "ml/neural/neural.go", "Softmax")
 	sm.Summary, sm.Time, sm.Space, sm.Input, sm.Params = "Turn scores into probabilities that sum to 1, and score them against the right answer: the loss a classifier learns from.", "O(n)", "O(n)", AnyInts, []string{"target"}
 	sm.Example = &Input{Values: []int{2, 1, 0, 3}, Target: 3}
@@ -775,5 +889,5 @@ func neuralEntries() []Entry {
 		}
 		return "", "neural.Softmax([]float64{" + strings.Join(f, ", ") + "})"
 	}
-	return []Entry{xor, act, sm}
+	return sm
 }

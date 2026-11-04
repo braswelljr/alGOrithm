@@ -1,0 +1,53 @@
+/* The visualizer's own theme: the colors of its roles (compare, swap, sorted,
+   the logic levels, the float fields) and its keyframes. The shared surfaces
+   and the accent come from the app theme (src/styles/theme.css); these
+   --av-* tokens default in styles.css and follow the theme on .av-root
+   (src/styles/main.css). */
+@theme inline {
+  --color-compare: var(--av-compare);
+  --color-swap: var(--av-swap);
+  --color-write: var(--av-write);
+  --color-pivot: var(--av-pivot);
+  --color-found: var(--av-found);
+  --color-sorted: var(--av-sorted);
+  --color-visited: var(--av-visited);
+  --color-path: var(--av-path);
+  --color-frontier: var(--av-frontier);
+  --color-high: var(--av-high);
+  --color-low: var(--av-low);
+  --color-unknown: var(--av-unknown);
+  --color-sign: var(--av-sign);
+  --color-exponent: var(--av-exponent);
+  --color-fraction: var(--av-fraction);
+  --color-parity: var(--av-parity);
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --animate-bit-flip: av-bit-flip 220ms cubic-bezier(0.23, 1, 0.32, 1);
+  --animate-wire-pulse: av-wire-pulse 600ms linear infinite;
+}
+
+/* A bit that just changed turns over once. */
+@keyframes av-bit-flip {
+  from {
+    transform: rotateX(90deg);
+    opacity: 0.4;
+  }
+  to {
+    transform: rotateX(0);
+    opacity: 1;
+  }
+}
+
+/* A Karnaugh map group draws itself in. */
+@keyframes av-group-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+/* A high wire carries a pulse toward the gate it feeds. */
+@keyframes av-wire-pulse {
+  to {
+    stroke-dashoffset: -16;
+  }
+}

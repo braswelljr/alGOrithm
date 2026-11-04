@@ -1,6 +1,8 @@
 # Diagrams are plain text
 
-A diagram in the documentation is drawn with plain characters (`+`, `-`, `|`, `>`, `v`) in a fenced `text` block, never with Mermaid or another diagram language that needs a renderer.
+A diagram in the repository's documentation (markdown, doc comments) is drawn with plain characters (`+`, `-`, `|`, `>`, `v`) in a fenced `text` block, never with Mermaid or another diagram language that needs a renderer.
+
+The website is different: it has a renderer, so its pages may draw diagrams with Mermaid through `MermaidDiagram` (`web/src/components/algorithm/mermaid-diagram.tsx`), which loads Mermaid only on a page that draws one, renders in strict mode with the theme's colors, and carries a text label for screen readers. The learning-path map on `/learn` is one.
 
 ## Why
 

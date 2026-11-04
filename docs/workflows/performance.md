@@ -1,6 +1,6 @@
 # Performance
 
-How heavy the site is, what makes it heavy, and the budgets that keep it light. `node web/apps/site/scripts/budget.mjs` checks the budgets against the static export in `web/apps/site/out/`, and `make web/test` runs it after the build.
+How heavy the site is, what makes it heavy, and the budgets that keep it light. `node web/scripts/budget.mjs` checks the budgets against the static export in `web/out/`, and `make web/test` runs it after the build.
 
 ## What a visitor downloads
 
@@ -46,8 +46,8 @@ The static export itself is large (118 MB) because every entry has its own page 
 ## What was done
 
 - **The wasm only where it runs.** Home, docs, tags and learn take their data from the build. The structures principles panel on `/docs`, the one part of those pages that runs entries, loads the wasm and its views on its own (`next/dynamic`).
-- **No views in the hook.** The site's `useSiteAlgorithm` imports `@braswelljr/algorithm-visualizer/react`, a new entry with only the hooks, instead of the package root, which pulled every view (and React Flow) into every page.
-- **React Flow on demand.** The four views drawn with React Flow (graph, structure, state machine, circuit) are `React.lazy` wrappers (`packages/visualizer/src/components/lazy-flow.tsx`), with a skeleton holding their space; React Flow downloads only when a graph is shown.
+- **No views in the hook.** The site's `useSiteAlgorithm` imports `@/visualizer/react`, a module with only the hooks, instead of the package root, which pulled every view (and React Flow) into every page.
+- **React Flow on demand.** The four views drawn with React Flow (graph, structure, state machine, circuit) are `React.lazy` wrappers (`web/src/visualizer/components/lazy-flow.tsx`), with a skeleton holding their space; React Flow downloads only when a graph is shown.
 - **Development code out of production.** `DevReload` (and its zod import) renders only in development.
 - **The quiz game on demand.** The play and results screens (GSAP, the live view, the burst) load while the start screen is up.
 - **Caching that cannot go stale.** The wasm and `wasm_exec.js` URLs carry the wasm's content hash (`?v=`, from `next.config.ts`), so `vercel.json` caches them for a year, immutably, and a new build is a new URL. `public/sw.js` keeps the current version in the Cache API for repeat and offline visits, keyed by that URL, and deletes older ones.

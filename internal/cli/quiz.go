@@ -97,7 +97,7 @@ func (g *quizGame) answer(right bool) bool {
 }
 
 // streakMultiplier is x1 for streaks 1-3, x2 for 4-6, x3 for 7-9, x4 after,
-// as in the site's game (web/packages/visualizer/src/core/game.ts).
+// as in the site's game (web/src/visualizer/core/game.ts).
 func streakMultiplier(streak int) int { return min(4, 1+max(0, streak-1)/3) }
 
 // line is the score line after an answer.

@@ -23,7 +23,7 @@ make bench BENCH='Sorts/quick' COUNT=5            # one benchmark, five times
 | Registry | [`internal/core`](../../internal/core/registry_test.go) | Every entry is consistent and documented, runs its example, rejects bad input with `ErrInput`; every Go snippet compiles (`TestGoSnippetsCompile`, skipped with `-short`) |
 | Command | [`internal/cli/cli_test.go`](../../internal/cli/cli_test.go) | Every subcommand end to end with temp files and standard input; the HTTP API through `httptest`; the MCP server on a script of JSON-RPC messages |
 | Generated docs | [`tools/gendocs`](../../tools/gendocs/main_test.go) | The README catalog and `docs/catalog.md` match the registry |
-| Site | `web/` | The npm package and the site against the real wasm (see `web/AGENTS.md`) |
+| Site | `web/` | The site and the visualizer against the real wasm (see `web/AGENTS.md`) |
 
 ## Writing a test
 

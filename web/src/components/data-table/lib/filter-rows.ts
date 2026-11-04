@@ -1,0 +1,90 @@
+import type { RowData } from '@tanstack/react-table';
+/**
+ * niko-table, created by Semir N. (Semkoo, https://github.com/Semkoo) with AI assistance.
+ *
+ * Before reporting anything: please check the changelog first.
+ *  - In-repo: ./CHANGELOG.md
+ *  - Docs site: https://niko-table.com/changelog
+ *
+ * Found a bug or have a fix? Open an issue or PR on GitHub so other
+ * users (and future LLMs reading this code) benefit:
+ * https://github.com/Semkoo/niko-table-registry
+ */
+
+import type { AppFilterFn, AppReactTable, AppRow } from '@/lib/table';
+
+/**
+ * Get filtered rows excluding a specific column's filter.
+ * This is useful when generating options for a column - we want to see
+ * options that exist in the filtered dataset (from other filters) but
+ * not be limited by the current column's own filter.
+ */
+export function getFilteredRowsExcludingColumn<TData extends RowData>(
+  table: AppReactTable<TData>,
+  coreRows: AppRow<TData>[],
+  excludeColumnId: string,
+  columnFilters: Array<{ id: string; value: unknown }>,
+  globalFilter: unknown
+): AppRow<TData>[] {
+  // Filter out the current column's filter
+  const otherFilters = columnFilters.filter((filter) => filter.id !== excludeColumnId);
+
+  // If no filters to apply (excluding the current column), return core rows
+  if (otherFilters.length < 1 && !globalFilter) {
+    return coreRows;
+  }
+
+  // Set of real column ids (leaf columns, including hidden accessor columns).
+  // `columnFilters` can carry filter ids that have no matching client column
+  // (for example a filter resolved entirely server-side). Those are skipped
+  // below, checking membership here avoids TanStack's `table.getColumn` dev
+  // warning ("Column with id 'x' does not exist") that fires before the
+  // `!column` guard would catch it.
+  const columnIds = new Set(table.getAllLeafColumns().map((c) => c.id));
+
+  // Filter rows manually, excluding the current column's filter
+  return coreRows.filter((row) => {
+    // Apply column filters (excluding the current column)
+    for (const filter of otherFilters) {
+      if (!columnIds.has(filter.id)) continue;
+
+      const column = table.getColumn(filter.id);
+      if (!column) continue;
+
+      const filterValue = filter.value;
+      const filterFn = column.columnDef.filterFn || 'extended';
+
+      // Skip if filter function is a string (built-in) and we don't have access
+      if (typeof filterFn === 'string') {
+        // Use the table's filterFns
+        // The key union includes "auto" and this package's own "extended",
+        // neither of which is in the built-in registry, so the lookup is
+        // widened rather than asserted to be present.
+        const registry = table._features.filterFns as
+          Record<string, AppFilterFn<TData> | undefined> | undefined;
+        const fn = registry?.[filterFn];
+        if (fn && typeof fn === 'function') {
+          if (!fn(row, filter.id, filterValue, () => {})) {
+            return false;
+          }
+        }
+      } else if (typeof filterFn === 'function') {
+        if (!filterFn(row, filter.id, filterValue, () => {})) {
+          return false;
+        }
+      }
+    }
+
+    // Apply global filter if present
+    if (globalFilter) {
+      const globalFilterFn = table.options.globalFilterFn;
+      if (globalFilterFn && typeof globalFilterFn === 'function') {
+        if (!globalFilterFn(row, 'global', globalFilter, () => {})) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  });
+}

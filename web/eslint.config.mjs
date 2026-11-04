@@ -67,7 +67,7 @@ export default defineConfig([
       'react-hooks/incompatible-library': 'off'
     },
     settings: {
-      next: { rootDir: 'apps/site/' },
+      next: { rootDir: './' },
       react: {
         // Stated rather than 'detect': eslint-plugin-react's detection calls
         // `context.getFilename()`, which ESLint 10 removed, and crashes the run.
@@ -89,21 +89,39 @@ export default defineConfig([
       'react-hooks/set-state-in-effect': 'warn'
     }
   },
-  // Tailwind 4 class correctness in the site and the ui package: no class that
+  // Tailwind 4 class correctness in the app: no class that
   // conflicts with another, no duplicate, no deprecated or unknown utility.
   // Order is prettier-plugin-tailwindcss's job, so the stylistic rules stay off.
   {
-    files: ['apps/site/src/**/*.{ts,tsx}', 'packages/ui/src/**/*.{ts,tsx}'],
+    files: ['src/**/*.{ts,tsx}'],
     plugins: { 'better-tailwindcss': pluginBetterTailwind },
     settings: {
       'better-tailwindcss': {
-        entryPoint: 'apps/site/src/styles/main.css',
+        entryPoint: 'src/styles/main.css',
         callees: ['cn', 'clsx', 'cva', 'tv']
       }
     },
     rules: {
       ...pluginBetterTailwind.configs['correctness-warn'].rules,
-      'better-tailwindcss/no-conflicting-classes': 'error'
+      'better-tailwindcss/no-conflicting-classes': 'error',
+      // Classes that are not Tailwind utilities on purpose: the visualizer's
+      // own (`av-*`, styles.css), React Flow's markers, the spinner's inline
+      // SVG styles, sonner's hook and the RTL flip in theme.css.
+      'better-tailwindcss/no-unknown-classes': [
+        'warn',
+        {
+          ignore: [
+            '^av-',
+            '^nodrag$',
+            '^nopan$',
+            '^spinner-bars?(-\\d)?$',
+            '^toaster$',
+            '^cn-rtl-flip$',
+            // A dark scope: tokens and keycaps inside take their dark colorway.
+            '^dark$'
+          ]
+        }
+      ]
     }
   },
   {
@@ -112,6 +130,13 @@ export default defineConfig([
     rules: {
       'prettier/prettier': 'warn'
     }
+  },
+  // The data-table is synced from gsl-special-courses (web/SYNC.md) and kept
+  // as written there, where this rule is not enabled: it reads its config
+  // refs during render on purpose.
+  {
+    files: ['src/components/data-table/**/*.{ts,tsx}'],
+    rules: { 'react-hooks/refs': 'off' }
   },
   prettierConfig
 ]);

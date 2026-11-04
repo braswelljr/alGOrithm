@@ -9,6 +9,27 @@ import (
 	"github.com/braswelljr/alGOrithm/pkg/trace"
 )
 
+// representationEntries is every entry of the representation category.
+func representationEntries() []Entry {
+	return []Entry{
+		baseConversionEntry(),
+		baseToDecimalEntry(),
+		bcdEntry(),
+		binaryAdditionEntry(),
+		endiannessEntry(),
+		fixedPointEntry(),
+		floatDecodeEntry(),
+		floatRoundingEntry(),
+		hammingCodeEntry(),
+		ieee754HalfEntry(),
+		ieee754SingleEntry(),
+		parityBitEntry(),
+		signedNumbersEntry(),
+		twosComplementOverflowEntry(),
+		utf8EncodingEntry(),
+	}
+}
+
 // floatRows draws a floating-point number as its three fields.
 func floatRows(x representation.Float) []BitRow {
 	s, e, f := x.Fields()
@@ -53,14 +74,49 @@ func oneNumber(in Input, what string) (int, error) {
 	return in.Values[0], nil
 }
 
-func representationEntries() []Entry {
-	base := Option{"base", "base", 2, 2, 36}
-	bitsOpt := func(def int) Option { return Option{"bits", "bits", def, 2, 32} }
+var representationBase = Option{"base", "base", 2, 2, 36}
 
+func representationBitsOpt(def int) Option { return Option{"bits", "bits", def, 2, 32} }
+
+func representationFloat(id, name, fn, summary string, ex string, encode func(float64) representation.Float) Entry {
+	e := computingEntry("representation", id, name, "float.go", fn, summary, "O(1)", "O(1)", Text, &Input{Text: ex})
+	e.Limits = "a number, like 0.1, -2.5, 1e-40 or inf"
+	e.Run = func(in Input, _ trace.Recorder) (Output, error) {
+		v, err := parseFloat(in.Text)
+		if err != nil {
+			return Output{}, err
+		}
+		x := encode(v)
+		return Output{Bits: floatRows(x), Lines: floatLines(x), Text: x.Exact}, nil
+	}
+	e.Call = func(in Input) (string, string) {
+		v, _ := parseFloat(in.Text)
+		return "", fmt.Sprintf("representation.%s(%v).Exact", fn, v)
+	}
+	return e
+}
+
+func representationParse3(text string) ([3]float64, error) {
+	f := strings.Fields(text)
+	var v [3]float64
+	if len(f) != 3 {
+		return v, inputError("give three numbers: a, b and c")
+	}
+	for i := range v {
+		x, err := parseFloat(f[i])
+		if err != nil {
+			return v, err
+		}
+		v[i] = x
+	}
+	return v, nil
+}
+
+func baseConversionEntry() Entry {
 	toBase := computingEntry("representation", "base-conversion", "Base Conversion", "bases.go", "ToBase",
 		"Write a number in binary, octal, hex or any base by repeated division: the remainders, read from last to first, are the digits.",
 		"O(log n)", "O(log n)", Number, &Input{Values: []int{156}, Options: map[string]int{"base": 2}})
-	toBase.Options = []Option{base}
+	toBase.Options = []Option{representationBase}
 	toBase.Limits = "a number of 0 or more and a base from 2 to 36"
 	toBase.Run = func(in Input, _ trace.Recorder) (Output, error) {
 		n, err := oneNumber(in, "number of 0 or more")
@@ -83,7 +139,10 @@ func representationEntries() []Entry {
 	toBase.Call = func(in Input) (string, string) {
 		return "", fmt.Sprintf("representation.ToBase(%d, %d)", in.Values[0], in.opt("base", 2))
 	}
+	return toBase
+}
 
+func baseToDecimalEntry() Entry {
 	fromBase := computingEntry("representation", "base-to-decimal", "Base to Decimal (Horner)", "bases.go", "FromBase",
 		"Read a number written in any base: start at zero and, for each digit from the left, multiply by the base and add the digit.",
 		"O(digits)", "O(digits)", Text, &Input{Text: "9C", Options: map[string]int{"base": 16}})
@@ -104,7 +163,10 @@ func representationEntries() []Entry {
 	fromBase.Call = func(in Input) (string, string) {
 		return "", fmt.Sprintf("representation.FromBase(%q, %d)", in.Text, in.opt("base", 16))
 	}
+	return fromBase
+}
 
+func binaryAdditionEntry() Entry {
 	add := computingEntry("representation", "binary-addition", "Binary Addition", "arithmetic.go", "AddBinary",
 		"Add two binary numbers the way you add on paper, column by column from the right: 1 + 1 is 0, carry 1.",
 		"O(n)", "O(n)", TwoTexts, &Input{Text: "1011", Other: "111"})
@@ -153,11 +215,14 @@ func representationEntries() []Entry {
 	add.Call = func(in Input) (string, string) {
 		return "", fmt.Sprintf("representation.AddBinary(%q, %q)", in.Text, in.Other)
 	}
+	return add
+}
 
+func signedNumbersEntry() Entry {
 	signed := computingEntry("representation", "signed-numbers", "Signed Number Encodings", "signed.go", "Encodings",
 		"Write a negative number three ways: sign-magnitude, ones' complement and two's complement, and see why two's complement won (one zero, and the same adder for signed and unsigned).",
 		"O(n)", "O(n)", Number, &Input{Values: []int{-5}, Options: map[string]int{"bits": 8}})
-	signed.Options = []Option{bitsOpt(8)}
+	signed.Options = []Option{representationBitsOpt(8)}
 	signed.Limits = "a whole number, positive or negative, and a width of 2 to 32 bits"
 	signed.Run = func(in Input, _ trace.Recorder) (Output, error) {
 		v, err := oneNumber(in, "whole number")
@@ -187,11 +252,14 @@ func representationEntries() []Entry {
 	signed.Call = func(in Input) (string, string) {
 		return "", fmt.Sprintf("representation.Encodings(%d, %d)", in.Values[0], in.opt("bits", 8))
 	}
+	return signed
+}
 
+func twosComplementOverflowEntry() Entry {
 	overflow := computingEntry("representation", "twos-complement-overflow", "Two's Complement Overflow", "signed.go", "TwosAdd",
 		"Add two signed numbers on a fixed number of bits: past the largest value the result wraps around to a negative, and the overflow flag says so. A carry out is not the same thing.",
 		"O(n)", "O(n)", TwoNumbers, &Input{Values: []int{100, 50}, Options: map[string]int{"bits": 8}})
-	overflow.Options = []Option{bitsOpt(8)}
+	overflow.Options = []Option{representationBitsOpt(8)}
 	overflow.Limits = "two numbers that fit in the chosen width"
 	overflow.Run = func(in Input, _ trace.Recorder) (Output, error) {
 		if len(in.Values) != 2 {
@@ -215,7 +283,10 @@ func representationEntries() []Entry {
 	overflow.Call = func(in Input) (string, string) {
 		return "", fmt.Sprintf("representation.TwosAdd(%d, %d, %d)", in.Values[0], in.Values[1], in.opt("bits", 8))
 	}
+	return overflow
+}
 
+func fixedPointEntry() Entry {
 	fixed := computingEntry("representation", "fixed-point", "Fixed Point", "signed.go", "FixedPoint",
 		"Store a fraction as an integer with an imaginary binary point: fast and exact in steps of 2^-f, the way DSPs, audio and old games do arithmetic.",
 		"O(bits)", "O(bits)", Text, &Input{Text: "3.14159", Options: map[string]int{"int": 4, "frac": 4}})
@@ -246,31 +317,24 @@ func representationEntries() []Entry {
 		v, _ := parseFloat(in.Text)
 		return "", fmt.Sprintf("representation.FixedPoint(%v, %d, %d)", v, in.opt("int", 4), in.opt("frac", 4))
 	}
+	return fixed
+}
 
-	float := func(id, name, fn, summary string, ex string, encode func(float64) representation.Float) Entry {
-		e := computingEntry("representation", id, name, "float.go", fn, summary, "O(1)", "O(1)", Text, &Input{Text: ex})
-		e.Limits = "a number, like 0.1, -2.5, 1e-40 or inf"
-		e.Run = func(in Input, _ trace.Recorder) (Output, error) {
-			v, err := parseFloat(in.Text)
-			if err != nil {
-				return Output{}, err
-			}
-			x := encode(v)
-			return Output{Bits: floatRows(x), Lines: floatLines(x), Text: x.Exact}, nil
-		}
-		e.Call = func(in Input) (string, string) {
-			v, _ := parseFloat(in.Text)
-			return "", fmt.Sprintf("representation.%s(%v).Exact", fn, v)
-		}
-		return e
-	}
-	single := float("ieee754-single", "IEEE 754 Single Precision", "EncodeSingle",
+func ieee754SingleEntry() Entry {
+	single := representationFloat("ieee754-single", "IEEE 754 Single Precision", "EncodeSingle",
 		"How a float is stored in 32 bits: a sign, an 8-bit exponent with a bias of 127, and 23 fraction bits after a hidden leading 1, and the exact value that really holds.",
 		"0.1", representation.EncodeSingle)
-	half := float("ieee754-half", "IEEE 754 Half Precision", "EncodeHalf",
+	return single
+}
+
+func ieee754HalfEntry() Entry {
+	half := representationFloat("ieee754-half", "IEEE 754 Half Precision", "EncodeHalf",
 		"The 16-bit float of GPUs and machine learning: 5 exponent bits, 10 fraction bits, a range up to 65504, and rounding you can see.",
 		"3.14159", representation.EncodeHalf)
+	return half
+}
 
+func floatDecodeEntry() Entry {
 	decode := computingEntry("representation", "float-decode", "Decode Float Bits", "float.go", "Decode",
 		"Go the other way: give 32 bits and read off the sign, exponent and fraction, including zeros, subnormals, infinities and NaN.",
 		"O(1)", "O(1)", Text, &Input{Text: "01000000010010010000111111011011"})
@@ -293,28 +357,16 @@ func representationEntries() []Entry {
 		return fmt.Sprintf("bits, err := representation.ParseBits(representation.Single, %q)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\t", s),
 			"representation.Decode(representation.Single, bits).Exact"
 	}
+	return decode
+}
 
+func floatRoundingEntry() Entry {
 	rounding := computingEntry("representation", "float-rounding", "Why 0.1 + 0.2 != 0.3", "float.go", "Rounding",
 		"Decimal fractions like 0.1 have no exact binary form, so each is stored as the nearest double; the small errors add up and 0.1 + 0.2 lands one step away from 0.3.",
 		"O(1)", "O(1)", Text, &Input{Text: "0.1 0.2 0.3"})
 	rounding.Limits = "three numbers a, b and c, to compare a + b with c"
-	parse3 := func(text string) ([3]float64, error) {
-		f := strings.Fields(text)
-		var v [3]float64
-		if len(f) != 3 {
-			return v, inputError("give three numbers: a, b and c")
-		}
-		for i := range v {
-			x, err := parseFloat(f[i])
-			if err != nil {
-				return v, err
-			}
-			v[i] = x
-		}
-		return v, nil
-	}
 	rounding.Run = func(in Input, _ trace.Recorder) (Output, error) {
-		v, err := parse3(in.Text)
+		v, err := representationParse3(in.Text)
 		if err != nil {
 			return Output{}, err
 		}
@@ -328,10 +380,13 @@ func representationEntries() []Entry {
 		}, Bits: append(floatRows(representation.EncodeDouble(v[0]+v[1])), floatRows(representation.EncodeDouble(v[2]))...)}, nil
 	}
 	rounding.Call = func(in Input) (string, string) {
-		v, _ := parse3(in.Text)
+		v, _ := representationParse3(in.Text)
 		return "", fmt.Sprintf("representation.Rounding(%v, %v, %v)", v[0], v[1], v[2])
 	}
+	return rounding
+}
 
+func bcdEntry() Entry {
 	bcd := computingEntry("representation", "bcd", "Binary-Coded Decimal", "codes.go", "BCD",
 		"Store each decimal digit in its own 4 bits, so a clock or calculator can show a number without dividing it: 409 is 0100 0000 1001.",
 		"O(digits)", "O(digits)", Number, &Input{Values: []int{409}})
@@ -356,7 +411,10 @@ func representationEntries() []Entry {
 		}}, nil
 	}
 	bcd.Call = func(in Input) (string, string) { return "", fmt.Sprintf("representation.BCD(%d)", in.Values[0]) }
+	return bcd
+}
 
+func parityBitEntry() Entry {
 	parity := computingEntry("representation", "parity-bit", "Parity Bit", "codes.go", "Parity",
 		"Add one bit that makes the count of 1s even: the receiver recounts, and any single flipped bit shows up (two flipped bits do not).",
 		"O(n)", "O(1)", Text, &Input{Text: "1011001"})
@@ -376,7 +434,10 @@ func representationEntries() []Entry {
 		v, _ := strconv.ParseUint(s, 2, 64)
 		return "", fmt.Sprintf("representation.Parity(%d, %d)", v, len(s))
 	}
+	return parity
+}
 
+func hammingCodeEntry() Entry {
 	hamming := computingEntry("representation", "hamming-code", "Hamming(7,4) Code", "codes.go", "Hamming74",
 		"Protect 4 data bits with 3 parity bits placed at positions 1, 2 and 4: when one bit flips, the failing checks spell out its position, so the receiver fixes it.",
 		"O(1)", "O(1)", Number, &Input{Values: []int{11}, Options: map[string]int{"flip": 6}})
@@ -428,7 +489,10 @@ func representationEntries() []Entry {
 	hamming.Call = func(in Input) (string, string) {
 		return "", fmt.Sprintf("representation.HammingDecode(representation.Hamming74(%d) ^ %d)", in.Values[0], hammingFlipMask(in.opt("flip", 0)))
 	}
+	return hamming
+}
 
+func utf8EncodingEntry() Entry {
 	utf := computingEntry("representation", "utf8-encoding", "UTF-8 Encoding", "text.go", "UTF8",
 		"How text becomes bytes: ASCII letters stay one byte, and every other character takes 2 to 4, with leading bits that say how many.",
 		"O(n)", "O(n)", Text, &Input{Text: "Aé€😀"})
@@ -465,7 +529,10 @@ func representationEntries() []Entry {
 		return Output{Bits: rows, Lines: lines, Number: &total}, nil
 	}
 	utf.Call = func(in Input) (string, string) { return "", fmt.Sprintf("representation.UTF8(%q)", in.Text) }
+	return utf
+}
 
+func endiannessEntry() Entry {
 	endian := computingEntry("representation", "endianness", "Endianness", "text.go", "Endian",
 		"The same 32-bit number laid out in memory two ways: big-endian puts the most significant byte first (network order), little-endian the least (x86, ARM).",
 		"O(1)", "O(1)", Number, &Input{Values: []int{305419896}})
@@ -491,8 +558,7 @@ func representationEntries() []Entry {
 				fmt.Sprintf("big-endian    % X", big[:]), fmt.Sprintf("little-endian % X", little[:])}}, nil
 	}
 	endian.Call = func(in Input) (string, string) { return "", fmt.Sprintf("representation.Endian(%d)", in.Values[0]) }
-
-	return []Entry{toBase, fromBase, add, signed, overflow, fixed, single, half, decode, rounding, bcd, parity, hamming, utf, endian}
+	return endian
 }
 
 func hammingFlipMask(pos int) int {

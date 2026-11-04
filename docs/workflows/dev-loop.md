@@ -6,9 +6,9 @@
 
 ```text
 start:   go build ./cmd/algorithm -> bin/algorithm
-         GOOS=js GOARCH=wasm go build ./cmd/algorithm-wasm -> web/packages/visualizer/assets/algorithm.wasm
-         copy it and wasm_exec.js to web/apps/site/public/
-         write web/apps/site/public/dev-build.json   {"build": 1, "ok": true, "at": ...}
+         GOOS=js GOARCH=wasm go build ./cmd/algorithm-wasm -> web/public/algorithm.wasm
+         copy wasm_exec.js beside it
+         write web/public/dev-build.json   {"build": 1, "ok": true, "at": ...}
          pnpm --dir web dev                          (if web/node_modules exists)
 
 watch:   every .go file and go.mod, outside web/, bin/, docs/, docs/ and dot directories

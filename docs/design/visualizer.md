@@ -1,8 +1,8 @@
 # Visualizer
 
-The design of the alGOrithm visualizer: a website, and an npm package to embed it, where anyone runs the repository's algorithms, data structures and operating-system simulations on their own data and watches them work step by step. The Go packages are compiled to WebAssembly and run in the browser, so the page shows the real implementation, and nothing is sent to a server. This document is the design; the [checklist](../requirements/checklist.md) tracks what is built.
+The design of the alGOrithm visualizer: a website where anyone runs the repository's algorithms, data structures and operating-system simulations on their own data and watches them work step by step. The Go packages are compiled to WebAssembly and run in the browser, so the page shows the real implementation, and nothing is sent to a server. This document is the design; the [checklist](../requirements/checklist.md) tracks what is built.
 
-Status: the Go side is built (the events in `trace`, the registry, `dataset`, the wasm API, the dev loop). The `web/` workspace (the npm package `@braswelljr/algorithm-visualizer` in `web/packages/visualizer` and the site in `web/apps/site`) is being built against the contract below.
+Status: built. The Go side (the events in `trace`, the registry, `dataset`, the wasm API, the dev loop) and the site in `web/`, one Next.js app, are in place.
 
 ## Goals
 
@@ -38,9 +38,9 @@ Status: the Go side is built (the events in `trace`, the registry, `dataset`, th
                                    | algorithm.wasm + wasm_exec.js
                                    v
         +---------------------------------- web/ ----------------------------------+
-        |  packages/visualizer   @braswelljr/algorithm-visualizer                   |
+        |  src/visualizer        the player, replay, views (no package)             |
         |    loader, zod schemas, player state machine, replay, views, components  |
-        |  apps/site             Next.js static export using the package           |
+        |  src/app, components   Next.js static export built on components/ui      |
         |    catalog, visualize, structures, compare, data, docs                   |
         +--------------------------------------------------------------------------+
 ```
@@ -59,7 +59,7 @@ An `Output` holds only what applies: `initial` and `values` (arrays), `index`, `
 
 `globalThis.alGOrithm`, every call JSON in and JSON out: `version`, `catalog()`, `run(id, input, limit)`, `compare(ids, input)`, `parse(format, text, options)`, `preview(csv, header)`, `generate(kind, size, seed)`, `generateGrid(kind, rows, cols, seed)`, `source(id)` and `snippet(id, input)`. The page treats every result as unknown until a zod schema accepts it ([rule](../rules/data-from-outside-is-unknown-until-checked.md)).
 
-### The npm package and the site: `web/`
+### The site: `web/`
 
 - **The player** is a hand-written, typed state machine (idle, loading, ready, playing, paused, finished, error) driven by events (play, pause, step, seek, speed, replay, reset), unit-tested transition by transition, and never autoplaying ([rule](../rules/motion-can-be-paused-stepped-and-reduced.md)). Stepping back replays from the nearest checkpoint.
 - **The views** draw a state, never an event: bars, array cells, grid, table, text matches, Hanoi pegs, a timeline with one lane per process or thread, a disk seek chart, and React Flow graphs for structures (rows, tidy trees, set chips, hash buckets, union-find forests).
@@ -84,7 +84,7 @@ An `Output` holds only what applies: `initial` and `values` (arrays), `index`, `
 4. Structure playground. **Done** in the first site; moving to React Flow.
 5. Compare. **Done** in the command and the first site.
 6. More algorithms: pathfinding, dynamic programming, string matching, arrays, new structures, and the operating-system topics. **Done** on the Go side; their views are in progress in `web/`.
-7. Polish and integrations: code view, docs pages, replay history, export, snippets, embed, the npm package, the HTTP API and MCP. **Done** on the Go side (API, MCP, snippets, source); in progress in `web/`.
+7. Polish and integrations: code view, docs pages, replay history, export, snippets, embed, the HTTP API and MCP. **Done** on the Go side (API, MCP, snippets, source); in progress in `web/`.
 
 The [roadmap](../requirements/roadmap.md) lists what to add next.
 

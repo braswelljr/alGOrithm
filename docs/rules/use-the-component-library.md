@@ -1,6 +1,6 @@
 # Use the component library
 
-The site is built from `@braswelljr/algorithm-ui` (`web/packages/ui`): if the library has a component for it, use it, and if it looks like a card, it is a `Card`. Extend a component with a cva variant rather than restyling it with one-off classes, and add what is missing to the library rather than to a page.
+The site is built from its primitives in `web/src/components/ui`: if the library has a component for it, use it, and if it looks like a card, it is a `Card`. Extend a component with a cva variant rather than restyling it with one-off classes, and add what is missing to the library rather than to a page.
 
 ## Why
 
@@ -44,16 +44,16 @@ Do not: `<div className="rounded-xl border bg-card p-4">`, `<h2 className="text-
 
 ## How it is checked
 
-`web/apps/site/test/markup.test.ts` scans the site and the library's own algorithm components and fails, with the file and line, on:
+`web/test/markup.test.ts` scans `web/src` (except the primitives in `components/ui` and the visualizer's views) and fails, with the file and line, on:
 
 - a class string that draws a card (rounded, outlined, and filled or shadowed) outside `Card`;
 - a raw `<button>`, `<input>`, `<select>`, `<textarea>` or `<h1>`-`<h6>` in the site;
 - `variant="outline"` without a reason.
 
-It warns when a file has more than one primary button. An exception carries its reason on the same or the previous line: `// card-ok: why` or `// ui-ok: why`. The published visualizer package (`web/packages/visualizer`) does not depend on the library and is exempt; the site wraps its views in `Card` or `Frame`.
+It warns when a file has more than one primary button. An exception carries its reason on the same or the previous line: `// card-ok: why` or `// ui-ok: why`. The primitives in `web/src/components/ui` and the visualizer's views in `web/src/visualizer` are exempt: the first are what everything else is built from, and the second draw shapes, not controls. The pages wrap the views in `Card` or `Frame`.
 
 ## Related
 
 - [The markup says what the thing is](the-markup-says-what-the-thing-is.md): the library's components carry the semantics.
 - [Motion can be paused, stepped and reduced](motion-can-be-paused-stepped-and-reduced.md).
-- `web/packages/ui/SYNC.md`: where each component came from.
+- `web/SYNC.md`: where each component came from.

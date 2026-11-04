@@ -1,7 +1,7 @@
 // Command dev is the development loop: it builds the algorithm command and the
 // WebAssembly, starts the visualizer's dev server, and then watches the Go
 // files. On every change it rebuilds both, runs the tests of the packages that
-// changed, and bumps web/apps/site/public/dev-build.json, which the open site
+// changed, and bumps web/public/dev-build.json, which the open site
 // polls to reload itself with the new wasm. Run it with `make dev`.
 //
 //	go run ./tools/dev [-web=false] [-test=false] [-interval 500ms]
@@ -24,10 +24,8 @@ import (
 	"time"
 )
 
-const (
-	wasmPkg  = "web/packages/visualizer/assets"
-	wasmSite = "web/apps/site/public"
-)
+// wasmSite is where the site serves the wasm and dev-build.json from.
+const wasmSite = "web/public"
 
 // skip lists the directories the watcher never looks in.
 var skip = map[string]bool{".git": true, "web": true, "bin": true, "node_modules": true, ".agents": true, ".claude": true, ".idea": true, "docs": true}
@@ -158,18 +156,16 @@ func run(name string, args ...string) error {
 	return nil
 }
 
-// buildAll builds the command into bin/ and the wasm into the npm package's
-// assets and the site's public folder, with wasm_exec.js beside it.
+// buildAll builds the command into bin/ and the wasm into the site's public
+// folder, with wasm_exec.js beside it.
 func buildAll() error {
 	if err := run("go", "build", "-o", "bin/algorithm", "./cmd/algorithm"); err != nil {
 		return err
 	}
-	for _, d := range []string{wasmPkg, wasmSite} {
-		if err := os.MkdirAll(d, 0o755); err != nil {
-			return err
-		}
+	if err := os.MkdirAll(wasmSite, 0o755); err != nil {
+		return err
 	}
-	cmd := exec.Command("go", "build", "-trimpath", "-o", filepath.Join(wasmPkg, "algorithm.wasm"), "./cmd/algorithm-wasm")
+	cmd := exec.Command("go", "build", "-trimpath", "-o", filepath.Join(wasmSite, "algorithm.wasm"), "./cmd/algorithm-wasm")
 	cmd.Env = append(os.Environ(), "GOOS=js", "GOARCH=wasm")
 	if out, err := cmd.CombinedOutput(); err != nil {
 		return fmt.Errorf("wasm: %w\n%s", err, out)
@@ -178,16 +174,7 @@ func buildAll() error {
 	if _, err := os.Stat(execJS); err != nil {
 		execJS = filepath.Join(runtime.GOROOT(), "misc", "wasm", "wasm_exec.js") // Go before 1.24
 	}
-	for _, f := range [][2]string{
-		{execJS, filepath.Join(wasmPkg, "wasm_exec.js")},
-		{filepath.Join(wasmPkg, "algorithm.wasm"), filepath.Join(wasmSite, "algorithm.wasm")},
-		{execJS, filepath.Join(wasmSite, "wasm_exec.js")},
-	} {
-		if err := copyFile(f[0], f[1]); err != nil {
-			return err
-		}
-	}
-	return nil
+	return copyFile(execJS, filepath.Join(wasmSite, "wasm_exec.js"))
 }
 
 func copyFile(from, to string) error {
