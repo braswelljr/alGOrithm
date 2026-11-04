@@ -29,7 +29,9 @@ test('every tour file is listed in the index', () => {
 });
 
 test('every target is a data-tour name a page carries', () => {
-  const code = [...files(join(src, 'components')), ...files(join(src, 'visualizer'))].map((f) => readFileSync(f, 'utf8')).join('\n');
+  const code = [...files(join(src, 'components')), ...files(join(src, 'visualizer'))]
+    .map((f) => readFileSync(f, 'utf8'))
+    .join('\n');
   const carried = new Set<string>();
   for (const m of code.matchAll(/(?:data-tour|\btour)=(?:"([a-z0-9-]+)"|\{'([a-z0-9-]+)'\})/g))
     carried.add(m[1] ?? m[2]);

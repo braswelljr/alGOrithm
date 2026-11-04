@@ -2,9 +2,9 @@
 
 import type { ReactNode } from 'react';
 import { ThemeProvider } from 'next-themes';
+import { TourProvider } from '@/components/tour/tour-provider';
 import { Sonner } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { TourProvider } from '@/components/tour/tour-provider';
 import { ShortcutsProvider } from '@/context/use-shortcuts';
 
 /**

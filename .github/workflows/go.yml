@@ -33,7 +33,7 @@ jobs:
 
       - name: Format
         if: runner.os == 'Linux'
-        run: make format/check
+        run: make go/format/check
 
       - name: Vet
         run: go vet ./...

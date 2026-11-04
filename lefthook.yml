@@ -1,18 +1,77 @@
 # Git hooks, run by lefthook (https://lefthook.dev). Install once with
 # `make hooks`. Skip for one commit with LEFTHOOK=0 git commit ..., never to get
 # a change past CI: the same checks run there.
+#
+# Git has no hook for `git add`, so the checks run when the staged files are
+# committed: pre-commit formats and lints exactly what is staged (and stages
+# its fixes), and commit-msg checks the message. Plain POSIX tools here, so
+# the hooks run for anyone, with or without gnux.
 
 pre-commit:
+  parallel: true
   jobs:
+    # The library's Go: gofmt -s and goimports, then every package a staged
+    # file belongs to, linted whole.
     - name: go
+      glob: "*.go"
+      exclude:
+        - "web/**"
+      group:
+        piped: true
+        jobs:
+          - name: format
+            run: golangci-lint fmt {staged_files}
+            stage_fixed: true
+          - name: lint
+            run: golangci-lint run $(for f in {staged_files}; do echo "./$(dirname "$f")/"; done | sort -u)
+
+    # The editor's terminal (web/runtime), a module of its own.
+    - name: runtime
+      root: "web/runtime/"
       glob: "*.go"
       group:
         piped: true
         jobs:
-          # gofmt -s and goimports, as configured in .golangci.yml.
           - name: format
-            run: golangci-lint fmt {staged_files}
+            run: gofmt -s -w {staged_files}
             stage_fixed: true
-          # Every package a staged file belongs to, linted whole.
+          - name: vet
+            run: go vet ./... && GOOS=js GOARCH=wasm go vet ./...
+
+    # Entries changed: the generated README catalog and docs must follow
+    # (`go run ./tools/gendocs` writes them).
+    - name: generated docs
+      glob: "internal/core/*.go"
+      run: go test ./tools/gendocs/
+
+    # The site: Prettier, then ESLint with its fixes, on the staged files.
+    - name: web
+      root: "web/"
+      group:
+        piped: true
+        jobs:
+          - name: format
+            glob: "*.{js,mjs,ts,jsx,tsx,md,css,json}"
+            run: pnpm exec prettier --write --ignore-unknown {staged_files}
+            stage_fixed: true
           - name: lint
-            run: golangci-lint run $(for f in {staged_files}; do echo "./$(dirname "$f")/"; done | sort -u)
+            glob: "*.{js,mjs,ts,jsx,tsx}"
+            run: pnpm exec eslint --fix {staged_files}
+            stage_fixed: true
+
+# Conventional Commits (docs/rules/commits-follow-conventional-commits.md):
+# type(scope)!: summary. Merges, reverts and fixup!/squash! commits pass.
+commit-msg:
+  jobs:
+    - name: conventional commit
+      run: |
+        first=$(head -n 1 "{1}")
+        case "$first" in
+          "Merge "*|"Revert "*|"fixup! "*|"squash! "*|"amend! "*) exit 0 ;;
+        esac
+        if ! printf '%s\n' "$first" | grep -Eq '^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9/._-]+\))?!?: [^ ].*'; then
+          echo "commit message: \"$first\""
+          echo "is not a Conventional Commit: type(scope): summary, e.g. fix(web): build the wasm before next build"
+          echo "types: feat fix docs style refactor perf test build ci chore revert"
+          exit 1
+        fi

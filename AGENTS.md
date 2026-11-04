@@ -91,8 +91,8 @@ make dev           # build CLI + wasm, start the site, then rebuild and retest o
 make build         # bin/algorithm
 make test          # go test -race ./...
 make cover/check   # coverage floor: every pkg/ package at 90%+, no exported function untested
-make lint          # golangci-lint run (v2)
-make format        # golangci-lint fmt
+make lint          # go/lint (golangci-lint v2, vet of web/runtime) and web/lint (ESLint, type-check)
+make format        # go/format (golangci-lint fmt) and web/format (Prettier); format/check fails on either
 make ci            # vet + format check + lint + test + wasm compile
 make web/wasm      # wasm and wasm_exec.js into web/public
 make web/install   # pnpm install in web/

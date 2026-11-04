@@ -20,10 +20,11 @@ import (
 	"sort"
 	"strings"
 
-	algorithm "github.com/braswelljr/alGOrithm"
 	"github.com/braswelljr/gnux/cmd"
 	"github.com/braswelljr/gnux/core"
 	"github.com/braswelljr/gnux/core/shell"
+
+	algorithm "github.com/braswelljr/alGOrithm"
 
 	"github.com/braswelljr/alGOrithm/web/runtime/goexec"
 	"github.com/braswelljr/alGOrithm/web/runtime/makefile"

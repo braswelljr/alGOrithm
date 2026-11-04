@@ -47,19 +47,43 @@ vet: ## go vet
 	go vet ./...
 
 .PHONY: format
-format: ## gofmt -s and goimports, as configured in .golangci.yml
-	golangci-lint fmt
+format: go/format web/format ## Format the Go and the site
 
 .PHONY: format/check
-format/check: ## Fail if any file is not gofmt -s clean
-	@out=$$(gofmt -s -l .); if [ -n "$$out" ]; then echo "not formatted:"; echo "$$out"; exit 1; fi
+format/check: go/format/check web/format/check ## Fail if any Go or site file is not formatted
 
 .PHONY: lint
-lint: ## golangci-lint v2
+lint: go/lint web/lint ## Lint the Go and the site
+
+.PHONY: go/format
+go/format: ## gofmt -s and goimports (as .golangci.yml configures them), both modules
+	golangci-lint fmt
+	cd web/runtime && gofmt -s -w .
+
+.PHONY: go/format/check
+go/format/check: ## Fail if any Go file, in either module, is not gofmt -s clean
+	@# Our own Go files only: not node_modules (web/scripts/wasm.mjs caches Go's modules there).
+	@out=$$(find . -name '*.go' -not -path '*/node_modules/*' -not -path './.git/*' -print0 | xargs -0 gofmt -s -l); if [ -n "$$out" ]; then echo "not formatted:"; echo "$$out"; exit 1; fi
+
+.PHONY: go/lint
+go/lint: ## golangci-lint v2, and go vet on the editor's terminal module
 	golangci-lint run
+	cd web/runtime && go vet ./... && GOOS=js GOARCH=wasm go vet ./...
+
+.PHONY: web/format
+web/format: ## Prettier over the site
+	cd $(WEB_DIR) && pnpm format
+
+.PHONY: web/format/check
+web/format/check: ## Fail if any site file is not Prettier-formatted
+	cd $(WEB_DIR) && pnpm format:check
+
+.PHONY: web/lint
+web/lint: ## ESLint and the type-check over the site
+	cd $(WEB_DIR) && pnpm lint && pnpm typecheck
 
 .PHONY: ci
-ci: vet format/check lint test cover/check wasm ## Everything CI checks
+ci: vet go/format/check go/lint test cover/check wasm ## Everything the Go CI checks (web.yml checks the site)
 
 .PHONY: hooks
 hooks: ## Install the Git hooks in lefthook.yml

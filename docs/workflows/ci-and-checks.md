@@ -5,7 +5,7 @@ Every check a change goes through, from the Git hook on your machine to the work
 ## Locally
 
 ```bash
-make hooks        # once: the lefthook pre-commit hook
+make hooks        # once: the lefthook pre-commit and commit-msg hooks
 make ci           # vet, gofmt check, golangci-lint, go test -race ./..., the wasm build
 make web/test     # build the wasm, then lint, type-check and test web/
 make dev          # the development loop (see dev-loop.md)
@@ -15,12 +15,12 @@ make release/check   # validate .goreleaser.yaml (needs goreleaser v2 installed)
 | Command | Runs | Fails when |
 |---------|------|------------|
 | `make vet` | `go vet ./...` | suspicious code |
-| `make format/check` | `gofmt -s -l .` | a file is not formatted (`make format` fixes it) |
-| `make lint` | `golangci-lint run` | any linter in `.golangci.yml` reports an issue |
+| `make format/check` | `gofmt -s -l` over our Go files (both modules, not `node_modules`) and Prettier's check over `web/` (`go/format/check`, `web/format/check`) | a Go or site file is not formatted (`make format` fixes both) |
+| `make lint` | `golangci-lint run`, `go vet` on `web/runtime`, then ESLint and the type-check over `web/` (`go/lint`, `web/lint`) | any linter in `.golangci.yml` or ESLint reports an issue, or a type error |
 | `make test` | `go test -race ./...` | a test fails or a race is detected, including stale generated docs |
 | `make wasm` | `GOOS=js GOARCH=wasm go vet ./cmd/algorithm-wasm/` | the browser build does not compile |
 
-The pre-commit hook in `lefthook.yml` formats staged Go files and lints their packages. Skip it for one commit with `LEFTHOOK=0 git commit ...`, never to get past CI.
+The hooks in `lefthook.yml` run on commit (Git has no hook for `git add`), on exactly the staged files. pre-commit formats staged Go files and lints their packages, formats and vets `web/runtime`, runs the generated-docs check when `internal/core` changes, and runs Prettier and ESLint (with fixes) on staged site files; each fix is staged with the commit. commit-msg checks the message is a Conventional Commit (`type(scope): summary`). Skip them for one commit with `LEFTHOOK=0 git commit ...`, never to get past CI.
 
 ## On GitHub
 

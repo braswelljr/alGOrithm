@@ -10,7 +10,7 @@ The [roadmap](docs/requirements/roadmap.md) lists algorithms and concepts to add
 
 ```bash
 git clone https://github.com/braswelljr/alGOrithm && cd alGOrithm
-make hooks    # format and lint on commit (needs lefthook and golangci-lint v2)
+make hooks    # on commit: format and lint the staged Go and site files, check the message (needs lefthook, golangci-lint v2, pnpm)
 make ci       # what CI runs for Go
 make dev      # build, serve the site, and rebuild and test on every change (make web/install first)
 ```
