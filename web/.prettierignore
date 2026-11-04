@@ -1,0 +1,7 @@
+node_modules
+.next
+out
+dist
+pnpm-lock.yaml
+**/assets/wasm_exec.js
+**/public/wasm_exec.js

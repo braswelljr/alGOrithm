@@ -1,0 +1,46 @@
+{
+  "name": "algorithm-site",
+  "version": "0.0.0",
+  "author": "braswelljr (https://braswelljr.vercel.app)",
+  "homepage": "https://algorithm.vercel.app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "npx --yes serve out",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "node --test \"test/*.test.ts\"",
+    "icons": "node scripts/icons.mjs",
+    "budget": "node scripts/budget.mjs"
+  },
+  "dependencies": {
+    "@base-ui/react": "1.9.0",
+    "@braswelljr/algorithm-ui": "workspace:*",
+    "@braswelljr/algorithm-visualizer": "workspace:*",
+    "@gsap/react": "2.1.2",
+    "class-variance-authority": "0.7.1",
+    "clsx": "^2.1.1",
+    "gsap": "3.15.0",
+    "lucide-react": "^1.66.0",
+    "motion": "14.9.0",
+    "next": "16.4.4",
+    "next-themes": "0.4.6",
+    "nuqs": "^2.10.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-hotkeys-hook": "5.3.3",
+    "sonner": "2.0.8",
+    "tailwind-merge": "^3.7.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "2.6.2",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "postcss": "^8.5.32",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^6.0.3"
+  }
+}

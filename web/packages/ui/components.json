@@ -1,0 +1,33 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "base-vega",
+  "rsc": true,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "src/styles/theme.css",
+    "baseColor": "zinc",
+    "cssVariables": false,
+    "prefix": ""
+  },
+  "iconLibrary": "lucide",
+  "aliases": {
+    "components": "@braswelljr/algorithm-ui/components",
+    "utils": "@braswelljr/algorithm-ui/lib/utils",
+    "ui": "@braswelljr/algorithm-ui/components",
+    "lib": "@braswelljr/algorithm-ui/lib",
+    "hooks": "@braswelljr/algorithm-ui/hooks"
+  },
+  "registries": {
+    "@aceternity": "https://ui.aceternity.com/registry/{name}.json",
+    "@smoothui": "https://smoothui.dev/r/{name}.json",
+    "@coss": "https://coss.com/ui/r/{name}.json",
+    "@magicui": "https://magicui.design/r/{name}",
+    "@diceui": "https://diceui.com/r/{name}.json",
+    "@niko-table": "https://niko-table.com/r/{name}.json",
+    "@beui": "https://beui.dev/r/{name}.json",
+    "@soralabs": "https://ui.soralabs.studio/r/{name}.json",
+    "@atelier": "https://www.atelier-ui.com/r/{name}.json",
+    "@ai-elements": "https://registry.ai-sdk.dev/{name}.json"
+  }
+}

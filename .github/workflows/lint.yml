@@ -1,15 +1,16 @@
+# Lint: golangci-lint v2 with .golangci.yml, on the whole tree (NFR-12).
 name: Lint
 on:
   push:
     paths:
       - "**.go"
       - go.mod
-      - go.sum
+      - .golangci.yml
   pull_request:
     paths:
       - "**.go"
       - go.mod
-      - go.sum
+      - .golangci.yml
 
 permissions:
   contents: read
@@ -19,29 +20,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up Go
-        uses: actions/setup-go@v7
-        with:
-          go-version: 1.19
-
       - name: Check out code
         uses: actions/checkout@v7
 
-      - name: Restore Go modules cache
-        uses: actions/cache@v6
+      - name: Set up Go
+        uses: actions/setup-go@v7
         with:
-          path: ~/go/pkg/mod
-          key: go-${{ runner.os }}-${{ hashFiles('go.mod') }}
-          restore-keys: |
-            go-${{ runner.os }}-
+          go-version-file: go.mod
 
       - name: Verify dependencies
-        run: |
-          go mod verify
-          go mod download
+        run: go mod verify
 
-      - name: Run checks
+      - name: golangci-lint
         uses: golangci/golangci-lint-action@v9
         with:
-          version: v1.53
-          args: --timeout=3m --issues-exit-code=1
+          version: v2.15

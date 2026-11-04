@@ -1,0 +1,177 @@
+# The HTTP API served by `algorithm serve` (internal/cli/serve.go).
+# TestOpenAPIDocumentsEveryRoute in internal/cli fails when a route is missing here.
+openapi: 3.1.0
+info:
+  title: alGOrithm
+  description: Run the algorithms, data structures and simulations of alGOrithm on your own input.
+  license:
+    name: MIT
+  version: "1"
+servers:
+  - url: http://127.0.0.1:8080
+paths:
+  /api/catalog:
+    get:
+      summary: The version, every category and every entry.
+      responses:
+        "200":
+          description: The catalog.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version: {type: string}
+                  categories: {type: array, items: {type: object}}
+                  entries: {type: array, items: {$ref: "#/components/schemas/Entry"}}
+  /api/entries/{id}:
+    get:
+      summary: One entry, its Go source file and its doc comment.
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          description: The entry.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  entry: {$ref: "#/components/schemas/Entry"}
+                  code: {type: string}
+                  doc: {type: string}
+        "404": {$ref: "#/components/responses/Error"}
+  /api/run/{id}:
+    post:
+      summary: Run an entry on an input; the result, the counts and up to limit events.
+      parameters:
+        - $ref: "#/components/parameters/id"
+        - name: limit
+          in: query
+          description: Events to keep; 0 keeps the default number, a negative limit keeps only the counts.
+          schema: {type: integer}
+      requestBody:
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/Input"}
+      responses:
+        "200":
+          description: The run.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Result"}
+        "400": {$ref: "#/components/responses/Error"}
+        "404": {$ref: "#/components/responses/Error"}
+  /api/compare:
+    post:
+      summary: Run several entries on the same input.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ids, input]
+              properties:
+                ids: {type: array, items: {type: string}}
+                input: {$ref: "#/components/schemas/Input"}
+      responses:
+        "200":
+          description: One result per entry.
+          content:
+            application/json:
+              schema: {type: array, items: {$ref: "#/components/schemas/Result"}}
+        "400": {$ref: "#/components/responses/Error"}
+  /api/snippet/{id}:
+    post:
+      summary: The command line and Go program that reproduce a run; the entry's example without a body.
+      parameters:
+        - $ref: "#/components/parameters/id"
+      requestBody:
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/Input"}
+      responses:
+        "200":
+          description: The snippet.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  go: {type: string}
+                  cli: {type: string}
+        "404": {$ref: "#/components/responses/Error"}
+components:
+  parameters:
+    id:
+      name: id
+      in: path
+      required: true
+      description: An entry id, such as quick-sort (`algorithm list`).
+      schema: {type: string}
+  responses:
+    Error:
+      description: The input was rejected or the entry does not exist.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error: {type: string}
+  schemas:
+    Entry:
+      type: object
+      description: One algorithm, data structure or simulation (internal/core Entry).
+      properties:
+        id: {type: string}
+        name: {type: string}
+        category: {type: string}
+        import: {type: string}
+        func: {type: string}
+        file: {type: string}
+        summary: {type: string}
+        kind: {type: string}
+        level: {type: string}
+        tags: {type: array, items: {type: string}}
+        time: {type: string}
+        space: {type: string}
+        input: {type: string}
+        why: {type: string}
+        realWorld:
+          type: array
+          description: Where the entry is used in real software, with a program in examples/ when there is one.
+          items:
+            type: object
+            properties:
+              title: {type: string}
+              where: {type: string}
+              example: {type: string, description: "A path like examples/leaderboard."}
+    Input:
+      type: object
+      description: The input of a run; each entry reads the fields its input kind names.
+      properties:
+        values: {type: array, items: {type: integer}}
+        target: {type: integer}
+        text: {type: string}
+        other: {type: string}
+        key: {type: string}
+        shift: {type: integer}
+        ops:
+          type: array
+          items:
+            type: object
+            required: [name]
+            properties:
+              name: {type: string}
+              value: {type: string}
+        options: {type: object, additionalProperties: {type: integer}}
+    Result:
+      type: object
+      properties:
+        id: {type: string}
+        output: {type: object, description: "Only the fields that apply: values, index, text, grid, table, timeline, graph, ..."}
+        events: {type: array, items: {type: object}}
+        truncated: {type: boolean}
+        counts: {type: object, additionalProperties: {type: integer}}
+        nanos: {type: integer, description: The time an untraced run took.}

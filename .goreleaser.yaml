@@ -1,0 +1,51 @@
+# What a release of the algorithm command is: archives for every platform,
+# checksums, and a Homebrew formula. Check with `make release/check`, build
+# without publishing with `make release/snapshot`. A release is published by
+# pushing a vX.Y.Z tag; the maintainer pushes it (docs/rules/agents-hand-over-git-commands.md).
+version: 2
+
+project_name: algorithm
+
+builds:
+  - id: algorithm
+    main: ./cmd/algorithm
+    binary: algorithm
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X github.com/braswelljr/alGOrithm/internal/version.Version={{ .Version }}
+    goos: [linux, darwin, windows, freebsd]
+    goarch: [amd64, arm64]
+
+archives:
+  - formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files:
+      - README.md
+      - LICENSE
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  use: github
+  sort: asc
+  filters:
+    exclude: ["^docs:", "^test:", "^chore:", "^ci:"]
+
+brews:
+  - name: algorithm
+    repository:
+      owner: braswelljr
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    skip_upload: "{{ if .Env.HOMEBREW_TAP_TOKEN }}false{{ else }}true{{ end }}"
+    homepage: https://github.com/braswelljr/alGOrithm
+    description: Run classic algorithms, data structures and operating-system simulations on your own data, step by step.
+    license: MIT
+    test: |
+      system "#{bin}/algorithm", "version"

@@ -1,0 +1,14 @@
+node_modules/
+.next/
+out/
+dist/
+next-env.d.ts
+*.tsbuildinfo
+.DS_Store
+
+# Written by `make web/wasm` (and by the dev tool): never committed.
+packages/visualizer/assets/algorithm.wasm
+packages/visualizer/assets/wasm_exec.js
+apps/site/public/algorithm.wasm
+apps/site/public/wasm_exec.js
+apps/site/public/dev-build.json

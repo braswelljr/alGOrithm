@@ -1,0 +1,94 @@
+# Web: the visualizer builds from a clean checkout. alGOrithm compiles to
+# WebAssembly, and the site lints, type-checks, passes its tests against that
+# real wasm, and builds its static export (NFR-21, NFR-25).
+name: Web
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "web/**"
+      - "**.go"
+      - go.mod
+      - Makefile
+      - .github/workflows/web.yml
+  pull_request:
+    paths:
+      - "web/**"
+      - "**.go"
+      - go.mod
+      - Makefile
+      - .github/workflows/web.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          package_json_file: web/package.json
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+
+      # The site loads this binary; it is built, not committed.
+      - name: Build the wasm
+        run: make web/wasm
+
+      - name: Install dependencies
+        working-directory: web
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        working-directory: web
+        run: pnpm lint
+
+      - name: Type-check
+        working-directory: web
+        run: pnpm typecheck
+
+      - name: Test against the real wasm
+        working-directory: web
+        run: pnpm test
+
+      - name: Build the package and the site
+        working-directory: web
+        run: pnpm build
+
+      - name: Check the size budgets (docs/workflows/performance.md)
+        working-directory: web/apps/site
+        run: pnpm budget
+
+      - name: Pack the npm package
+        working-directory: web/packages/visualizer
+        run: pnpm pack --pack-destination ../../../dist-npm
+
+      - name: Keep the static site
+        uses: actions/upload-artifact@v6
+        with:
+          name: site
+          path: web/apps/site/out
+          retention-days: 7

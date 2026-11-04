@@ -1,0 +1,167 @@
+version: "2"
+
+linters:
+  # golangci-lint enables errcheck, govet, ineffassign, staticcheck and unused
+  # by default; these are added on top.
+  enable:
+    - misspell   # typos in strings and comments, US spelling
+    - unconvert  # unnecessary type conversions
+    - revive     # idiomatic Go style
+    - gocritic   # opinionated, but catches real issues
+    - forbidigo  # library code neither prints nor reads a terminal
+    - errorlint      # errors compared with errors.Is/As and wrapped with %w
+    - errname        # sentinel errors start with Err
+    - nilerr         # no nil returned right after checking an error
+    - predeclared    # no shadowing of min, max, len, new, ...
+    - nolintlint     # every nolint names its linter and why
+    - thelper        # test helpers call t.Helper()
+    - unparam        # no parameters that are always the same or unused
+    - usestdlibvars  # http.MethodGet over "GET"
+    - makezero       # no append to a slice made with a nonzero length
+    - durationcheck  # no duration times duration
+    - bodyclose      # HTTP bodies are closed
+    - dupword        # no "the the" in comments
+    - mirror         # bytes/strings variants used the right way round
+    - nakedret       # no naked returns in long functions
+    - wastedassign   # no assignments that are never read
+    - testableexamples # examples have output to check
+    - gosec          # security checks
+    - exhaustive     # switches over an enum cover every value
+    - godot          # comments are sentences
+    # Design principles (docs/rules/design-principles.md), where a tool can check them:
+    - funlen         # KISS: a function is short enough to read in one go
+    - gocognit       # KISS: no function is too tangled to follow
+    - dupl           # DRY: no copied blocks
+    - ireturn        # accept interfaces, return structs
+    - interfacebloat # interface segregation: small interfaces
+
+  settings:
+    revive:
+      rules:
+        - name: error-return
+        - name: error-naming
+        - name: error-strings
+        - name: blank-imports
+
+    gocritic:
+      # Only checks that are not on by default.
+      enabled-checks:
+        - commentedOutCode
+        - emptyFallthrough
+        - nilValReturn
+        - unnecessaryBlock
+
+    misspell:
+      locale: US
+
+    gosec:
+      excludes:
+        - G404 # math/rand is deliberate: seeded generators make every dataset and simulation reproducible
+        - G115 # integer conversions are bounds-checked where they matter (radix, buckets); the rest are by construction
+
+    exhaustive:
+      default-signifies-exhaustive: true
+
+    godot:
+      scope: declarations # doc comments are sentences; inline notes need not be
+
+    dupword:
+      comments-only: true # example inputs such as "A B\nB C" repeat words by nature
+      ignore:
+        - log # O(n log log n)
+
+    # A long function is split into named steps; the limits leave room for a
+    # textbook algorithm written out in full.
+    funlen:
+      lines: 100
+      statements: 80
+      ignore-comments: true
+
+    # Above 60 a function wants its steps named (a simulation's tick, a
+    # protocol's handlers): see the Raft, ARQ and Paxos simulators.
+    gocognit:
+      min-complexity: 60
+
+    dupl:
+      threshold: 150
+
+    # Generic type parameters are concrete at the call site, so they are not
+    # the interfaces this rule is about.
+    ireturn:
+      allow:
+        - anon
+        - error
+        - empty
+        - stdlib
+        - generic
+
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+
+    # An algorithm returns its answer; it never prints it or reads its input
+    # from a terminal (docs/rules/a-package-returns-its-answer.md). The
+    # command in cmd/ writes through the Streams it is given.
+    forbidigo:
+      forbid:
+        - pattern: '^fmt\.(Print|Printf|Println|Scan|Scanf|Scanln)$'
+          msg: "return the result instead of printing it (docs/rules/a-package-returns-its-answer.md)"
+        - pattern: '^print(ln)?$'
+          msg: "return the result instead of printing it"
+
+  exclusions:
+    paths:
+      - vendor
+    rules:
+      # gosec guards the library; the build tools, the command's tests and the
+      # tests run commands and write files on purpose.
+      - path: "^tools/"
+        linters:
+          - gosec
+      - path: "_test\\.go"
+        linters:
+          - gosec
+      # Programs (the command, the build tools) print; the library does not.
+      - path: "^(cmd|tools|examples)/"
+        linters:
+          - forbidigo
+      # Writes to the terminal are best effort; a failed write to stdout or
+      # stderr is not actionable.
+      - linters:
+          - errcheck
+        text: "Error return value of `fmt\\.Fprint(f|ln)?`"
+      # Test files get latitude for helpers and long tables.
+      - path: "_test\\.go"
+        linters:
+          - gocritic
+          - revive
+          - forbidigo
+          - funlen
+          - gocognit
+          - dupl
+      # The registry and the system design package are being reorganized
+      # (one registry file per domain); the principle linters cover them
+      # once that lands. Remove this rule then.
+      - path: "^(internal/core|pkg/systems/design)/"
+        linters:
+          - funlen
+          - gocognit
+          - dupl
+          - ireturn
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    gofmt:
+      simplify: true
+    goimports:
+      local-prefixes:
+        - github.com/braswelljr/alGOrithm
+  exclusions:
+    paths:
+      - vendor
+
+run:
+  timeout: 5m

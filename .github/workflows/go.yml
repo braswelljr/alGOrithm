@@ -1,3 +1,6 @@
+# Tests: every package builds, is gofmt -s clean, passes go vet and its tests
+# under the race detector on Linux, macOS and Windows; the wasm build compiles
+# and the command runs (NFR-1, NFR-9, NFR-11, NFR-21).
 name: Tests
 on: [push, pull_request]
 
@@ -13,29 +16,40 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Set up Go
-        uses: actions/setup-go@v7
-        with:
-          go-version: 1.19
-
       - name: Check out code
         uses: actions/checkout@v7
 
-      - name: Restore Go modules cache
-        uses: actions/cache@v6
+      - name: Set up Go
+        uses: actions/setup-go@v7
         with:
-          path: ~/go/pkg/mod
-          key: go-${{ runner.os }}-${{ hashFiles('go.mod') }}
-          restore-keys: |
-            go-${{ runner.os }}-
+          go-version-file: go.mod
+
       - name: Download dependencies
         run: go mod download
 
       - name: Build
         run: go build -v ./...
 
-      - name: Lint
-        run: go fmt ./...
+      - name: Format
+        if: runner.os == 'Linux'
+        run: make format/check
+
+      - name: Vet
+        run: go vet ./...
 
       - name: Test
-        run: go test -race -v ./...
+        run: go test -race ./...
+
+      - name: Build for the browser
+        if: runner.os == 'Linux'
+        run: GOOS=js GOARCH=wasm go build -o /dev/null ./cmd/algorithm-wasm
+
+      - name: Command smoke test
+        if: runner.os == 'Linux'
+        run: |
+          go build -o bin/algorithm ./cmd/algorithm
+          ./bin/algorithm list
+          ./bin/algorithm run merge-sort 5 3 9 1
+          ./bin/algorithm run round-robin --example
+          ./bin/algorithm run a-star --generate maze
+          ./bin/algorithm compare --generate random --size 500

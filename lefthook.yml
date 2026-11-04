@@ -1,0 +1,18 @@
+# Git hooks, run by lefthook (https://lefthook.dev). Install once with
+# `make hooks`. Skip for one commit with LEFTHOOK=0 git commit ..., never to get
+# a change past CI: the same checks run there.
+
+pre-commit:
+  jobs:
+    - name: go
+      glob: "*.go"
+      group:
+        piped: true
+        jobs:
+          # gofmt -s and goimports, as configured in .golangci.yml.
+          - name: format
+            run: golangci-lint fmt {staged_files}
+            stage_fixed: true
+          # Every package a staged file belongs to, linted whole.
+          - name: lint
+            run: golangci-lint run $(for f in {staged_files}; do echo "./$(dirname "$f")/"; done | sort -u)

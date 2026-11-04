@@ -1,0 +1,13 @@
+# The visualizer package and the site that uses it.
+packages:
+  - packages/*
+  - apps/*
+
+# Packages whose install scripts may run.
+allowBuilds:
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
+
+minimumReleaseAgeExclude:
+  - react-resizable-panels@4.18.0

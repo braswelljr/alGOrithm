@@ -1,0 +1,38 @@
+{
+  "name": "algorithm-web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The alGOrithm visualizer: the npm package and the site built on it.",
+  "scripts": {
+    "dev": "pnpm --filter @braswelljr/algorithm-visualizer build && pnpm --parallel --filter @braswelljr/algorithm-visualizer --filter algorithm-site dev",
+    "build": "pnpm --filter @braswelljr/algorithm-visualizer build && pnpm --filter algorithm-site build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "pnpm --filter @braswelljr/algorithm-visualizer build && pnpm -r typecheck",
+    "test": "pnpm --filter @braswelljr/algorithm-visualizer build && pnpm -r test",
+    "format": "prettier --write \"**/*.{js,mjs,ts,jsx,tsx,md,css,json}\"",
+    "format:check": "prettier --check \"**/*.{js,mjs,ts,jsx,tsx,md,css,json}\"",
+    "wasm": "cd .. && make web/wasm"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@12.16.1",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
+    "@types/node": "^26.6.6",
+    "eslint": "^10.14.0",
+    "eslint-config-next": "16.4.4",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-better-tailwindcss": "4.10.0",
+    "eslint-plugin-prettier": "^5.5.7",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.14.0",
+    "prettier": "^3.9.10",
+    "prettier-plugin-tailwindcss": "0.8.1",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.1"
+  }
+}
