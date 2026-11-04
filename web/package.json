@@ -5,7 +5,7 @@
   "type": "module",
   "description": "The alGOrithm site: the visualizer, the docs, learning paths and the quiz, running the Go code as WebAssembly.",
   "author": "braswelljr (https://braswelljr.vercel.app)",
-  "homepage": "https://algorithm.vercel.app",
+  "homepage": "https://algorithm-beige.vercel.app",
   "scripts": {
     "dev": "next dev",
     "build": "node scripts/wasm.mjs && next build",

@@ -34,7 +34,7 @@ Kept ticked so the history is easy to find.
 - [ ] Why each cost is what it is (`Entry.Why`), shown in `algorithm info` and on the site (FR-8, FR-305).
 - [ ] The Big O guide, [`docs/guides/big-o.md`](../guides/big-o.md).
 - [ ] The quiz: `core.Quiz` and `algorithm quiz` exist; the game in the site (modes, scoring, the paused view, results, seeds, high scores) and the package's quiz reducer are in progress (FR-217, FR-309). `TestQuizOnEveryExample` must pass on every entry, k-core included.
-- [ ] Logo and SEO: the logo, icons, Open Graph images, sitemap, robots, manifest, JSON-LD, canonical URLs under `https://algorithm.vercel.app`, and the author credit to braswelljr (FR-310, FR-311).
+- [ ] Logo and SEO: the logo, icons, Open Graph images, sitemap, robots, manifest, JSON-LD, canonical URLs under `https://algorithm-beige.vercel.app`, and the author credit to braswelljr (FR-310, FR-311).
 - [ ] Systems: networking, databases and distributed systems (FR-410 to FR-412).
 - [ ] Computing: logic, circuits, data representation, automata, compilers and architecture, with their views (FR-312, FR-420 to FR-425).
 - [ ] Learning paths for systems and computing, once their entries land ("How systems talk and agree", "From gates to a CPU", "How a program runs").
@@ -45,7 +45,7 @@ Kept ticked so the history is easy to find.
 - [ ] `make release/check` has not been run: GoReleaser is not installed on the machine these docs were written on. Run it before the first tag.
 - [ ] A `HOMEBREW_TAP_TOKEN` secret and a `braswelljr/homebrew-tap` repository, for the Homebrew formula; without them the release skips it.
 - [ ] npm publishing of the visualizer package (a token, and a publish step in a workflow).
-- [ ] Hosting: deploy the static export to Vercel at `https://algorithm.vercel.app`, and confirm the canonical URLs, sitemap and Open Graph images resolve there.
+- [ ] Hosting: deploy the static export to Vercel at `https://algorithm-beige.vercel.app`, and confirm the canonical URLs, sitemap and Open Graph images resolve there.
 - [ ] `.github/dependabot.yml`: the `time:` keys under `schedule` are indented differently from `interval:`; confirm GitHub reads the file as intended.
 - [ ] Doc comments: every exported method of `arrays.Matrix` (`pkg/structures/arrays/matrix.go`, ported as it was) to the doc-comment standard, with costs.
 - [ ] Caesar decryption has no function of its own (`Caesar(s, -k)` decrypts); decide whether `CaesarDecrypt` is worth adding (YAGNI says not yet).

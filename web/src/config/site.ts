@@ -18,10 +18,9 @@ export const repoUrl = 'https://github.com/braswelljr/alGOrithm';
  * Where the site is published, for canonical links, the sitemap and social
  * cards. Set NEXT_PUBLIC_SITE_URL when deploying anywhere else.
  */
-export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://algorithm.vercel.app').replace(
-  /\/+$/,
-  ''
-);
+export const siteUrl = (
+  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://algorithm-beige.vercel.app'
+).replace(/\/+$/, '');
 
 export const siteName = 'alGOrithm';
 export const siteTagline = 'Algorithms and data structures, step by step';

@@ -1,6 +1,6 @@
 # System design
 
-How to design a system, for an interview or for real, one step at a time, with every step something you can run. The models live in [`pkg/systems/design`](../../pkg/systems/design); each is a seeded simulation, so a run replays exactly. On the site, [/system-design](https://algorithm.vercel.app/system-design/) shows each case study's architecture with requests moving through it and knobs to change. The learning path is `algorithm learn system-design`.
+How to design a system, for an interview or for real, one step at a time, with every step something you can run. The models live in [`pkg/systems/design`](../../pkg/systems/design); each is a seeded simulation, so a run replays exactly. On the site, [/system-design](https://algorithm-beige.vercel.app/system-design/) shows each case study's architecture with requests moving through it and knobs to change. The learning path is `algorithm learn system-design`.
 
 These are teaching models. Each doc comment says what it keeps and what it leaves out; none of them is a capacity planner.
 

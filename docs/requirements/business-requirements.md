@@ -4,7 +4,7 @@ Why alGOrithm exists, who it is for, and the few decisions that shape everything
 
 ## Vision
 
-A practical toolkit to learn and teach computer science, from logic gates to distributed consensus: clear Go to read, packages to install and use, a command to run them on real data, a visualizer to watch every step, learning paths that say what to study next, and a quiz game that checks what was learned. It is built by braswelljr ([braswelljr.vercel.app](https://braswelljr.vercel.app)) and published at [algorithm.vercel.app](https://algorithm.vercel.app).
+A practical toolkit to learn and teach computer science, from logic gates to distributed consensus: clear Go to read, packages to install and use, a command to run them on real data, a visualizer to watch every step, learning paths that say what to study next, and a quiz game that checks what was learned. It is built by braswelljr ([braswelljr.vercel.app](https://braswelljr.vercel.app)) and published at [algorithm-beige.vercel.app](https://algorithm-beige.vercel.app).
 
 ## Objectives
 

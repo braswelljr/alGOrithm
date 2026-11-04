@@ -1,6 +1,6 @@
 # alGOrithm
 
-[![alGOrithm logo](docs/assets/logo.svg)](https://algorithm.vercel.app)
+[![alGOrithm logo](docs/assets/logo.svg)](https://algorithm-beige.vercel.app)
 
 **Algorithms and data structures in Go, step by step: a library, a command and a visualizer that runs the real Go code in your browser.**
 
@@ -12,7 +12,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/braswelljr/alGOrithm)](https://goreportcard.com/report/github.com/braswelljr/alGOrithm)
 [![Go 1.27+](https://img.shields.io/badge/go-1.27%2B-00add8?logo=go&logoColor=white)](go.mod)
 [![MIT license](https://img.shields.io/github/license/braswelljr/alGOrithm)](LICENSE)
-[![The visualizer, live](https://img.shields.io/badge/visualizer-algorithm.vercel.app-00add8)](https://algorithm.vercel.app)
+[![The visualizer, live](https://img.shields.io/badge/visualizer-algorithm--beige.vercel.app-00add8)](https://algorithm-beige.vercel.app)
 
 **alGOrithm** is an open-source collection of **696 algorithms, data structures and computer-science
 simulations in 59 categories**, written in Go with nothing but the standard library: sorting and
@@ -22,15 +22,15 @@ networking, databases, distributed systems, system design, machine learning, dig
 compilers. Every entry is documented with its time and space complexity (Big O), tested, and
 traced, so the same code can be read, imported, run on your own data and watched step by step.
 
-Try it in the browser, no install: **[algorithm.vercel.app](https://algorithm.vercel.app)**.
+Try it in the browser, no install: **[algorithm-beige.vercel.app](https://algorithm-beige.vercel.app)**.
 
-- **[Visualize](https://algorithm.vercel.app/visualize/)** a sort, a search, a pathfinder or a scheduler on your data, and step through every comparison and swap.
-- **[Read the docs](https://algorithm.vercel.app/docs/)** of every entry: what it does, what it costs, its Go source and how to call it.
-- **[Learn](https://algorithm.vercel.app/learn/)** along 20 paths, from your first sort to how an operating system works.
-- **[Quiz yourself](https://algorithm.vercel.app/quiz/)** on real runs: predict the next step.
-- **[Measure Big O](https://algorithm.vercel.app/big-o/)**: time an entry on growing inputs and fit its curve.
-- **[System design](https://algorithm.vercel.app/system-design/)**: case studies with live architectures you can change.
-- **[Play the arena](https://algorithm.vercel.app/shortcuts/)**: race the pathfinders, beat the sorts at swaps, and more.
+- **[Visualize](https://algorithm-beige.vercel.app/visualize/)** a sort, a search, a pathfinder or a scheduler on your data, and step through every comparison and swap.
+- **[Read the docs](https://algorithm-beige.vercel.app/docs/)** of every entry: what it does, what it costs, its Go source and how to call it.
+- **[Learn](https://algorithm-beige.vercel.app/learn/)** along 20 paths, from your first sort to how an operating system works.
+- **[Quiz yourself](https://algorithm-beige.vercel.app/quiz/)** on real runs: predict the next step.
+- **[Measure Big O](https://algorithm-beige.vercel.app/big-o/)**: time an entry on growing inputs and fit its curve.
+- **[System design](https://algorithm-beige.vercel.app/system-design/)**: case studies with live architectures you can change.
+- **[Play the arena](https://algorithm-beige.vercel.app/shortcuts/)**: race the pathfinders, beat the sorts at swaps, and more.
 
 ## Features
 
