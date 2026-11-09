@@ -91,7 +91,7 @@ jobs:
         run: pnpm budget
 
       - name: Keep the static site
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: site
           path: web/out
